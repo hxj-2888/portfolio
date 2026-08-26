@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>乒乓对决 · 双人联机乒乓球</title>
+  <!-- PWA：手机端"添加到主屏幕/安装"，下载完即可装（见 sw.js / manifest.webmanifest） -->
+  <meta name="theme-color" content="#0d1220">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- 主菜单 -->
+  <div id="menu" class="panel">
+    <button id="btnSettings" class="settings-btn" title="设置">⚙</button>
+    <!-- 电脑端说明书按钮：设置在设置按钮正下方、同尺寸（需求 18；手机端入口在触控底栏） -->
+    <button id="btnManualMenu" class="manual-menu-btn" title="说明书" style="display:none">📖</button>
+    <div class="menu-scroll">
+      <div class="logo">
+        <div class="logo-ball">●</div>
+        <h1>乒乓对决</h1>
+        <p>TABLE TENNIS DUEL · ITTF 标准场地</p>
+      </div>
+      <div class="menu-card">
+        <label>你的昵称
+          <input id="nameInput" maxlength="12" placeholder="球员名字" value="乒乓球手">
+        </label>
+        <!-- 个人生涯：昵称下方蓝色独立方块（点击展开整页；内容渲染见 records.js） -->
+        <div id="recordsPanel" class="records-block">个人生涯 · 加载中…</div>
+        <!-- 队伍与旗帜：玩家在名称旁选择自己的队伍（旗帜以颜色命名，系统默认队名可自定义）；观众/球服颜色随旗帜同步 -->
+        <div class="team-pick">
+          <label class="ai-label">我的队伍
+            <span class="team-flag" id="teamFlagMe"></span>
+            <select id="teamMe"></select>
+          </label>
+          <input id="teamMeName" class="team-name" maxlength="6" placeholder="队名">
+        </div>
+        <button id="btnLocal" class="btn primary">本地双人对战（分屏）</button>
+        <button id="btnAI" class="btn primary">人机对战（单机）</button>
+        <button id="btnEndless" class="btn primary" style="display:none">♾ 无尽人机</button>
+        <!-- 人机电脑：难度 + 旗帜 + 队名 合并同一栏（电脑对手配置） -->
+        <div class="pick-row">
+          <span class="pick-tag">电脑</span>
+          <select id="aiLevel" class="pick-diff">
+            <option value="0">简单</option>
+            <option value="1" selected>中等</option>
+            <option value="2">困难</option>
+            <option value="3" disabled>地狱 🔒（击败困难解锁）</option>
+          </select>
+          <span class="team-flag" id="teamFlagOpp"></span>
+          <select id="teamOpp" class="pick-team"></select>
+          <input id="teamOppName" class="team-name" maxlength="6" placeholder="队名">
+        </div>
+        <div class="row ai-row">
+          <button id="btnAIVsAI" class="btn primary">模拟推演（AI vs AI）</button>
+        </div>
+        <!-- 模拟推演：甲/乙双方 难度 + 旗帜 + 队名 合并同一栏 -->
+        <div class="pick-row">
+          <span class="pick-tag">甲</span>
+          <select id="aiLevelA" class="pick-diff">
+            <option value="0">简单</option>
+            <option value="1" selected>中等</option>
+            <option value="2">困难</option>
+            <option value="3" disabled>地狱 🔒</option>
+          </select>
+          <span class="team-flag" id="teamFlagA"></span>
+          <select id="teamA" class="pick-team"></select>
+          <input id="teamAName" class="team-name" maxlength="6" placeholder="队名">
+        </div>
+        <div class="pick-row">
+          <span class="pick-tag">乙</span>
+          <select id="aiLevelB" class="pick-diff">
+            <option value="0">简单</option>
+            <option value="1" selected>中等</option>
+            <option value="2">困难</option>
+            <option value="3" disabled>地狱 🔒</option>
+          </select>
+          <span class="team-flag" id="teamFlagB"></span>
+          <select id="teamB" class="pick-team"></select>
+          <input id="teamBName" class="team-name" maxlength="6" placeholder="队名">
+        </div>
+        <div class="row">
+          <button id="btnNetEntry" class="btn primary">🎮 联机对战</button>
+        </div>
+        <div class="row">
+          <button id="btnTraining" class="btn primary">📈 能力训练</button>
+          <button id="btnDressup" class="btn primary">🎨 装扮系统</button>
+        </div>
+      <!-- 手机端：下载安卓版 APK（国内用户直接安装；APK 内不显示） -->
+      <div class="row apk-row">
+        <a id="btnDownloadApk" class="btn small apk-link" href="PingPongDuel-v270.apk" download="PingPongDuel-v270.apk" style="display:none">📱 下载安卓版（直接安装）</a>
+        <a id="apkHelpLink" class="apk-help" href="download" style="display:none">下载有问题？</a>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- 联机框（主页「联机对战」入口打开，等同新开页面）：模式切换/建房/加入/房主等待/教程全部收纳 -->
+  <div id="netPanel" class="net-panel" style="display:none">
+    <div class="net-card">
+      <div class="net-header">
+        <h2>联机对战</h2>
+        <button id="btnNetBack" class="btn">← 返回主菜单</button>
+      </div>
+      <div style="font-size:12px;color:#e8b64c;margin-bottom:10px;line-height:1.5">⚠ 联机功能持续开发中，当前体验可能较差</div>
+      <!-- 操作区（建房进入等待态后整体隐藏：房主无需再输房间号，需求 11） -->
+      <div id="netOperate">
+      <!-- 模式切换：本地/公网 + 公网 ⚠ 说明（点击展开，再点收回） -->
+      <div class="net-mode-row">
+        <button id="btnNetMode" class="btn small" style="display:none">联机:本地</button>
+        <button id="btnNetWarn" class="btn small net-warn" style="display:none" title="说明">⚠</button>
+      </div>
+      <div id="netWarnNote" class="net-warn-note" style="display:none">⚠ 玩家量过大将导致服务器负载卡顿</div>
+      <!-- v2.5：联机服务器线路选择（公网模式生效）——线路一 Cloudflare（全球边缘）/
+           线路二 ECS（国内低延迟自建）；自动=跟随页面（ECS 站走 ECS、Cloudflare 站走 Cloudflare） -->
+      <div class="row net-line-row" style="justify-content:center;gap:8px;margin:2px 0 4px">
+        <label style="font-size:13px;color:#cfe0ff;display:flex;align-items:center;gap:8px">联机线路
+          <select id="setServerLine"
+            style="padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(0,0,0,0.3);color:#eef2f8;font-size:13px">
+            <option value="auto">自动</option>
+            <option value="cloudflare">线路一 · Cloudflare</option>
+            <option value="ecs">线路二 · ECS</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <button id="btnHost" class="btn primary">创建联机房间</button>
+        <button id="btnJoin" class="btn">加入房间</button>
+      </div>
+      <div class="row">
+        <input id="joinInput" maxlength="4" placeholder="输入 4 位房间码">
+      </div>
+      <!-- 本地联机：对方设备地址（本地模式下显示，可填 IP 或 IP:端口，支持 IP+房间码加入） -->
+      <div class="row lan-target-row" id="lanTargetRow" style="display:none">
+        <input id="lanTargetInput" placeholder="对方设备地址（如 192.168.1.5:8765，可留空）" spellcheck="false" autocapitalize="off" autocomplete="off">
+      </div>
+      </div>
+      <!-- 房主等待区（原独立等待面板合并进来）：本地联机网址显示在房间码上方 -->
+      <div id="netWait" style="display:none">
+        <div id="lanUrls" class="lan-urls" style="display:none"></div>
+        <div id="roomCode" class="room-code">----</div>
+        <p id="roomHint">等待对手加入…</p>
+        <!-- 房主开联机时的解禁提醒：仅文字提示，绝不自动修改防火墙 -->
+        <div id="lanFirewallNote" class="lan-firewall-note" style="display:none">
+          <div class="lan-fw-title">⚠ 请手动放行防火墙（游戏不会自动修改）</div>
+          <p>首次联机：以管理员身份运行一次 <b>tools\局域网放行.cmd</b>，或在「控制面板 → Windows Defender 防火墙 → 允许应用」中放行 TCP <span id="lanFirewallPort">8765</span>，否则对方连不上（症状：一直"连接中"/超时）。</p>
+          <p>地址有多个 = 电脑有多个网卡（WLAN / 以太网 / Radmin VPN），把<b>与对方同一网络</b>的那个地址连同 4 位房间码发给对方。</p>
+        </div>
+        <p class="small">让朋友在本机/局域网输入房间码加入<br>（同一网络下直接访问本机 IP:端口）</p>
+      </div>
+      <div id="netStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- 游戏画面 -->
+  <div id="gameScreen" style="display:none">
+    <div id="hud">
+      <div class="player-box">
+        <span class="team-flag hud-flag" id="flagP1"></span>
+        <span id="hudP1">玩家1</span>
+        <span class="score" id="score1">0</span>
+      </div>
+      <div class="center">
+        <div id="serveDot" class="serve-dot"></div>
+        <div class="vs">VS</div>
+      </div>
+      <div class="player-box right">
+        <span class="score" id="score2">0</span>
+        <span id="hudP2">玩家2</span>
+        <span class="team-flag hud-flag" id="flagP2"></span>
+      </div>
+    </div>
+    <div id="phaseBanner"></div>
+    <div id="serveTimer" class="serve-timer" style="display:none"></div>
+    <div id="pointToast"></div>
+    <div id="hintBar"></div>
+    <div id="netInfo"></div>
+    <!-- 左上角：判定指示（v2.4 精简：只保留 球高/进箱；碰撞箱数字、扣杀/高吊指示已移除；虚线框在场景中绘制） -->
+    <div id="hitRangeInfo">
+      <div class="hr-title">接球判定（进箱即命中）</div>
+      <div class="hr-row"><span class="hr-dot ball"></span><span>球高 <b id="ballHeight">-</b></span></div>
+      <div class="hr-row"><span class="hr-dot box"></span><span>进箱 <b id="inBoxStatus" class="off">-</b></span></div>
+    </div>
+    <!-- 右上角工具：设置 / 暂停 / 退出（人机难度在开局菜单选定，对局中锁定不可切换） -->
+    <div id="gameTools" class="game-tools">
+      <button id="btnSettingsGame" class="tool-btn" title="设置">⚙</button>
+      <button id="btnPause" class="tool-btn">暂停</button>
+      <button id="btnExit" class="tool-btn">退出</button>
+      <div class="stat-stack">
+        <span id="fpsMeter" class="fps-meter" title="估测帧数（v2.4 显示真实渲染帧率，受浏览器/系统刷新率限制）">60</span>
+        <span id="pingMeter" class="ping-meter" style="display:none" title="网络延迟（心跳 RTT 均值）">— ms</span>
+      </div>
+    </div>
+    <!-- 暂停面板 -->
+    <div id="pausePanel" class="pause-panel" style="display:none">
+      <div class="pause-card">
+        <h2>已暂停</h2>
+        <!-- 模拟推演：暂停中调整甲/乙双方 AI 难度与参数（即时生效） -->
+        <div id="pauseAIVsAI" class="pause-aivai" style="display:none">
+          <div class="tune-side">
+            <label class="ai-label">甲 AI 名字
+              <input id="pauseAiNameA" maxlength="12" placeholder="甲 AI">
+            </label>
+            <label class="ai-label">甲 AI
+              <select id="pauseAiLevelA">
+                <option value="0">简单</option>
+                <option value="1" selected>中等</option>
+                <option value="2">困难</option>
+                <option value="3" disabled>地狱 🔒</option>
+              </select>
+            </label>
+            <div class="tune-grid">
+              <label class="tune-row">反应 <input id="tuneAReact" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">接球 <input id="tuneACatch" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">攻击 <input id="tuneASmash" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">敏捷 <input id="tuneAAgility" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+            </div>
+            <button id="tuneResetA" class="tune-reset" type="button">重置 ×1</button>
+          </div>
+          <div class="tune-side">
+            <label class="ai-label">乙 AI 名字
+              <input id="pauseAiNameB" maxlength="12" placeholder="乙 AI">
+            </label>
+            <label class="ai-label">乙 AI
+              <select id="pauseAiLevelB">
+                <option value="0">简单</option>
+                <option value="1" selected>中等</option>
+                <option value="2">困难</option>
+                <option value="3" disabled>地狱 🔒</option>
+              </select>
+            </label>
+            <div class="tune-grid">
+              <label class="tune-row">反应 <input id="tuneBReact" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">接球 <input id="tuneBCatch" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">攻击 <input id="tuneBSmash" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">敏捷 <input id="tuneBAgility" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+            </div>
+            <button id="tuneResetB" class="tune-reset" type="button">重置 ×1</button>
+          </div>
+        </div>
+        <!-- 人机对战：击败地狱后解锁「电脑 AI 数值调控」（暂停面板滑杆，即时生效） -->
+        <div id="pauseAITune" class="pause-aivai" style="display:none">
+          <div class="tune-side" style="max-width:460px;margin:0 auto;">
+            <label class="ai-label">电脑 AI 数值调控（击败地狱解锁）</label>
+            <div class="tune-grid">
+              <label class="tune-row">反应 <input id="tuneOppReact" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">接球 <input id="tuneOppCatch" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">攻击 <input id="tuneOppSmash" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+              <label class="tune-row">敏捷 <input id="tuneOppAgility" type="range" min="50" max="150" step="5" value="100"><b>×1.00</b><span class="tune-eff"></span></label>
+            </div>
+            <button id="tuneResetOpp" class="tune-reset" type="button">重置 ×1</button>
+          </div>
+        </div>
+        <button id="btnResume" class="btn primary">继续游戏</button>
+        <button id="btnPauseExit" class="btn">退出比赛（返回主页面）</button>
+      </div>
+    </div>
+    <!-- 对局开场渲染：双方旗帜 + 队名 + VS（渲染结束进入对局；本地/人机/模拟推演生效） -->
+    <div id="teamIntro" class="team-intro" style="display:none">
+      <div class="ti-row">
+        <div class="ti-team">
+          <div class="ti-flag" id="tiFlagL"></div>
+          <div class="ti-name" id="tiNameL"></div>
+        </div>
+        <div class="ti-vs">VS</div>
+        <div class="ti-team">
+          <div class="ti-name" id="tiNameR"></div>
+          <div class="ti-flag" id="tiFlagR"></div>
+        </div>
+      </div>
+      <div class="ti-tag">比赛即将开始</div>
+    </div>
+    <!-- 手机端触控（触屏设备才显示）：摇杆移动 + 蹲下按钮 + 说明书入口；扣球用上滑手势（单击=推球） -->
+    <div id="touchControls" class="touch-controls" style="display:none">
+      <div class="tc-group">
+        <div id="joyArea" class="joy-area">
+          <div id="joyBase" class="joy-base"><div id="joyKnob" class="joy-knob"></div></div>
+        </div>
+        <div class="tc-btns">
+          <button id="btnCrouch" class="tbtn crouch-btn" aria-label="蹲下">蹲</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 覆盖层 -->
+  <div id="overlay" class="overlay" style="display:none">
+    <div class="overlay-card">
+      <h2 id="overlayTitle"></h2>
+      <p id="overlayText"></p>
+      <button id="overlayBtn" class="btn primary"></button>
+    </div>
+  </div>
+
+  <!-- 一局结束：渐变成黑屏，显示输赢与三个操作按钮 -->
+  <div id="gameOver" class="game-over-screen" style="display:none">
+    <h1 id="gameOverTitle">您赢了</h1>
+    <div class="game-over-btns">
+      <button id="btnReplay" class="btn primary" disabled>▶ 查看回放</button>
+      <button id="btnSaveReplay" class="btn" disabled>💾 保存回放</button>
+      <button id="btnAgain" class="btn primary">再来一局</button>
+      <button id="btnMenu" class="btn">返回主界面</button>
+      <button id="btnQuit" class="btn">退出游戏</button>
+    </div>
+  </div>
+
+  <!-- 设置（主页与比赛页右上角 ⚙ 打开）：判定虚线 / 背景音乐 / 游戏音效 -->
+  <div id="settingsPanel" class="settings-panel" style="display:none">
+    <div class="settings-card">
+      <h2>设置</h2>
+      <label class="toggle-label">
+        <input type="checkbox" id="setShowHitRanges">
+        判定范围虚线（球高 / 进箱提示）
+      </label>
+      <label class="toggle-label">
+        <input type="checkbox" id="setMusic" checked>
+        背景音乐
+      </label>
+      <label class="toggle-label">
+        <input type="checkbox" id="setSound" checked>
+        游戏音效
+      </label>
+      <!-- v2.7.0：特效开关移入设置——全局生效并记忆（localStorage），所有模式通用（原暂停面板的推演特效区块已移除） -->
+      <label class="ai-label">特效（全局生效，所有模式通用）</label>
+      <label class="toggle-label">
+        <input type="checkbox" id="setTrailFx" checked>
+        尾影特效
+      </label>
+      <label class="toggle-label">
+        <input type="checkbox" id="setSplashFx" checked>
+        球台撞击特效
+      </label>
+      <label class="tune-row">音乐音量 <input id="setMusicVol" type="range" min="0" max="100" step="5" value="30"><b>30%</b></label>
+      <label class="tune-row">音效音量 <input id="setSfxVol" type="range" min="0" max="100" step="5" value="50"><b>50%</b></label>
+      <label class="toggle-label">画质
+        <select id="quality">
+          <option value="high" selected>高画质</option>
+          <option value="medium">中画质（平衡）</option>
+          <option value="low">低画质（省电流畅）</option>
+        </select>
+      </label>
+      <label class="toggle-label">
+        <input type="checkbox" id="setNoCrowd" checked>
+        关闭环境观众（高/中画质下生效）
+      </label>
+      <label class="toggle-label">帧率
+        <select id="frameRate">
+          <option value="unlimited" selected>无上限（自动匹配刷新率）</option>
+          <option value="60">60</option>
+          <option value="30">30</option>
+        </select>
+      </label>
+      <!-- v2.4：帧率说明——无上限档显示真实渲染帧率；实际帧率受浏览器/系统刷新率限制（部分手机浏览器/WebView 固定 60Hz） -->
+      <div class="settings-note">帧率显示真实渲染值；实际受浏览器/系统刷新率限制（部分手机浏览器固定 60Hz），手机高画质已自动限幅 DPR 以释放性能</div>
+      <div class="app-version">版本 <span id="appVersion"></span></div>
+      <button id="btnSettingsClose" class="btn primary">完成</button>
+    </div>
+  </div>
+
+  <!-- 说明书（独立全屏页面，等同新开页面；主页/比赛页入口打开。平台分流 data-platform=pc/mobile/both） -->
+  <div id="manualPanel" class="manual-panel" style="display:none">
+    <div class="manual-card">
+      <div class="manual-header">
+        <h2>📖 说明书</h2>
+        <button id="btnManualBack" class="btn">← 返回</button>
+      </div>
+      <div class="manual-scroll" id="manualScroll">
+        <details class="manual-capsule" data-platform="both">
+          <summary>判分与规则</summary>
+          <div class="manual-capsule-body">
+            <p>11 分制（10 平后净胜 2 分）· 每 2 分发球轮换 · 发球须先落本方再落对方半台 · 触网入界重发</p>
+            <p>得分：对方未能回球（opp-miss）/ 出界（out）/ 同半台两次弹跳（double）/ 未过网（no-cross）/ 违例拦击（volley）/ 发球失误（serve-fault）</p>
+            <p>发球位置：发球方站在台面中路附近（台边站位解不出合法发球），瞄准对方半台</p>
+          </div>
+        </details>
+        <details class="manual-capsule" data-platform="both">
+          <summary>个人生涯</summary>
+          <div class="manual-capsule-body">
+            <p>每局结束自动记录胜负（人机 / 本地双人 / 联机都会计入，含真人记录），后端留最近 60 条——本地版写入 records.json，公网联机写入 Cloudflare</p>
+            <p>主菜单下方「个人生涯」面板显示总场次 / 胜率摘要，点击展开整页分页战绩列表（10 条/页）；本地双人记录以 P1 视角计胜负，联机记录以你自己的视角计胜负</p>
+            <p>手机端：战绩保存在手机本地，无需联网；卸载 App 或清除应用数据会清空全部战绩，换手机/重装前请留意</p>
+          </div>
+        </details>
+        <details class="manual-capsule" data-platform="both">
+          <summary>联机对战</summary>
+          <div class="manual-capsule-body">
+            <p>入口：主页「联机对战」→ 联机框（等同新开页面），内含 本地/公网 切换、建房/加入、房间码、对方设备地址与房主等待面板。</p>
+            <p>「联机:本地」模式（默认）：一方「创建联机房间」，另一方输入 4 位房间码加入——适合同一局域网内的两台电脑/手机；对方在同一网络（或 Radmin VPN）打开 http://房主IP:8765 输入房间码加入；首次需手动放行防火墙 TCP 8765</p>
+            <p>「联机:公网」模式：切到公网后再建房/加入——通过 Cloudflare 服务器（wss://ping-pong-duel.pages.dev/ws），公网任何地方的朋友都能加入；⚠ 玩家量过大将导致服务器负载卡顿</p>
+            <p>网页版（ping-pong-duel.pages.dev）固定走公网，无需切换；本地联机请用桌面版 / 安装包</p>
+          </div>
+        </details>
+        <details class="manual-capsule" data-platform="both">
+          <summary>国际赛事标准</summary>
+          <div class="manual-capsule-body">
+            <p>球台 2.74×1.525m（高 0.76m）· 网高 0.1525m · 球 40mm / 2.7g · 拍面 15×15cm</p>
+            <p>规则：11 分制（10 平后净胜 2 分）· 每 2 分发球轮换 · 发球须先落本方再落对方半台 · 触网入界重发</p>
+          </div>
+        </details>
+        <details class="manual-capsule" data-platform="both">
+          <summary>模式与提示</summary>
+          <div class="manual-capsule-body">
+            <p>模式：人机对战（简单/中等/困难/地狱）· 模拟推演（AI vs AI）· 本地双人（电脑）· 联机（4 位房间码）</p>
+            <p>关键招数：推球（左键/单击）；扣球（右键/上滑，球高≥约 1.0m 可扣，不够高直接撞网判负）；高吊（蹲下+推球，喂高球逼对方扣杀）；反击扣杀（扣杀来球预判起拍+推球即可接回，站立即可，贴地低扣需蹲下）；蹲下（贴地接任何低球，但会降低移动速度）</p>
+            <p>AI 对战：四档难度由弱到强（简单只推球 → 地狱全面拉满）；困难/地狱会打低平快球（蹲下接最稳）与放高吊；成功反击扣杀/低平快球时该回球视为扣杀、电脑应对概率减半</p>
+            <p>瞄准位置解不出合法发球时，轨迹线消失且发不出球，调整鼠标/手指位置即可</p>
+            <p>移动中也能击球；本地双人电脑端 P2 用 , 推球 / . 扣球；击败地狱后可调电脑 AI 数值</p>
+          </div>
+        </details>
+      </div>
+      <!-- 说明书滑钮（手机端，v1.6.1）：纵向滑轨 + 可拖拽滑钮 ↔ 内容滚动双向同步 -->
+      <div class="manual-scrollbar" id="manualScrollbar" style="display:none">
+        <div class="manual-scroll-thumb" id="manualScrollThumb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 个人生涯（单开页面：主菜单小方框点击展开，分页展示战绩记录） -->
+  <!-- 个人生涯（合并页：主菜单蓝块点击展开；战绩记录 + 历史回放 两个标签） -->
+  <div id="careerPanel" class="career-panel" style="display:none">
+    <div class="career-card">
+      <div class="career-header">
+        <h2>个人生涯</h2>
+        <button id="btnCareerBack" class="btn">← 返回主菜单</button>
+      </div>
+      <div class="career-tabs">
+        <button id="btnCareerTab" class="career-tab-btn active" type="button">战绩记录</button>
+        <button id="btnHistoryTab" class="career-tab-btn" type="button">历史回放</button>
+      </div>
+      <!-- 战绩记录标签体（原生涯列表） -->
+      <div id="careerTab" class="career-tab-body">
+        <div id="careerStats" class="career-stats"></div>
+        <div id="careerList" class="career-list"></div>
+        <div class="career-pager">
+          <button id="btnCareerPrev" class="btn small">上一页</button>
+          <span id="careerPageLabel" class="career-page-label">第 1 / 1 页</span>
+          <button id="btnCareerNext" class="btn small">下一页</button>
+        </div>
+      </div>
+      <!-- 历史回放标签体（并入生涯页；id=historyPanel 保留供 replay.js/state.js 复用） -->
+      <div id="historyPanel" class="career-tab-body" style="display:none">
+        <div class="history-header-actions">
+          <button id="btnHistoryDelete" class="btn danger">🗑 删除回放</button>
+        </div>
+        <div id="historyDeleteBar" class="history-delete-bar" style="display:none">
+          <span id="historyDeleteHint" class="history-delete-hint">点击条目选择要删除的回放</span>
+          <button id="btnHistoryDeleteConfirm" class="btn danger small" disabled>删除所选</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+        <div class="history-note">按时间倒序排列（最新在前）· 回放仅保存在本设备</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 能力训练（单开页面：主菜单「能力训练」入口，积分 + 训练升级/降级 + 顶部全部洗点） -->
+  <div id="trainingPanel" class="career-panel pure-panel" style="display:none">
+    <div class="career-card">
+      <div class="career-header">
+        <h2>能力训练</h2>
+        <button id="btnTrainingBack" class="btn">← 返回主菜单</button>
+      </div>
+      <div id="trainingPoints" class="career-stats">积分：0</div>
+      <div class="training-reset-row">
+        <button id="btnTrainingReset" class="btn small">全部洗点（退还训练积分）</button>
+      </div>
+      <div id="trainingList" class="training-list"></div>
+    </div>
+  </div>
+
+  <!-- 装扮系统（单开页面：主菜单「装扮系统」入口，外观库存/装配卸下/退款 + 装扮方案） -->
+  <div id="dressupPanel" class="career-panel pure-panel" style="display:none">
+    <div class="career-card">
+      <div class="career-header">
+        <h2>装扮系统</h2>
+        <button id="btnDressupBack" class="btn">← 返回主菜单</button>
+      </div>
+      <div id="dressupPoints" class="career-stats">积分：0</div>
+      <div id="dressupList" class="training-list"></div>
+      <h3 class="training-h">装扮方案（每类选一组合，至多 8 个）</h3>
+      <div class="plan-form">
+        <input id="planNameInput" type="text" maxlength="12" placeholder="方案名（如：火焰橙）">
+        <button id="btnPlanSave" class="btn small">保存当前装扮为方案</button>
+      </div>
+      <div id="planList" class="training-list"></div>
+    </div>
+  </div>
+
+  <!-- 无尽人机关卡选择页：地狱通关后开启，从无尽-1 开始，通关逐级解锁 -->
+  <div id="endlessPanel" class="endless-panel" style="display:none">
+    <div class="endless-card">
+      <div class="career-header">
+        <h2>♾ 无尽人机</h2>
+        <button id="btnEndlessBack" class="btn">← 返回主菜单</button>
+      </div>
+      <div class="endless-tip">从无尽-1 开始挑战，通关一级解锁下一级。落败会回到无尽-1。</div>
+      <div id="endlessList" class="endless-list"></div>
+    </div>
+  </div>
+
+  <!-- 赛后回放播放器（结算页「查看回放」/历史页条目打开；画面画在 game canvas，控制条在底部） -->
+  <div id="replayPanel" class="replay-panel" style="display:none">
+    <div id="replayTitle" class="replay-title"></div>
+    <div class="replay-controls">
+      <button id="btnReplayBack" class="btn small">← 返回</button>
+      <button id="btnReplayPlay" class="btn">▶ 播放</button>
+      <input id="replayProgress" type="range" min="0" max="1000" value="0" step="1">
+      <span id="replayTimeLabel" class="replay-time">0:00 / 0:00</span>
+      <button id="btnReplaySpeed" class="btn small">1.0×</button>
+      <button id="btnReplaySave" class="btn primary">💾 保存视频</button>
+    </div>
+    <div id="replayStatus" class="replay-status"></div>
+  </div>
+
+  <!-- 引擎：按依赖顺序加载的独立小模块（engine.js 负责组装） -->
+  <script src="js/engine/rules.js"></script>
+  <script src="js/engine/math.js"></script>
+  <script src="js/engine/state.js"></script>
+  <script src="js/engine/physics.js"></script>
+  <script src="js/engine/shots.js"></script>
+  <script src="js/engine/strokes.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ai.js"></script>
+  <!-- 游戏界面：按功能拆分的独立小模块（app/state.js 提供共享状态） -->
+  <script src="js/app/state.js"></script>
+  <script src="js/app/teams.js"></script>
+  <script src="js/app/records.js"></script>
+  <script src="js/app/replay.js"></script>
+  <script src="js/app/training.js"></script>
+  <script src="js/app/dressup.js"></script>
+  <script src="js/app/input.js"></script>
+  <script src="js/app/render.js"></script>
+  <script src="js/app/hud.js"></script>
+  <script src="js/app/net.js"></script>
+  <script src="js/app/modes.js"></script>
+  <script src="js/app/loop.js"></script>
+  <script src="js/app/main.js"></script>
+  <!-- raw 游戏音乐：<audio> 元素播放 mp4（含视频轨的视频容器取其音频），随音乐按钮开始/暂停 -->
+  <audio id="bgmAudio" loop preload="auto" style="display:none"></audio>
+  <!-- 真实掌声 WAV 兜底：WebView/file:// 下 fetch 被拦截时用 <audio> 元素直载（与 BGM 同策略） -->
+  <audio id="applauseAudio" preload="auto" style="display:none"></audio>
+  <!-- PWA：注册 Service Worker（仅 https/localhost 生效；http 的 ECS 端自动跳过，不影响游玩） -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => { /* 非 https 或不受支持：静默 */ });
+      });
+    }
+  </script>
+</body>
+</html>

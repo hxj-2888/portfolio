@@ -1,0 +1,25 @@
+# 敏感文件 — 绝不上传
+.env
+.env.local
+.env.production
+
+# Cloudflare 本地缓存（含账号信息与调试数据，必须排除）
+.wrangler/
+.wrangler.dev/
+
+# Node
+node_modules/
+package-lock.json
+
+# Python 缓存（.pyc 内含编译时本地路径，绝不入库）
+__pycache__/
+*.pyc
+
+# 分发压缩包（本地打包产物，不入库）
+*.zip
+dist/
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+*.log

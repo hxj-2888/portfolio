@@ -1,0 +1,62 @@
+{
+  "projects": [
+    {
+      "id": "ping-pong-duel",
+      "name": "乒乓对决 · 双人联机乒乓球",
+      "description": "ITTF 标准球台与真实物理（重力 / 旋转 / 摩擦）的双人联机乒乓球游戏：支持人机对战（四档难度 + 数值调节）、AI 观战、电脑端本地双人与房间码联机（本地/公网，独立联机框），个人生涯含真人记录；手机端摇杆 + 上滑扣球 + 蹲下；发球轨迹实时预览、判定范围虚线辅助；独立说明书页收纳全部规则与赛事标准；反击扣杀与低平快球均有操作奖励。零依赖纯 JavaScript 实现。",
+      "tags": [
+        "联机游戏",
+        "WebSocket",
+        "Canvas",
+        "物理引擎"
+      ],
+      "thumbnail": "projects/ping-pong-duel/game-crowd.png",
+      "entry": "index.html",
+      "type": "web",
+      "mobile": true,
+      "liveUrl": "https://ping-pong-duel.pages.dev",
+      "source": {
+        "type": "local",
+        "path": "../乒乓对决_合并/public"
+      }
+    },
+    {
+      "id": "delta-force",
+      "name": "三角洲行动 - 变卖物价格查询",
+      "description": "三角洲行动变卖物实时价格查询工具，支持分类浏览、搜索、收藏、价格异动与历史走势。",
+      "tags": [
+        "PWA",
+        "API",
+        "价格查询",
+        "IndexedDB"
+      ],
+      "thumbnail": "projects/delta-force/delta-force-logo.webp",
+      "entry": "index.html",
+      "type": "web",
+      "mobile": true,
+      "liveUrl": "https://delta-force-v5.pages.dev",
+      "source": {
+        "type": "local",
+        "path": "projects/delta-force"
+      }
+    },
+    {
+      "id": "portfolio-source",
+      "name": "个人作品集 · 本站",
+      "description": "本站由这些文件组成：实时预览 + 源码展示，自己展示自己。",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "自我展示"
+      ],
+      "icon": "🖥️",
+      "entry": "index.html",
+      "type": "web",
+      "source": {
+        "type": "local",
+        "path": "projects/portfolio-source"
+      }
+    }
+  ]
+}

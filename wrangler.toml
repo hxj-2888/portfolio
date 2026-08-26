@@ -1,0 +1,13 @@
+name = "portfolio"
+pages_build_output_dir = "."
+
+# D1 数据库（价格历史存储）
+[[d1_databases]]
+binding = "DB"
+database_name = "delta-force-prices"
+database_id = "b1a4f06e-4236-4a79-9ab4-1cd0fa72b224"
+
+# KV 命名空间（元数据动态刷新）
+[[kv_namespaces]]
+binding = "METADATA_KV"
+id = "252ac6dfa5ab47f491d6f5752abae6db"

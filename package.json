@@ -1,0 +1,12 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "个人作品集 — 项目展示与预览",
+  "scripts": {
+    "collect": "node build-collect.js",
+    "dev": "npx serve . -p 3000",
+    "deploy": "npm run collect && echo '→ 推送到 Cloudflare Pages / 静态托管'"
+  },
+  "keywords": ["portfolio", "showcase"],
+  "license": "MIT"
+}
