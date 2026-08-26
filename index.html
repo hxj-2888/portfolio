@@ -95,6 +95,7 @@ header a[href="#contact"],main a[href="#work"].inline-flex{background:linear-gra
 <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2">
 <a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://ping-pong-duel.pages.dev" rel="noopener" target="_blank"><iconify-icon icon="solar:global-linear" width="15"></iconify-icon>https://ping-pong-duel.pages.dev <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
 <a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://gitee.com/hxj-2888/ping-pong-duel" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:gitee" width="15"></iconify-icon>https://gitee.com/hxj-2888/ping-pong-duel <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
+<button class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" onclick="event.stopPropagation();showQr('assets/qr/ping-pong.png','乒乓对决 · 扫码下载安卓安装包')" type="button">📱 扫码下载 APK</button>
 </div>
 </div>
 </article>
@@ -110,6 +111,7 @@ header a[href="#contact"],main a[href="#work"].inline-flex{background:linear-gra
 <div class="mt-4 flex flex-wrap gap-x-4 gap-y-2">
 <a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://delta-force-v5.pages.dev" rel="noopener" target="_blank"><iconify-icon icon="solar:global-linear" width="15"></iconify-icon>https://delta-force-v5.pages.dev <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
 <a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://gitee.com/hxj-2888/delta-force-price-query" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:gitee" width="15"></iconify-icon>https://gitee.com/hxj-2888/delta-force-price-query <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
+<button class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" onclick="event.stopPropagation();showQr('assets/qr/delta-force.png','三角洲行动 · 扫码打开应用（PWA 可安装）')" type="button">📱 扫码打开应用</button>
 </div>
 </div>
 </article>
@@ -199,6 +201,18 @@ header a[href="#contact"],main a[href="#work"].inline-flex{background:linear-gra
 </div>
 </div>
 
+<!-- 下载二维码弹窗 -->
+<div id="qrModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onclick="if(event.target===this)closeQr()">
+<div class="flex max-w-sm flex-col items-center gap-4 rounded-3xl border border-[#3a3a55] bg-[#141420] p-8 text-center shadow-2xl">
+<div class="flex w-full items-center justify-between">
+<h3 id="qrTitle" class="text-lg font-semibold tracking-[-0.02em]"></h3>
+<button class="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[#252535] text-[#8a8aa0] transition hover:border-[#6366f1] hover:text-white" onclick="closeQr()" aria-label="关闭">✕</button>
+</div>
+<img id="qrImg" src="" alt="下载二维码" class="h-72 w-72 rounded-xl bg-white p-3">
+<p class="text-xs leading-5 text-[#8a8aa0]">使用手机浏览器扫码，可直接安装应用 / 打开应用。<br>（安卓也可直接访问下载页手动下载安装包）</p>
+</div>
+</div>
+
 <script>
     function openPreview(id, title, tags, live) {
       document.getElementById('pmTitle').textContent = title;
@@ -221,8 +235,19 @@ header a[href="#contact"],main a[href="#work"].inline-flex{background:linear-gra
       document.getElementById('pmFrame').src = 'about:blank';
       document.body.style.overflow = '';
     }
+    function showQr(src, title) {
+      document.getElementById('qrTitle').textContent = title;
+      document.getElementById('qrImg').src = src;
+      document.getElementById('qrModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeQr() {
+      document.getElementById('qrModal').style.display = 'none';
+      document.getElementById('qrImg').src = '';
+      document.body.style.overflow = '';
+    }
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closePreview();
+      if (e.key === 'Escape') { closePreview(); closeQr(); }
     });
   </script>
 </body>
