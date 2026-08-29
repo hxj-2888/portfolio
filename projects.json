@@ -10,7 +10,7 @@
         "Canvas",
         "物理引擎"
       ],
-      "thumbnail": "projects/ping-pong-duel/game-crowd.png",
+      "thumbnail": "assets/projects/ping-pong-duel.png",
       "entry": "index.html",
       "type": "web",
       "mobile": true,
@@ -32,7 +32,7 @@
         "价格查询",
         "IndexedDB"
       ],
-      "thumbnail": "projects/delta-force/delta-force-logo.webp",
+      "thumbnail": "assets/projects/delta-force.png",
       "entry": "index.html",
       "type": "web",
       "mobile": true,
