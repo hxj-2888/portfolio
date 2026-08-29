@@ -32,10 +32,10 @@
           "note": "根绝对路径改相对路径（内嵌预览时 /xxx 会指向作品集根目录而 404）",
           "rules": [
             {
-              "type": "string",
-              "from": "href=\"/delta-force-logo.webp\"",
-              "to": "href=\"delta-force-logo.webp\"",
-              "okIfContains": "href=\"delta-force-logo.webp\""
+              "type": "regex",
+              "from": "href=\"/delta-force-logo\\.webp(\\?v=[a-z0-9-]+)?\"",
+              "to": "href=\"delta-force-logo.webp$1\"",
+              "okIfContains": "href=\"delta-force-logo.webp"
             },
             {
               "type": "string",
@@ -44,16 +44,16 @@
               "okIfContains": "href=\"manifest.json\""
             },
             {
-              "type": "string",
-              "from": "href=\"/icon.ico\"",
-              "to": "href=\"icon.ico\"",
-              "okIfContains": "href=\"icon.ico\""
+              "type": "regex",
+              "from": "href=\"/icon\\.ico(\\?v=[a-z0-9-]+)?\"",
+              "to": "href=\"icon.ico$1\"",
+              "okIfContains": "href=\"icon.ico"
             },
             {
-              "type": "string",
-              "from": "href=\"/icon-192.png\"",
-              "to": "href=\"icon-192.png\"",
-              "okIfContains": "href=\"icon-192.png\""
+              "type": "regex",
+              "from": "href=\"/icon-192\\.png(\\?v=[a-z0-9-]+)?\"",
+              "to": "href=\"icon-192.png$1\"",
+              "okIfContains": "href=\"icon-192.png"
             }
           ]
         },

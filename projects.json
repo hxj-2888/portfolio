@@ -22,8 +22,10 @@
     },
     {
       "id": "delta-force",
-      "name": "三角洲行动 - 变卖物价格查询",
-      "description": "三角洲行动变卖物实时价格查询工具，支持分类浏览、搜索、收藏、价格异动与历史走势。",
+      "name": "落幕查 - 变卖物价格查询",
+      "description": "落幕查（三角洲行动变卖物实时价格查询工具）：分类浏览、搜索、收藏、价格异动与 30 天历史走势；网页 PWA 一键安装，安卓 APK（v3.0）扫码下载。",
+      "downloadUrl": "https://delta-force-v5.pages.dev/download.html",
+      "qr": "assets/qr/delta-force.png",
       "tags": [
         "PWA",
         "API",
