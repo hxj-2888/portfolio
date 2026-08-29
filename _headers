@@ -1,0 +1,12 @@
+# 审计 2026-08-30：补安全响应头（此前缺失）
+# 说明：
+#   - portfolio 的「项目预览」用同源 iframe 加载 projects/*，故：
+#       X-Frame-Options 用 SAMEORIGIN（允许自家嵌入、阻止跨站），
+#       frame-ancestors 用 'self'（与上一致）。
+#   - 首页大量内联 onclick（重构前无法收紧），script-src 保留 'unsafe-inline'；
+#     style 同理由于大量内联 style 保留 'unsafe-inline'。
+#   - 预览页（内嵌三角洲）需访问同源 /api 与 wss 联机，connect-src 放行 ws:/wss:。
+/*
+  X-Frame-Options: SAMEORIGIN
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
