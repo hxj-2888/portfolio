@@ -13,7 +13,14 @@ if ($LASTEXITCODE -ne 0) { Write-Host '项目已存在或创建失败，继续�
 
 Write-Host ''
 Write-Host '===== 2/4 部署到 Cloudflare Pages =====' -ForegroundColor Cyan
-wrangler pages deploy --project-name $PROJECT --branch main
+# ★ 白名单暂存：wrangler pages deploy 不支持 .assetsignore，
+#   只复制确定的站点文件部署，其余（笔记/脚本/.github/配置）永远不公开
+$STAGE = Join-Path $env:TEMP 'portfolio-pages-deploy'
+if (Test-Path $STAGE) { Remove-Item $STAGE -Recurse -Force }
+New-Item -ItemType Directory -Force $STAGE | Out-Null
+'index.html', 'css', 'js', 'assets', 'projects', 'functions', 'wrangler.toml' |
+  ForEach-Object { Copy-Item -Recurse -Force $_ $STAGE/ }
+wrangler pages deploy $STAGE --project-name $PROJECT --branch main
 
 Write-Host ''
 Write-Host '===== 3/4 设置三角洲数据代理密钥 API_TOKEN =====' -ForegroundColor Cyan

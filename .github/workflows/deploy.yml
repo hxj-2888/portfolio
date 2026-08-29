@@ -55,12 +55,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ★ 白名单暂存：wrangler pages deploy 不支持 .assetsignore，
+      #   只复制确定的站点文件部署，其余（笔记/脚本/.github/配置）永远不公开
+      - name: Stage site files (allowlist)
+        run: |
+          mkdir -p /tmp/site-deploy
+          cp -r index.html css js assets projects functions wrangler.toml /tmp/site-deploy/
+          find /tmp/site-deploy -maxdepth 1 -type f | sort
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy . --project-name=portfolio-ji --branch=main --commit-hash=${{ github.sha }}
+          command: pages deploy /tmp/site-deploy --project-name=portfolio-ji --branch=main --commit-hash=${{ github.sha }}
 
   # ===== 部署后冒烟验证: 首页 / 项目数据 / 内嵌预览可达 =====
   smoke-test:
