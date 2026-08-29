@@ -17,7 +17,7 @@
       "liveUrl": "https://ping-pong-duel.pages.dev",
       "source": {
         "type": "local",
-        "path": "../乒乓对决_合并/public"
+        "path": "projects/ping-pong-duel"
       }
     },
     {
@@ -56,6 +56,24 @@
       "source": {
         "type": "local",
         "path": "projects/portfolio-source"
+      }
+    },
+    {
+      "id": "space-kill",
+      "name": "太空杀 · 三阵营对抗",
+      "description": "15 人三阵营（人类 11 / 异形 3 / 外星人 1）身份博弈桌游的规则设计与自动化平衡性模拟：确定性裁判 + 高水平玩家博弈 AI，严格禁止「上帝视角」；大规模对局输出阵营胜率、职业强度与策略矩阵。作品集内按「剧情 / 调试文档 / 游戏规则」分类展示交付物。",
+      "tags": [
+        "Python",
+        "蒙特卡洛模拟",
+        "数值平衡",
+        "博弈 AI"
+      ],
+      "icon": "🚀",
+      "entry": "index.html",
+      "type": "web",
+      "source": {
+        "type": "local",
+        "path": "projects/space-kill"
       }
     }
   ]

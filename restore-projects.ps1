@@ -6,7 +6,13 @@ $OUT = 'C:\Users\ASUS\Desktop\portfolio\projects'
 function Get-File($url, $target) {
   $tdir = Split-Path $target -Parent
   New-Item -ItemType Directory -Force -Path $tdir | Out-Null
-  & curl.exe -s -L -o $target $url
+  # 仅 HTTP 200 时写入磁盘，避免把 404 回退页存成假文件（历史教训：HTML 被存成 sw.js / manifest.json）
+  $code = & curl.exe -s -L -o $target -w '%{http_code}' $url
+  if ($code -ne '200') {
+    if (Test-Path $target) { Remove-Item $target -Force }
+    Write-Host "  [SKIP] $(Split-Path $target -Leaf) <- HTTP $code ($url)" -ForegroundColor Yellow
+    return
+  }
   $sz = (Get-Item $target).Length
   Write-Host "  $([IO.Path]::GetFileName($target)) ($sz B) from $url"
 }

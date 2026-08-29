@@ -1,0 +1,96 @@
+{
+  "_说明": "项目同步配置 — 由 sync-projects.js 读取。enabled=false 的项目在同步时跳过并记录原因。",
+  "_用法": "node sync-projects.js          # 执行同步（自动打内嵌适配补丁）",
+  "_用法2": "node sync-projects.js --dry-run # 只预览，不写磁盘",
+  "projects": [
+    {
+      "id": "delta-force",
+      "enabled": true,
+      "sourceDir": "../delta-force-deploy",
+      "targetDir": "projects/delta-force",
+      "note": "三角洲独立部署仓库 → 作品集副本。同步后自动打 portfolio 内嵌适配补丁",
+      "files": [
+        "index.html",
+        "sw.js",
+        "manifest.json",
+        "js/bundle.js",
+        "js/sw-register.js",
+        "css/layout.css",
+        "css/components.css",
+        "data/metadata.json",
+        "icon.ico",
+        "icon-192.png"
+      ],
+      "neverCopy": {
+        "_警告": "以下文件绝不可复制进 portfolio，否则会劫持作品集站点",
+        "functions/index.js": "独立域名的根路径 302 缓存破除重定向，放进 portfolio 会劫持作品集首页",
+        "functions/api/[[path]].js": "两边仅一行合法差异（metadata.json 静态回退路径各自适配所在域名），portfolio 侧已正确，保持各自维护"
+      },
+      "patches": [
+        {
+          "file": "index.html",
+          "note": "根绝对路径改相对路径（内嵌预览时 /xxx 会指向作品集根目录而 404）",
+          "rules": [
+            {
+              "type": "string",
+              "from": "href=\"/delta-force-logo.webp\"",
+              "to": "href=\"delta-force-logo.webp\"",
+              "okIfContains": "href=\"delta-force-logo.webp\""
+            },
+            {
+              "type": "string",
+              "from": "href=\"/manifest.json\"",
+              "to": "href=\"manifest.json\"",
+              "okIfContains": "href=\"manifest.json\""
+            },
+            {
+              "type": "string",
+              "from": "href=\"/icon.ico\"",
+              "to": "href=\"icon.ico\"",
+              "okIfContains": "href=\"icon.ico\""
+            },
+            {
+              "type": "string",
+              "from": "href=\"/icon-192.png\"",
+              "to": "href=\"icon-192.png\"",
+              "okIfContains": "href=\"icon-192.png\""
+            }
+          ]
+        },
+        {
+          "file": "js/sw-register.js",
+          "note": "portfolio 专属适配：恢复 iframe 守卫 + SW 注册改相对路径（deploy 版用根绝对路径 /sw.js，会劫持作品集全站）",
+          "rules": [
+            {
+              "type": "string",
+              "from": "if (!('serviceWorker' in navigator)) return;",
+              "to": "if (!('serviceWorker' in navigator)) return;\n  // portfolio 专属适配：嵌入 iframe 预览时不注册 SW，避免与作品集站点作用域冲突（勿删）\n  if (window.self !== window.top) return;",
+              "okIfContains": "window.self !== window.top"
+            },
+            {
+              "type": "regex",
+              "from": "register\\('/sw\\.js\\?v=([^']+)'\\)",
+              "to": "register('sw.js?v=$1', { scope: './' })",
+              "okIfContains": "register('sw.js?v="
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ping-pong-duel",
+      "enabled": false,
+      "reason": "无本地源仓库（原 乒乓对决_合并 已删除），projects/ 内为唯一本地副本。建议先推送到 Gitee/GitHub，再配置 sourceDir 并置 enabled=true"
+    },
+    {
+      "id": "portfolio-source",
+      "enabled": false,
+      "reason": "作品集自身源码展示页，无外部来源，直接在 projects/ 内维护"
+    },
+    {
+      "id": "space-kill",
+      "enabled": false,
+      "reason": "★ 用户要求本次暂时屏蔽同步。恢复时把 enabled 改为 true 并补上 sourceDir（Desktop\\space-kill\\公测2.0）与 files 列表即可"
+    }
+  ]
+}

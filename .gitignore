@@ -7,6 +7,9 @@
 .wrangler/
 .wrangler.dev/
 
+# build-collect 克隆暂存目录
+.collect-temp/
+
 # Node
 node_modules/
 package-lock.json
