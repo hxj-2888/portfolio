@@ -21,8 +21,9 @@ package-lock.json
 __pycache__/
 *.pyc
 
-# 分发压缩包（本地打包产物，不入库）
+# 分发压缩包与安装包（本地打包产物，不入库；由本地 Pages 部署直发）
 *.zip
+*.apk
 dist/
 
 # 系统垃圾
