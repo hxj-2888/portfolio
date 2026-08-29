@@ -60,7 +60,7 @@ jobs:
       - name: Stage site files (allowlist)
         run: |
           mkdir -p /tmp/site-deploy
-          cp -r index.html css js assets projects functions wrangler.toml /tmp/site-deploy/
+          cp -r index.html projects.json css js assets projects functions wrangler.toml /tmp/site-deploy/
           find /tmp/site-deploy -maxdepth 1 -type f | sort
 
       - name: Deploy to Cloudflare Pages

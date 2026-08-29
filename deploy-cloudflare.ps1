@@ -18,7 +18,7 @@ Write-Host '===== 2/4 部署到 Cloudflare Pages =====' -ForegroundColor Cyan
 $STAGE = Join-Path $env:TEMP 'portfolio-pages-deploy'
 if (Test-Path $STAGE) { Remove-Item $STAGE -Recurse -Force }
 New-Item -ItemType Directory -Force $STAGE | Out-Null
-'index.html', 'css', 'js', 'assets', 'projects', 'functions', 'wrangler.toml' |
+'index.html', 'projects.json', 'css', 'js', 'assets', 'projects', 'functions', 'wrangler.toml' |
   ForEach-Object { Copy-Item -Recurse -Force $_ $STAGE/ }
 wrangler pages deploy $STAGE --project-name $PROJECT --branch main
 

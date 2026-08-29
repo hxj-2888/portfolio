@@ -9,13 +9,14 @@ const API_PATH = '/workApi/v1/sjz_api';
 
 // ★ 上游 API Token — 必须在 Cloudflare Dashboard 中设置 API_TOKEN 环境变量
 
-// ========== 简单内存限流 ==========
-// 说明: 模块级计数器按 isolate 生效, 各边缘节点独立统计; 对个人工具足够,
-//       如需跨节点全局限流, 可改用 CF Rate Limiting 或 KV 计数。
-//       规范实现见 scripts/rate-limit.cjs, 改动时请同步三处副本。
+// ========== 限流（双层） ==========
+// 第一层: 内存计数, 每 isolate 生效, 拦截绝大多数高频滥用（快, 零额外 IO）
+// 第二层: D1 原子 UPSERT 全局窗口计数, 跨边缘节点统一阈值（按分钟窗口）
+//         D1 故障/未绑定时自动降级, 只靠第一层兜底, 不影响可用性。
+//         规范实现见 scripts/rate-limit.cjs, 改动时请同步各副本。
 const RATE_WINDOW_MS = 60 * 1000;
 const RATE_MAX_PER_IP = 120;   // 每 IP 每分钟
-const RATE_MAX_GLOBAL = 600;   // 每 isolate 每分钟
+const RATE_MAX_GLOBAL = 600;   // 全局每分钟（跨节点, D1 计数）
 const rateWindows = new Map();
 let rateGlobal = [];
 
@@ -37,6 +38,30 @@ function checkRateLimit(ip) {
   }
   rateGlobal.push(now);
   return true;
+}
+
+// 全局限流: D1 原子计数, 返回 true=放行
+// 窗口 = 'g' + 北京时间 yyyyMMddHHmm, 旧行每次检查顺带清理（概率 1/20, 控制 D1 写放大）
+async function checkGlobalRateLimitDB(db) {
+  if (!db) return true; // D1 未绑定 → 降级
+  try {
+    const bj = new Date(Date.now() + 8 * 3600 * 1000);
+    const win = 'g' + bj.toISOString().replace(/[-:TZ.]/g, '').slice(0, 12);
+    const { results } = await db.prepare(`
+      INSERT INTO rate_limit_window (win, n) VALUES (?1, 1)
+      ON CONFLICT(win) DO UPDATE SET n = n + 1
+      RETURNING n
+    `).bind(win).all();
+    const n = results && results[0] ? results[0].n : 0;
+    if (Math.random() < 0.05) {
+      db.prepare("DELETE FROM rate_limit_window WHERE win < ?1").bind('g' + win.slice(1)).run().catch(() => {});
+    }
+    return n <= RATE_MAX_GLOBAL;
+  } catch (e) {
+    // 表不存在或 D1 临时故障: 不阻塞业务, 降级为仅内存限流
+    console.warn('[ratelimit] D1 全局限流降级:', e.message);
+    return true;
+  }
 }
 
 // ========== HTTP 请求处理 ==========
@@ -71,11 +96,31 @@ export async function onRequest(context) {
   }
 
   // 限流（保护上游配额, 防止代理被爬虫/脚本滥用）
+  // 第一层内存拦截高频; 第二层 D1 全局窗口计数兜底跨节点绕过
   const ip = request.headers.get('cf-connecting-ip') || 'unknown';
   if (!checkRateLimit(ip)) {
     return new Response(JSON.stringify({ code: -1, msg: '请求过于频繁, 请稍后再试' }), {
       status: 429,
       headers: { 'Content-Type': 'application/json; charset=utf-8', 'Retry-After': '60' },
+    });
+  }
+  if (!await checkGlobalRateLimitDB(env.DB)) {
+    return new Response(JSON.stringify({ code: -1, msg: '当前请求量较大, 请稍后再试' }), {
+      status: 429,
+      headers: { 'Content-Type': 'application/json; charset=utf-8', 'Retry-After': '60' },
+    });
+  }
+
+  // ─── 来源校验 ───
+  // ★ 位置很关键：必须排在 /api/metadata 与 /api/history/:id 之前。
+  //   原实现把它放在这两个业务分支之后，导致它们对任意站点开放（跨站浏览器可直接读取 D1 历史）。
+  //   注意语义：isAuthorizedOrigin 对【无 Origin】的服务端请求放行（curl / CI 脚本 / Cron Worker），
+  //   因此本校验的作用是「拒绝跨站浏览器读取」，不能阻止脚本化调用——后者由限流与 WAF 规则兜底。
+  //   也正因如此，上移校验不会影响 scripts/generate-metadata.js 与 workers/cron（它们无 Origin）。
+  if (!isAuthorizedOrigin(request)) {
+    return new Response(JSON.stringify({ code: -1, msg: '未授权的来源' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
     });
   }
 
@@ -138,14 +183,6 @@ export async function onRequest(context) {
     return handleHistoryRequest(env, parseInt(historyMatch[1], 10));
   }
 
-  // ─── 来源校验 ───
-  if (!isAuthorizedOrigin(request)) {
-    return new Response(JSON.stringify({ code: -1, msg: '未授权的来源' }), {
-      status: 403,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    });
-  }
-
   // ─── 解析 endpoint 和 params ───
   let endpoint = '';
   let queryParams = {};
@@ -175,6 +212,16 @@ export async function onRequest(context) {
   if (!/^[a-zA-Z0-9_\-/]*$/.test(endpoint)) {
     return new Response(JSON.stringify({ code: -1, msg: '非法路径' }), {
       status: 400,
+      headers: { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' },
+    });
+  }
+
+  // endpoint 枚举白名单（安全审计 2026-08-29）：host 固定后仍不希望本代理+token 可调上游任意子路径，
+  // 只放行业务实际使用的接口；新增上游接口时在此登记
+  const ALLOWED_ENDPOINTS = ['item_list', 'item_price_all'];
+  if (!ALLOWED_ENDPOINTS.includes(endpoint)) {
+    return new Response(JSON.stringify({ code: -1, msg: '不支持的 endpoint' }), {
+      status: 403,
       headers: { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*' },
     });
   }
