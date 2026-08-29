@@ -23,12 +23,20 @@ New-Item -ItemType Directory -Force $STAGE | Out-Null
 wrangler pages deploy $STAGE --project-name $PROJECT --branch main
 
 Write-Host ''
-Write-Host '===== 3/4 设置三角洲数据代理密钥 API_TOKEN =====' -ForegroundColor Cyan
+Write-Host '===== 3/5 设置三角洲数据代理密钥 API_TOKEN =====' -ForegroundColor Cyan
 Write-Host '将提示输入 secret 值（即你 delta-force-deploy 用的上游 API Token）'
 wrangler pages secret put API_TOKEN --project-name $PROJECT
 
 Write-Host ''
-Write-Host '===== 4/4 完成 =====' -ForegroundColor Green
+Write-Host '===== 4/5 设置代理防滥用密钥 PROXY_KEY（可选但强烈建议）=====' -ForegroundColor Cyan
+Write-Host '审计 M1:本作品集部署了与 delta-force 相同的 API 代理，'
+Write-Host '若不设置该密钥，任何人可写脚本直接消耗你的上游 Token 配额（限流换 IP 即可绕过）。'
+Write-Host '设置后：脚本调用须带匹配的 X-Proxy-Key 头，浏览器正常访问不受影响。'
+Write-Host '直接回车可跳过（代理维持原有行为，仅靠限流）。'
+wrangler pages secret put PROXY_KEY --project-name $PROJECT
+
+Write-Host ''
+Write-Host '===== 5/5 完成 =====' -ForegroundColor Green
 Write-Host ''
 Write-Host '如果第 3 步失败，可手动到 Dashboard 配置：' -ForegroundColor Yellow
 Write-Host "  Cloudflare → Workers & Pages → $PROJECT → Settings → Variables 添加 API_TOKEN"
