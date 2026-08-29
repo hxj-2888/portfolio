@@ -1,7 +1,10 @@
 # 敏感文件 — 绝不上传
-.env
-.env.local
-.env.production
+.env*
+*.keystore
+*.jks
+*.pem
+*.key
+id_rsa*
 
 # Cloudflare 本地缓存（含账号信息与调试数据，必须排除）
 .wrangler/
