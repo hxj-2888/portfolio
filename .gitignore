@@ -30,3 +30,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+
+# 本机工作笔记（含本机路径，不入库、不部署）
+修改记录.md

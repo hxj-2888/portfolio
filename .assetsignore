@@ -1,0 +1,6 @@
+# 非站点文件 — 不随 Pages 部署公开（语法同 .gitignore）
+修改记录.md
+DEPLOY.md
+sync.json
+*.ps1
+.github/
