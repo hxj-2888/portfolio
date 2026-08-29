@@ -90,7 +90,7 @@
     {
       "id": "space-kill",
       "enabled": false,
-      "reason": "★ 用户要求本次暂时屏蔽同步。恢复时把 enabled 改为 true 并补上 sourceDir（Desktop\\space-kill\\公测2.0）与 files 列表即可"
+      "reason": "★ 采用手动复制维护（保留 2.0 目录 + 新增 3.0/3.1 目录，源为 Desktop\\space-kill-3.0）。不启用脚本同步，以免旧 sourceDir 覆盖已整理的多版本目录"
     }
   ]
 }
