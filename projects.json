@@ -73,6 +73,7 @@
       "icon": "🚀",
       "entry": "index.html",
       "type": "web",
+      "liveUrl": "https://space-kill.pages.dev",
       "source": {
         "type": "local",
         "path": "projects/space-kill"
