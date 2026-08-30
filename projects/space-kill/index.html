@@ -1,112 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>太空杀：三阵营对抗 · 公测3.1</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>太空杀 · 星途归航 — 剧情与规则</title>
+<meta name="description" content="太空杀：15 人三阵营（人类 / 异形 / 外星人）身份博弈桌游的剧情与规则。">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(160deg, #0a0a0f 0%, #141420 60%, #0a0a0f 100%);
-    color: #e0e0e8; min-height: 100vh; padding: 28px 18px 40px;
-  }
-  .wrap { max-width: 700px; margin: 0 auto; }
-  h1 { font-size: 24px; letter-spacing: 1px; text-align: center; }
-  .sub { text-align: center; color: #9fb2cc; font-size: 13px; margin: 8px 0 20px; }
-  .factions { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
-  .chip { border-radius: 999px; padding: 5px 14px; font-size: 12.5px; border: 1px solid; }
-  .chip.human { color: #7ee787; border-color: rgba(126,231,135,.4); background: rgba(126,231,135,.08); }
-  .chip.alien { color: #ff7b72; border-color: rgba(255,123,114,.4); background: rgba(255,123,114,.08); }
-  .chip.fore   { color: #79c0ff; border-color: rgba(121,192,255,.4); background: rgba(121,192,255,.08); }
-  .desc { color: #b7c2d8; font-size: 13.5px; line-height: 1.9; margin-bottom: 20px; }
-  h2 { font-size: 15px; color: #ffd166; margin: 22px 0 10px; display: flex; align-items: center; gap: 6px; }
-  .file {
-    display: flex; align-items: center; gap: 12px; text-decoration: none;
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 14px; padding: 12px 16px; margin-bottom: 8px; transition: border-color .15s;
-  }
-  .file:hover { border-color: #6366f1; }
-  .file .ico { font-size: 20px; }
-  .file .nm { font-size: 14px; font-weight: 600; color: #fff; }
-  .file .ds { font-size: 12px; color: #9fb2cc; margin-top: 3px; }
-  .file .go { margin-left: auto; color: #a5b4fc; font-size: 13px; white-space: nowrap; padding-left: 8px; }
-  .ver { display: inline-block; border-radius: 6px; padding: 1px 7px; font-size: 10.5px; margin-right: 6px; vertical-align: 1px; }
-  .ver.v20 { background: rgba(121,192,255,.14); color: #79c0ff; border: 1px solid rgba(121,192,255,.35); }
-  .ver.v30 { background: rgba(126,231,135,.14); color: #7ee787; border: 1px solid rgba(126,231,135,.35); }
-  .ver.v31 { background: rgba(255,209,102,.14); color: #ffd166; border: 1px solid rgba(255,209,102,.35); }
-  .notice { border-radius: 12px; padding: 11px 14px; font-size: 12.5px; line-height: 1.7; margin-bottom: 16px; }
-  .notice.ok { background: rgba(126,231,135,.08); border: 1px solid rgba(126,231,135,.3); color: #b9f4c9; }
-  .notice.warn { background: rgba(255,209,102,.10); border: 1px solid rgba(255,209,102,.32); color: #ffe9b8; }
-  .notice b { color: #ffd166; }
-  .links { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-  .links a {
-    flex: 1; min-width: 150px; text-align: center; text-decoration: none; font-size: 13.5px; font-weight: 600;
-    border-radius: 12px; padding: 12px 0; transition: transform .15s;
-  }
-  .links a:hover { transform: translateY(-2px); }
-  .gh { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; }
-  .gt { background: rgba(255,255,255,0.08); color: #d7e2f2; border: 1px solid rgba(255,255,255,0.18); }
-  .foot { text-align: center; color: #6d7f9c; font-size: 11.5px; margin-top: 24px; line-height: 1.8; }
-  kbd { background: rgba(255,255,255,.1); border-radius: 5px; padding: 1px 7px; font-size: 11.5px; }
+:root {{ --bg:#0a0a0f; --card:#141420; --line:#252535; --text:#e0e0ea; --muted:#8888a0; --accent:#818cf8 }}
+* {{ margin:0; padding:0; box-sizing:border-box }}
+body {{ background:var(--bg); color:var(--text); font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif; line-height:1.8;
+  background-image:radial-gradient(1200px 500px at 70% -10%, rgba(99,102,241,.14), transparent), radial-gradient(900px 420px at 10% 110%, rgba(124,58,237,.10), transparent) }}
+.wrap {{ max-width:64rem; margin:0 auto; padding:72px 22px 96px }}
+.kicker {{ font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent) }}
+h1 {{ font-size:clamp(30px,5.4vw,46px); letter-spacing:-.02em; color:#fff; margin:12px 0 14px }}
+.sub {{ color:var(--muted); max-width:46rem }}
+.grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:18px; margin-top:44px }}
+.card {{ display:block; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:24px 22px; text-decoration:none; color:var(--text); transition:.2s }}
+.card:hover {{ transform:translateY(-3px); border-color:var(--accent); box-shadow:0 12px 32px rgba(99,102,241,.15) }}
+.card .tag {{ font-size:12px; color:var(--accent); letter-spacing:.14em; text-transform:uppercase }}
+.card h2 {{ font-size:19px; color:#fff; margin:8px 0 6px }}
+.card p {{ color:var(--muted); font-size:14px }}
+.foot {{ margin-top:56px; color:var(--muted); font-size:13px }}
+.foot a {{ color:var(--accent); text-decoration:none }}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>🚀 太空杀：三阵营对抗</h1>
-  <div class="sub">身份博弈桌游 · 规则设计 + 自动化平衡性模拟 · 公测3.1</div>
-  <div class="factions">
-    <span class="chip human">👤 人类 × 11</span>
-    <span class="chip alien">👽 异形 × 3</span>
-    <span class="chip fore">🛸 外星人 × 1</span>
+  <div class="kicker">Space Kill · 公测 3.0</div>
+  <h1>太空杀 · 星途归航</h1>
+  <p class="sub">15 人三阵营（人类 11 / 异形 3 / 外星人 1）身份博弈桌游。这里收录官方剧情（三条胜利线）与最新正式规则（公测 3.0）。</p>
+  <div class="grid">
+    <a class="card" href="story-human.html"><div class="tag">剧情</div><h2>人类胜利线</h2><p>星途归航 · 最终版——信天翁号的二十昼夜。</p></a>
+    <a class="card" href="story-alien.html"><div class="tag">剧情</div><h2>外星人胜利线</h2><p>星途归航 · 修订版——船体深处的低语。</p></a>
+    <a class="card" href="story-xeno.html"><div class="tag">剧情</div><h2>异形胜利线</h2><p>寄生、觉醒与破壳之夜。</p></a>
+    <a class="card" href="rules.html"><div class="tag">规则</div><h2>游戏规则 v3.0</h2><p>三阵营对抗 · 正式发布版全部条款、表格与【消歧】注释。</p></a>
+    <a class="card" href="sim31-matrix.html"><div class="tag">平衡性模拟</div><h2>策略矩阵报告（公测 3.1）</h2><p>异形三大流派权重化 · 感染为显式权重 · 均衡解。</p></a>
+    <a class="card" href="sim31-flows.html"><div class="tag">平衡性模拟</div><h2>异形流派核验（公测 3.1）</h2><p>击杀 / 破坏 / 感染 · 12/12 行为判据。</p></a>
   </div>
-  <p class="desc">
-    15 人三阵营身份博弈桌游：裁判逻辑 100% 确定性，玩家 AI 带策略与信息博弈（私聊三层信息交换、白天讨论节奏、投票追责、信息迷雾），严格禁止「上帝视角」。通过大规模自动化对局输出阵营胜率、职业强度与策略矩阵，用数据驱动规则持续迭代。
-  </p>
-
-  <div class="notice ok"><b>✅ 公测 3.1</b>：异形策略升级为 <b>击杀 / 破坏 / 感染</b> 三大权重化流派，感染为显式权重项；觉醒与转化视情形自动切换。公测 3.0 起修复 R1~R11 规则消歧。</div>
-  <div class="notice warn"><b>⚠ 说明</b>：模拟代码的自由决策未完全实现（部分场景依赖预设策略分支），模拟结论供参考，不等同于真人玩家完整决策空间。</div>
-
-  <h2>🧬 公测 3.1 · 策略层升级</h2>
-  <a class="file" href="公测3.1/策略矩阵报告.md" download><span class="ico">📈</span><span><div class="nm"><span class="ver v31">3.1</span>策略矩阵报告.md</div><div class="ds">18 组合 × 2000 局 · 异形三流派与均衡解</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.1/异形流派核验.md" download><span class="ico">🧪</span><span><div class="nm"><span class="ver v31">3.1</span>异形流派核验.md</div><div class="ds">击杀 / 破坏 / 感染 · 12/12 行为判据</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.1/策略参数说明.md" download><span class="ico">⚙️</span><span><div class="nm"><span class="ver v31">3.1</span>策略参数说明.md</div><div class="ds">三大流派权重体系与关键参数</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.1/cross_convergence.md" download><span class="ico">🔄</span><span><div class="nm"><span class="ver v31">3.1</span>交叉收敛分析.md</div><div class="ds">三方阵营最优应对与均衡解</div></span><span class="go">下载 ↗</span></a>
-
-  <h2>⚙️ 公测 3.0 · 规则与调试</h2>
-  <a class="file" href="公测3.0/太空杀_公测3.0_规则.md" download><span class="ico">📝</span><span><div class="nm"><span class="ver v30">3.0</span>规则.md</div><div class="ds">规则正文（正式发布版）· R1~R11 + 感染体系 v3</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.0/太空杀_公测3.0_机制核验报告.md" download><span class="ico">✅</span><span><div class="nm"><span class="ver v30">3.0</span>机制核验报告.md</div><div class="ds">规则机制核验 · 结算流程校验</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.0/太空杀_公测3.0_高水平报告.html" download><span class="ico">📄</span><span><div class="nm"><span class="ver v30">3.0</span>高水平报告.html</div><div class="ds">高水平玩家对局分析 · 胜率与原因拆解</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.0/太空杀_公测3.0_高水平报告.md" download><span class="ico">📊</span><span><div class="nm"><span class="ver v30">3.0</span>高水平报告.md</div><div class="ds">高水平玩家对局分析（Markdown 版）</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.0/太空杀_公测3.0_随机基线报告.md" download><span class="ico">🎲</span><span><div class="nm"><span class="ver v30">3.0</span>随机基线报告.md</div><div class="ds">随机行动基线 · 对照策略效果</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.0/太空杀_公测3.0_模拟代码.py" download><span class="ico">🐍</span><span><div class="nm"><span class="ver v30">3.0</span>模拟代码.py</div><div class="ds">确定性裁判 + 玩家博弈 AI · <kbd>python 太空杀_公测3.0_模拟代码.py</kbd></div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测3.0/verify_rules.py" download><span class="ico">🔍</span><span><div class="nm"><span class="ver v30">3.0</span>verify_rules.py</div><div class="ds">规则核验脚本 · 结算流程自动化校验</div></span><span class="go">下载 ↗</span></a>
-
-  <h2>🎬 剧情（公测 2.0，保留）</h2>
-  <a class="file" href="公测2.0/人类胜利线.docx" download><span class="ico">👤</span><span><div class="nm"><span class="ver v20">2.0</span>人类胜利线.docx</div><div class="ds">星途归航 · 人类阵营获胜路线 / 剧情线</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/异形胜利线.docx" download><span class="ico">👽</span><span><div class="nm"><span class="ver v20">2.0</span>异形胜利线.docx</div><div class="ds">星途归航 · 异形阵营获胜路线 / 剧情线</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/外星人胜利线.docx" download><span class="ico">🛸</span><span><div class="nm"><span class="ver v20">2.0</span>外星人胜利线.docx</div><div class="ds">星途归航 · 外星人阵营获胜路线 / 剧情线</div></span><span class="go">下载 ↗</span></a>
-
-  <h2>🧪 调试文档（公测 2.0，保留）</h2>
-  <a class="file" href="公测2.0/太空杀_公测2.0_机制核验报告.md" download><span class="ico">⚙️</span><span><div class="nm"><span class="ver v20">2.0</span>机制核验报告.md</div><div class="ds">规则机制核验 · 结算流程校验</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/太空杀_公测2.0_策略矩阵报告.md" download><span class="ico">📈</span><span><div class="nm"><span class="ver v20">2.0</span>策略矩阵报告.md</div><div class="ds">策略矩阵与胜率统计 · 平衡性调试</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/太空杀_公测2.0_策略边际收益分析.md" download><span class="ico">📉</span><span><div class="nm"><span class="ver v20">2.0</span>策略边际收益分析.md</div><div class="ds">策略边际收益分析 · 决策收益拆解</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/太空杀_公测2.0_高水平报告.html" download><span class="ico">📄</span><span><div class="nm"><span class="ver v20">2.0</span>高水平报告.html</div><div class="ds">高水平玩家对局分析 · 胜率与原因拆解</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/太空杀_公测2.0_高水平报告.md" download><span class="ico">📊</span><span><div class="nm"><span class="ver v20">2.0</span>高水平报告.md</div><div class="ds">高水平玩家对局分析（Markdown 版）</div></span><span class="go">下载 ↗</span></a>
-
-  <h2>📖 游戏规则（公测 2.0，保留）</h2>
-  <a class="file" href="公测2.0/太空杀_公测2.0_规则.md" download><span class="ico">📝</span><span><div class="nm"><span class="ver v20">2.0</span>规则.md</div><div class="ds">规则正文（Markdown 版）· 全步骤结算顺序</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/规则.docx" download><span class="ico">📋</span><span><div class="nm"><span class="ver v20">2.0</span>规则.docx</div><div class="ds">规则正文（Word 版）</div></span><span class="go">下载 ↗</span></a>
-  <a class="file" href="公测2.0/太空杀_公测2.0_模拟代码.py" download><span class="ico">🐍</span><span><div class="nm"><span class="ver v20">2.0</span>模拟代码.py</div><div class="ds">确定性裁判 + 玩家博弈 AI（2.0 存档）</div></span><span class="go">下载 ↗</span></a>
-
-  <h2>🌐 官网与源码仓库</h2>
-  <div class="links">
-    <a class="gh" href="https://space-kill.pages.dev" target="_blank" rel="noopener">官网（剧情/规则）↗</a>
-    <a class="gh" href="https://github.com/hxj-2888/space-kill" target="_blank" rel="noopener">GitHub ↗</a>
-    <a class="gt" href="https://gitee.com/hxj-2888/space-kill" target="_blank" rel="noopener">Gitee ↗</a>
-  </div>
-
-  <div class="foot">太空杀 · 三阵营对抗 · 公测3.1<br>确定性裁判 / 博弈 AI / 蒙特卡洛平衡性模拟</div>
+  <div class="foot"> <a href="https://github.com/hxj-2888/space-kill" rel="noopener" target="_blank">GitHub 仓库</a></div>
 </div>
 </body>
 </html>
