@@ -19,7 +19,10 @@
         "css/components.css",
         "data/metadata.json",
         "icon.ico",
-        "icon-192.png"
+        "icon-192.png",
+        "icon-512.png",
+        "icon-maskable-512.png",
+        "delta-force-logo.webp"
       ],
       "neverCopy": {
         "_警告": "以下文件绝不可复制进 portfolio，否则会劫持作品集站点",
@@ -59,7 +62,7 @@
         },
         {
           "file": "js/sw-register.js",
-          "note": "portfolio 专属适配：恢复 iframe 守卫 + SW 注册改相对路径（deploy 版用根绝对路径 /sw.js，会劫持作品集全站）",
+          "note": "portfolio 专属适配：恢复 iframe 守卫 + SW 注册改相对路径并加 pf 后缀（换新缓存桶，防止老访客被旧桶缓存-first 卡住旧 logo/旧文案）",
           "rules": [
             {
               "type": "string",
@@ -70,8 +73,62 @@
             {
               "type": "regex",
               "from": "register\\('/sw\\.js\\?v=([^']+)'\\)",
-              "to": "register('sw.js?v=$1', { scope: './' })",
+              "to": "register('sw.js?v=$1pf', { scope: './' })",
               "okIfContains": "register('sw.js?v="
+            }
+          ]
+        },
+        {
+          "file": "sw.js",
+          "note": "portfolio 专属适配：HTML 与 data/ 判定改为按子路径匹配（内嵌副本位于 /projects/delta-force/ 子目录，原根路径判定会让 HTML/metadata 走缓存优先而陈旧）",
+          "rules": [
+            {
+              "type": "string",
+              "from": "if (url.pathname === '/' || url.pathname === '/index.html') {",
+              "to": "if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname.endsWith('/') || url.pathname.endsWith('/index.html')) { // portfolio 适配：子目录部署",
+              "okIfContains": "url.pathname.endsWith('/index.html')"
+            },
+            {
+              "type": "string",
+              "from": "if (url.pathname.indexOf('/data/') === 0) {",
+              "to": "if (url.pathname.indexOf('/data/') !== -1) { // portfolio 适配：子目录部署",
+              "okIfContains": "url.pathname.indexOf('/data/') !== -1"
+            }
+          ]
+        },
+        {
+          "file": "manifest.json",
+          "note": "portfolio 专属适配：PWA 图标与 start_url/scope 改相对路径（根绝对路径在内嵌子目录下会指向作品集根而 404/越界）",
+          "rules": [
+            {
+              "type": "string",
+              "from": "\"src\": \"/icon-192.png?v=2\"",
+              "to": "\"src\": \"icon-192.png?v=2\"",
+              "okIfContains": "\"src\": \"icon-192.png?v=2\""
+            },
+            {
+              "type": "string",
+              "from": "\"src\": \"/icon-512.png?v=2\"",
+              "to": "\"src\": \"icon-512.png?v=2\"",
+              "okIfContains": "\"src\": \"icon-512.png?v=2\""
+            },
+            {
+              "type": "string",
+              "from": "\"src\": \"/icon-maskable-512.png?v=2\"",
+              "to": "\"src\": \"icon-maskable-512.png?v=2\"",
+              "okIfContains": "\"src\": \"icon-maskable-512.png?v=2\""
+            },
+            {
+              "type": "string",
+              "from": "\"start_url\": \"/\"",
+              "to": "\"start_url\": \"./\"",
+              "okIfContains": "\"start_url\": \"./\""
+            },
+            {
+              "type": "string",
+              "from": "\"scope\": \"/\"",
+              "to": "\"scope\": \"./\"",
+              "okIfContains": "\"scope\": \"./\""
             }
           ]
         }
@@ -79,8 +136,47 @@
     },
     {
       "id": "ping-pong-duel",
-      "enabled": false,
-      "reason": "无本地源仓库（原 乒乓对决_合并 已删除），projects/ 内为唯一本地副本。建议先推送到 Gitee/GitHub，再配置 sourceDir 并置 enabled=true"
+      "enabled": true,
+      "sourceDir": "../乒乓对决_合并/public",
+      "targetDir": "projects/ping-pong-duel",
+      "note": "乒乓对决源仓库 public/（部署到 ping-pong-duel.pages.dev 的同一份产物）→ 作品集副本。已确认全部为相对路径、SW 作用域 ./ 不越界，无需补丁。_worker.js（房间服务，部署在独立 Pages 项目）与 APK（体积大，作品集不分发安装包）不复制",
+      "files": [
+        "index.html",
+        "download.html",
+        "sw.js",
+        "manifest.webmanifest",
+        "css/style.css",
+        "js/ai.js",
+        "js/audio.js",
+        "js/characters.js",
+        "js/engine.js",
+        "js/network.js",
+        "js/render.js",
+        "js/app/dressup.js",
+        "js/app/hud.js",
+        "js/app/input.js",
+        "js/app/loop.js",
+        "js/app/main.js",
+        "js/app/modes.js",
+        "js/app/net.js",
+        "js/app/records.js",
+        "js/app/render.js",
+        "js/app/replay.js",
+        "js/app/state.js",
+        "js/app/teams.js",
+        "js/app/training.js",
+        "js/engine/math.js",
+        "js/engine/physics.js",
+        "js/engine/rules.js",
+        "js/engine/shots.js",
+        "js/engine/state.js",
+        "js/engine/strokes.js",
+        "icon-192.png",
+        "icon-512.png",
+        "qr-download.png",
+        "audio/applause.wav",
+        "audio/music.mp4"
+      ]
     },
     {
       "id": "portfolio-source",
@@ -89,8 +185,19 @@
     },
     {
       "id": "space-kill",
-      "enabled": false,
-      "reason": "★ 采用手动复制维护（保留 2.0 目录 + 新增 3.0/3.1 目录，源为 Desktop\\space-kill-3.0）。不启用脚本同步，以免旧 sourceDir 覆盖已整理的多版本目录"
+      "enabled": true,
+      "sourceDir": "../space-kill-3.0/site",
+      "targetDir": "projects/space-kill",
+      "note": "太空杀官网部署源（space-kill.pages.dev 的同一份产物）→ 作品集副本。2026-08-30 起内嵌预览与官网完全一致，改为自动同步防止再次漂移（旧的 2.0/3.0/3.1 多版本门户已移除，其文档以 space-kill 仓库为准）",
+      "files": [
+        "index.html",
+        "rules.html",
+        "sim31-flows.html",
+        "sim31-matrix.html",
+        "story-human.html",
+        "story-alien.html",
+        "story-xeno.html"
+      ]
     }
   ]
 }

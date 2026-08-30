@@ -47,7 +47,7 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/')) return;
 
-  if (url.pathname === '/' || url.pathname === '/index.html') {
+  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname.endsWith('/') || url.pathname.endsWith('/index.html')) { // portfolio 适配：子目录部署
     // HTML 网络优先：离线时回退缓存，保证已安装应用可打开
     e.respondWith(
       fetch(e.request)
@@ -64,7 +64,7 @@ self.addEventListener('fetch', (e) => {
   // ★ /data/*（如 metadata.json）：网络优先 + 后台更新
   //   这些文件不带 ?v= 版本号，若走缓存优先会永久陈旧（_headers 里的 max-age 对 SW 无效）。
   //   网络失败时仍回退缓存，保证离线可用。
-  if (url.pathname.indexOf('/data/') === 0) {
+  if (url.pathname.indexOf('/data/') !== -1) { // portfolio 适配：子目录部署
     e.respondWith(
       fetch(e.request)
         .then((resp) => {

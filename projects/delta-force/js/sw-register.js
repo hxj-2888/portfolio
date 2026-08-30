@@ -9,7 +9,7 @@ async function registerPeriodicSync() {
   // portfolio 专属适配：嵌入 iframe 预览时不注册 SW，避免与作品集站点作用域冲突（勿删）
   if (window.self !== window.top) return;
   try {
-    var reg = await navigator.serviceWorker.register('sw.js?v=v20260829q', { scope: './' });
+    var reg = await navigator.serviceWorker.register('sw.js?v=v20260829qpf', { scope: './' });
     console.log('[SW] 注册成功', reg.scope);
 
     if ('periodicSync' in reg) {
