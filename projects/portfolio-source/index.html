@@ -45,7 +45,7 @@ h1 .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135d
   </div>
 
   <div class="panel active" id="panel-live">
-    <div class="iframe-box"><iframe id="liveFrame" src="../../index.html" title="本站实时预览" loading="lazy"></iframe></div>
+    <div class="iframe-box"><iframe id="liveFrame" title="本站实时预览" loading="lazy"></iframe></div>
     <p class="note">↑ 上方是本站真实页面，点击卡片可继续打开各项目预览。</p>
   </div>
   <div class="panel" id="panel-file">
@@ -58,6 +58,8 @@ h1 .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135d
 (function () {
   var tabs = document.getElementById('tabs');
   var livePanel = document.getElementById('panel-live');
+  // 实时预览加时间戳参数，确保每次打开都加载站点最新版本（避免浏览器/边缘缓存旧文档）
+  document.getElementById('liveFrame').src = '../../index.html?t=' + Date.now();
   var filePanel = document.getElementById('panel-file');
   var fileName = document.getElementById('fileName');
   var codeBox = document.getElementById('codeBox');
