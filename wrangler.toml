@@ -1,6 +1,13 @@
 name = "portfolio"
 pages_build_output_dir = "."
 
+# Pages Functions 运行时兼容标志。
+# 必须显式声明：wrangler v4（wrangler-action v4 的默认 CLI）在缺少 compatibility_date
+# 时会注入引用 node: 内置模块的运行时 shim，Functions 打包随即失败
+# （"No such module node:stream"）。开启 nodejs_compat 后可正常解析。
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
 # D1 数据库（价格历史存储）
 [[d1_databases]]
 binding = "DB"
