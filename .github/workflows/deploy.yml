@@ -57,10 +57,12 @@ jobs:
 
       # ★ 白名单暂存：wrangler pages deploy 不支持 .assetsignore，
       #   只复制确定的站点文件部署，其余（笔记/脚本/.github/配置）永远不公开
+      #   注意：不含 wrangler.toml——deploy 读的是当前工作目录的配置，
+      #   把它上传只会公开 D1 database_id / KV namespace id，无任何必要
       - name: Stage site files (allowlist)
         run: |
           mkdir -p /tmp/site-deploy
-          cp -r index.html projects.json js assets projects functions wrangler.toml /tmp/site-deploy/
+          cp -r index.html projects.json js assets projects functions /tmp/site-deploy/
           find /tmp/site-deploy -maxdepth 1 -type f | sort
 
       - name: Deploy to Cloudflare Pages

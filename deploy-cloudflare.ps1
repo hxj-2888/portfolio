@@ -15,10 +15,12 @@ Write-Host ''
 Write-Host '===== 2/4 部署到 Cloudflare Pages =====' -ForegroundColor Cyan
 # ★ 白名单暂存：wrangler pages deploy 不支持 .assetsignore，
 #   只复制确定的站点文件部署，其余（笔记/脚本/.github/配置）永远不公开
+#   注意：不含 wrangler.toml——deploy 读的是当前工作目录的配置，
+#   把它上传只会公开 D1 database_id / KV namespace id，无任何必要
 $STAGE = Join-Path $env:TEMP 'portfolio-pages-deploy'
 if (Test-Path $STAGE) { Remove-Item $STAGE -Recurse -Force }
 New-Item -ItemType Directory -Force $STAGE | Out-Null
-'index.html', 'projects.json', 'css', 'js', 'assets', 'projects', 'functions', 'wrangler.toml', '_headers' |
+'index.html', 'projects.json', 'css', 'js', 'assets', 'projects', 'functions', '_headers' |
   ForEach-Object { Copy-Item -Recurse -Force $_ $STAGE/ }
 wrangler pages deploy $STAGE --project-name $PROJECT --branch main
 
