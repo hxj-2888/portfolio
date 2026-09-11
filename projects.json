@@ -63,17 +63,20 @@
     {
       "id": "space-kill",
       "name": "太空杀 · 三阵营对抗",
-      "description": "15 人三阵营（人类 11 / 异形 3 / 外星人 1）身份博弈桌游的规则设计与自动化平衡性模拟：确定性裁判 + 高水平玩家博弈 AI，严格禁止「上帝视角」。公测 3.1 异形策略升级为击杀 / 破坏 / 感染三大权重化流派，感染为显式权重项，觉醒与转化视情形自动切换。大规模对局输出阵营胜率、职业强度与策略矩阵（18 组合 × 2000 局），用数据驱动规则持续迭代。",
+      "description": "15 人三阵营（人类 11 / 异形 3 / 外星人 1）身份博弈的可玩网页游戏：19 个夜间步骤的真实计时窗口、实时公开讨论、私聊双向确认、六分区记事本、上帝视角复盘，空席位与断线者由 AI 托管。当前为预览版，后续将全力优化 AI 判断逻辑与 AI 语言。配套附件站收录正式剧情（三条胜利线）、公测 3.0 规则全文，以及用同一套网页版引擎离线跑出的蒙特卡洛成果（10000 局：人类 30.3% / 异形 59.0% / 外星人 10.6%，0 异常）。",
       "tags": [
-        "Python",
+        "网页游戏",
+        "三阵营博弈",
+        "AI 托管",
         "蒙特卡洛模拟",
-        "数值平衡",
         "博弈 AI"
       ],
+      "thumbnail": "assets/projects/space-kill.png",
       "icon": "🚀",
       "entry": "index.html",
       "type": "web",
-      "liveUrl": "https://space-kill.pages.dev",
+      "liveUrl": "https://space-kill-web.pages.dev",
+      "attachmentUrl": "https://space-kill.pages.dev",
       "source": {
         "type": "local",
         "path": "projects/space-kill"
