@@ -10,3 +10,7 @@
   X-Frame-Options: SAMEORIGIN
   Strict-Transport-Security: max-age=31536000
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+
+# 太空杀安卓包不放在本作品集分发（避免 *.apk 进仓库 / 本地部署依赖）：
+# 安装包由游戏站自带域名托管 —— https://space-kill-web.pages.dev/SpaceKill.apk
+# 附件下载响应头在那边仓库的 _headers 内定义。

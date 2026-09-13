@@ -1,7 +1,7 @@
 # 从 Cloudflare 旧部署恢复被 build-collect 清空的项目目录（curl -L 跟随 308）
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $BASE = 'https://69d49bc2.portfolio-ji.pages.dev/projects'
-$OUT = 'C:\Users\ASUS\Desktop\portfolio\projects'
+$OUT = Join-Path $PSScriptRoot 'projects'   # 相对脚本所在目录，避免把本机绝对路径写进仓库
 
 function Get-File($url, $target) {
   $tdir = Split-Path $target -Parent

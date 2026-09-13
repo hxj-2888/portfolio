@@ -77,6 +77,7 @@
       "type": "web",
       "liveUrl": "https://space-kill-web.pages.dev",
       "attachmentUrl": "https://space-kill.pages.dev",
+      "downloadUrl": "https://space-kill-web.pages.dev/SpaceKill.apk",
       "source": {
         "type": "local",
         "path": "projects/space-kill"
