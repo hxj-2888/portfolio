@@ -57,12 +57,15 @@ jobs:
 
       # ★ 白名单暂存：wrangler pages deploy 不支持 .assetsignore，
       #   只复制确定的站点文件部署，其余（笔记/脚本/.github/配置）永远不公开
-      #   注意：不含 wrangler.toml——deploy 读的是当前工作目录的配置，
+      #   注意 1：不含 wrangler.toml——deploy 读的是当前工作目录的配置，
       #   把它上传只会公开 D1 database_id / KV namespace id，无任何必要
+      #   注意 2：必须带 _headers——漏了它 CI 部署会把线上的安全响应头
+      #   （X-Frame-Options / HSTS / CSP）一并清掉（2026-09-13 实测踩过），
+      #   本地部署脚本 deploy-cloudflare.ps1 的白名单里一直有它，两处需保持一致
       - name: Stage site files (allowlist)
         run: |
           mkdir -p /tmp/site-deploy
-          cp -r index.html projects.json js assets projects functions /tmp/site-deploy/
+          cp -r index.html projects.json _headers js assets projects functions /tmp/site-deploy/
           find /tmp/site-deploy -maxdepth 1 -type f | sort
 
       - name: Deploy to Cloudflare Pages
@@ -86,3 +89,12 @@ jobs:
 
       - name: 内嵌三角洲预览
         run: curl -fsSL --max-time 30 "https://portfolio-ji.pages.dev/projects/delta-force/" | head -c 200
+
+      # 回归门禁：_headers 若漏进部署暂存，线上会静默丢失安全响应头（2026-09-13 踩过）
+      - name: 安全响应头 _headers 生效
+        run: |
+          H=$(curl -fsSI --max-time 30 "https://portfolio-ji.pages.dev/")
+          for k in "Content-Security-Policy" "X-Frame-Options" "Strict-Transport-Security"; do
+            echo "$H" | grep -qi "^$k:" || { echo "缺少响应头: $k（_headers 未部署）"; exit 1; }
+          done
+          echo "_headers OK"
