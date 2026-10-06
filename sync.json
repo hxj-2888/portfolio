@@ -137,7 +137,7 @@
     {
       "id": "ping-pong-duel",
       "enabled": true,
-      "sourceDir": "../乒乓对决_合并/public",
+      "sourceDir": "乒乓对决_合并/public",
       "targetDir": "projects/ping-pong-duel",
       "note": "乒乓对决源仓库 public/（部署到 ping-pong-duel.pages.dev 的同一份产物）→ 作品集副本。已确认全部为相对路径、SW 作用域 ./ 不越界，无需补丁。_worker.js（房间服务，部署在独立 Pages 项目）与 APK（体积大，作品集不分发安装包）不复制",
       "files": [
