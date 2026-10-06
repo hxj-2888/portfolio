@@ -78,6 +78,7 @@
       "liveUrl": "https://space-kill-web.pages.dev",
       "attachmentUrl": "https://space-kill.pages.dev",
       "downloadUrl": "https://space-kill-web.pages.dev/SpaceKill.apk",
+      "mirrorUrl": "https://gitee.com/hxj-2888/space-kill-web",
       "source": {
         "type": "local",
         "path": "projects/space-kill"
