@@ -186,12 +186,13 @@
     {
       "id": "space-kill",
       "enabled": true,
-      "sourceDir": "../space-kill-3.0/site",
+      "sourceDir": "space-kill-3.0/site",
       "targetDir": "projects/space-kill",
       "note": "太空杀官网部署源（space-kill.pages.dev 的同一份产物）→ 作品集副本。2026-08-30 起内嵌预览与官网完全一致，改为自动同步防止再次漂移（旧的 2.0/3.0/3.1 多版本门户已移除，其文档以 space-kill 仓库为准）",
       "files": [
         "index.html",
         "rules.html",
+        "太空杀V6.6正文_v66修订版.pdf",
         "sim31-flows.html",
         "sim31-matrix.html",
         "mc-10000.html",
