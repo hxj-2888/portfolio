@@ -176,6 +176,26 @@
         "qr-download.png",
         "audio/applause.wav",
         "audio/music.mp4"
+      ],
+      "patches": [
+        {
+          "file": "download.html",
+          "note": "作品集不分发安装包（见 .gitignore「作品集不承载二进制」）：把相对 APK 链接改写为游戏站绝对地址。相对路径在作品集域名下会落到 SPA 回退——返回 200 + HTML，用户下到一个改名为 .apk 的网页，正是「解析包错误」的成因之一。",
+          "rules": [
+            {
+              "type": "regex",
+              "from": "href=\"PingPongDuel-v",
+              "to": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            },
+            {
+              "type": "regex",
+              "from": "var APK = 'PingPongDuel-v",
+              "to": "var APK = 'https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "var APK = 'https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            }
+          ]
+        }
       ]
     },
     {
