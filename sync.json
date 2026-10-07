@@ -205,10 +205,11 @@
     },
     {
       "id": "space-kill",
-      "enabled": true,
+      "enabled": false,
+      "reason": "2026-10-07 起退役：附件站已并入太空杀仓 attachment-site/（唯一源），作品集副本 projects/space-kill 由本仓 sync-attachment-site CI 拉取、CI 内重建比对后自动同步。原 sourceDir 指向过期克隆 space-kill-3.0/（停在 07ddc31、remote 已 404），继续用它同步会造成副本回退，故停用本段；如需恢复，先把 sourceDir 改指 ../太空杀游戏-完整版/attachment-site/site",
       "sourceDir": "space-kill-3.0/site",
       "targetDir": "projects/space-kill",
-      "note": "太空杀官网部署源（space-kill.pages.dev 的同一份产物）→ 作品集副本。2026-08-30 起内嵌预览与官网完全一致，改为自动同步防止再次漂移（旧的 2.0/3.0/3.1 多版本门户已移除，其文档以 space-kill 仓库为准）",
+      "note": "（已停用）太空杀官网部署源（space-kill.pages.dev 的同一份产物）→ 作品集副本。2026-08-30 起内嵌预览与官网完全一致，改为自动同步防止再次漂移（旧的 2.0/3.0/3.1 多版本门户已移除，其文档以 space-kill 仓库为准）",
       "files": [
         "index.html",
         "rules.html",
