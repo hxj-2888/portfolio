@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>策略矩阵报告 · 太空杀</title>
-<meta name="description" content="18 组合 × 2000 局 · 异形三流派与均衡解">
+<meta name="description" content="测试 3.1 · 18 组合 × 2000 局 · 异形三流派与均衡解">
 <style>
 :root { --bg:#0a0a0f; --card:#141420; --line:#252535; --text:#e0e0ea; --muted:#8888a0; --accent:#818cf8; }
 * { margin:0; padding:0; box-sizing:border-box }
@@ -47,8 +47,8 @@ pre { background:#12121e; border:1px solid var(--line); border-radius:10px; padd
   <a class="tab" href="https://space-kill-web.pages.dev" rel="noopener" target="_blank">可玩网页版 ↗</a>
 </nav>
 <div class="wrap">
-<h1>太空杀 公测3.1 策略矩阵报告（三方风格交叉对战）</h1>
-<p>模拟：<strong>18 组合 × 2000 局</strong>高水平对战（种子 90000）。规则版本：公测3.0（R1~R11 + 感染体系v3 + 倒计时24 + 补刀第4夜）。</p>
+<h1>太空杀 测试3.1 策略矩阵报告（三方风格交叉对战）</h1>
+<p>模拟：<strong>18 组合 × 2000 局</strong>高水平对战（种子 90000）。规则版本：测试3.0（R1~R11 + 感染体系v3 + 倒计时24 + 补刀第4夜）。</p>
 <p>异形流派已收敛为 <strong>击杀流 kill / 破坏流 sab / 感染流 infect</strong>（原 mix 混合分工、balanced 均衡、mimic 拟态渗透已移除）；<strong>感染是行动权重表中的显式权重项</strong>，三大流派共用"视情形而定"的权重化觉醒与转化。</p>
 <p>默认参数：TRUSTED_LR=5.0 / ORDINARY_LR=1.12 / 记忆衰减0.97 / 情绪+追责+质询+引述全开。<strong>规则数值未改动</strong>，仅切换策略权重。</p>
 <h3>策略含义</h3>
@@ -138,7 +138,7 @@ pre { background:#12121e; border:1px solid var(--line); border-radius:10px; padd
 <blockquote><p>说明：本矩阵仅切换 AI 策略权重，不改规则数值。若均衡解与目标仍有缺口，差额只能由规则层旋钮（感染死亡夜 / 救援额度 / 停摆奖励 / 神探查验频率等）补齐。</p></blockquote>
 <h3>⑦ 关键观察</h3>
 <ul><li>异形三大流派中 <strong>kill</strong> 的异形胜率最高（跨人类×外星均值 25.5%）。</li><li>三大流派的行动占比、觉醒方向分布与转化利用度见 <code>异形流派核验.md</code>（verify_alien31.py）。</li><li>目标 40/35/25 的缺口由规则层旋钮补齐；本次按约定<strong>保留策略层改动，不施加规则数值削弱</strong>。</li></ul>
-<div class="foot"><span>太空杀 · 三阵营身份博弈 · 规则正文 v6.6（v66 修订版）</span><span><a href="https://github.com/hxj-2888/space-kill" rel="noopener" target="_blank">GitHub</a></span></div>
+<div class="foot"><span>太空杀 · 三阵营身份博弈 · 规则正文 v6.6（v66 修订版）</span><span><a href="https://github.com/hxj-2888/space-kill-web/tree/main/attachment-site" rel="noopener" target="_blank">GitHub 源码</a></span></div>
 </div>
 </body>
 </html>
