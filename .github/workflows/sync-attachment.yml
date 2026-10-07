@@ -108,11 +108,14 @@ jobs:
           #   漂移永远不被修复。故这里额外把「本次重建结果」与「仓库里现存副本」逐文件比一次，
           #   两者任一变化都进入修复流程。
           if [ ! -d projects/space-kill ]; then
-            echo "drift=true  (副本目录不存在)"
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            echo "副本目录不存在"
           elif diff -rq projects/space-kill attachment-src/attachment-site/site > /tmp/drift.txt 2>&1; then
-            echo "drift=false (副本与源一致)"
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+            echo "副本与源一致"
           else
-            echo "drift=true  (副本已偏离源)："
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            echo "副本已偏离源："
             sed 's/^/    /' /tmp/drift.txt
           fi
 
