@@ -45,10 +45,23 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: hxj-2888/space-kill-web
-          path: attachment-site
+          # 注意：checkout 的 path 是「工作目录」，而 sparse-checkout 的模式相对**仓库根**。
+          # 所以内容实际落在 attachment-src/attachment-site/site —— 这里最容易写错，
+          # 故下面第一步立即断言路径，错了当场报「路径错」而不是在 diff 里报「产物不一致」。
+          path: attachment-src
           sparse-checkout: attachment-site
           sparse-checkout-cone-mode: true
           persist-credentials: false
+
+      - name: Assert source layout
+        run: |
+          SRC=attachment-src/attachment-site
+          if [ ! -d "$SRC/site" ] || [ ! -f "$SRC/tools/build_site.py" ]; then
+            echo "::error::源码布局不符预期。实际内容："
+            find attachment-src -maxdepth 3 -type d | sed 's/^/    /'
+            exit 1
+          fi
+          echo "源码就位: $SRC（site/ 共 $(ls "$SRC/site" | wc -l) 个文件）"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -61,7 +74,7 @@ jobs:
 
       - name: Rebuild site from source
         run: |
-          cd attachment-site
+          cd attachment-src/attachment-site
           # 先记录提交进来的那份，重建后与之比对
           cp -r site /tmp/site-committed
           python tools/build_site.py
@@ -78,7 +91,7 @@ jobs:
         id: fp
         run: |
           # 只对内容敏感：按相对路径 + 文件哈希排序后整体哈希，忽略 mtime
-          cd attachment-site/site
+          cd attachment-src/attachment-site/site
           FP=$(find . -type f | sort | while read -r f; do
                 printf '%s  %s\n' "$(sha256sum "$f" | cut -d' ' -f1)" "$f"
               done | sha256sum | cut -d' ' -f1)
@@ -104,16 +117,17 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy attachment-site/site --project-name=space-kill --branch=main
+          command: pages deploy attachment-src/attachment-site/site --project-name=space-kill --branch=main
 
       - name: Sync into portfolio copy
         if: steps.changed.outputs.changed == 'true'
         run: |
-          # 整目录同步：source 的文件集是超集，直接 rsync --delete 避免残留旧文件。
+          # 整目录同步：source 的文件集是超集，直接 rm -r + cp 避免残留旧文件。
           # ⚠ 若在 space-kill-web 的 attachment-site/site/ 里删过文件，这里会同步删除作品集副本，
           #   这是预期行为（作品集副本必须是附件站的忠实镜像）。
           rm -rf projects/space-kill
-          cp -r attachment-site/site projects/space-kill
+          cp -r attachment-src/attachment-site/site projects/space-kill
+          echo "已同步 $(ls projects/space-kill | wc -l) 个文件"
 
       - name: Commit fingerprint + synced copy
         if: steps.changed.outputs.changed == 'true'
