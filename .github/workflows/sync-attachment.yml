@@ -1,0 +1,169 @@
+# ===== GitHub Actions — 附件站同步与部署（太空杀 · 附件站） =====
+#
+# 做什么（一次跑完三件事）：
+#   1. 从 space-kill-web 拉取 attachment-site/（该仓是附件站源码的唯一所在地）
+#   2. 在 CI 内用 python-docx 重新构建 site/，并与仓库里提交的那份逐字节比对
+#      —— 这道门禁是当年真源与产物长期脱节的直接补丁
+#   3. 部署到 Cloudflare Pages（space-kill.pages.dev），
+#      并把产物复制进本仓 projects/space-kill/ 后提交 → 触发现有 deploy.yml 上线作品集
+#
+# 为什么这个工作流放在作品集仓、而不是 space-kill-web：
+#   - Cloudflare 凭据只有本仓有（CF_API_TOKEN / CF_ACCOUNT_ID）；space-kill-web 一个 secret 都没有
+#   - GitHub 的 GITHUB_TOKEN 只能写本仓。工作流要提交 projects/space-kill/ 就必须在作品集仓里
+#   - 两个仓都是 public，跨仓**读取**用默认 token 即可（已实测，无需 PAT）
+#   反向（让 space-kill-web 主持）需要额外 3 个 secret（2 个 Cloudflare + 1 个跨仓 PAT），故不取。
+#
+# 触发：定时轮询（默认）+ 手动。
+#   定时而非 webhook，是因为 webhook 需要在 space-kill-web 里放一个 PAT；
+#   代价是最多延迟一个轮询周期。要改成 push 即联动，见文末「改成秒级联动」。
+
+name: sync-attachment-site
+
+on:
+  schedule:
+    # 每 6 小时一次（避开整点，错开其他项目的定时任务）
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: sync-attachment-site
+  # 不取消：一次部署要几分钟，中途中断会留下半部署状态
+  cancel-in-progress: false
+
+permissions:
+  contents: write          # 需要把产物提交回本仓 projects/space-kill/
+
+jobs:
+  sync:
+    name: Build · Verify · Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout portfolio
+        uses: actions/checkout@v7
+
+      - name: Checkout attachment-site source (public, default token)
+        uses: actions/checkout@v7
+        with:
+          repository: hxj-2888/space-kill-web
+          path: attachment-site
+          sparse-checkout: attachment-site
+          sparse-checkout-cone-mode: true
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 版本锁定：与 tools/build_site.py 头注释一致，防上游大版本破坏构建
+      - name: Install python-docx
+        run: pip install "python-docx==1.2.0"
+
+      - name: Rebuild site from source
+        run: |
+          cd attachment-site
+          # 先记录提交进来的那份，重建后与之比对
+          cp -r site /tmp/site-committed
+          python tools/build_site.py
+          echo "---- 重建结果 vs 提交内容 ----"
+          if diff -rq /tmp/site-committed site; then
+            echo "一致：产物可由源（docx / md / pdf）确定性重建"
+          else
+            echo "::error::attachment-site/site 与源文档不一致 —— 有人手工改过产物。"
+            echo "::error::请勿直接编辑 site/*.html；改源文档后重新运行 python tools/build_site.py 并提交。"
+            exit 1
+          fi
+
+      - name: Compute content fingerprint
+        id: fp
+        run: |
+          # 只对内容敏感：按相对路径 + 文件哈希排序后整体哈希，忽略 mtime
+          cd attachment-site/site
+          FP=$(find . -type f | sort | while read -r f; do
+                printf '%s  %s\n' "$(sha256sum "$f" | cut -d' ' -f1)" "$f"
+              done | sha256sum | cut -d' ' -f1)
+          echo "sha256=$FP" >> "$GITHUB_OUTPUT"
+          echo "产物指纹: $FP"
+
+      - name: Compare against last deployed fingerprint
+        id: changed
+        run: |
+          PREV=$(cat .attachment-site.fingerprint 2>/dev/null || echo "")
+          echo "上次指纹: ${PREV:-（无）}"
+          echo "本次指纹: ${{ steps.fp.outputs.sha256 }}"
+          if [ "$PREV" = "${{ steps.fp.outputs.sha256 }}" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "产物无变化，跳过部署"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.changed.outputs.changed == 'true'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: pages deploy attachment-site/site --project-name=space-kill --branch=main
+
+      - name: Sync into portfolio copy
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          # 整目录同步：source 的文件集是超集，直接 rsync --delete 避免残留旧文件。
+          # ⚠ 若在 space-kill-web 的 attachment-site/site/ 里删过文件，这里会同步删除作品集副本，
+          #   这是预期行为（作品集副本必须是附件站的忠实镜像）。
+          rm -rf projects/space-kill
+          cp -r attachment-site/site projects/space-kill
+
+      - name: Commit fingerprint + synced copy
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          echo "${{ steps.fp.outputs.sha256 }}" > .attachment-site.fingerprint
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A projects/space-kill .attachment-site.fingerprint
+          if git diff --cached --quiet; then
+            echo "无文件变化，无需提交"
+            exit 0
+          fi
+          git commit -m "sync(space-kill): 附件站产物同步（指纹 ${{ steps.fp.outputs.sha256 }}）
+
+          来源：hxj-2888/space-kill-web 的 attachment-site/site（由本次工作流拉取并重建校验）。
+          这次提交会触发现有 deploy.yml，把副本部署到 portfolio-ji.pages.dev。"
+          git push origin HEAD:main
+
+      - name: Smoke test attachment site
+        run: |
+          ok=0
+          for i in 1 2 3 4 5 6; do
+            if curl -fsSL --max-time 30 -o /dev/null "https://space-kill.pages.dev/mc-10000.html"; then ok=1; break; fi
+            echo "重试 $i（该站边缘节点偶发超时，属已知现象）"
+            sleep 10
+          done
+          [ "$ok" = "1" ] || { echo "::error::附件站持续不可达"; exit 1; }
+          echo "附件站可达"
+
+# ===== 改成「push 即联动」（秒级，代价是 1 个新 secret）=====
+# 1) 在 space-kill-web 仓创建一个 PAT，权限只需 public_repo + workflow（勾选
+#    "Contents: Read-only" 即可），存为该仓 secret： REPO_DISPATCH_TOKEN
+# 2) 在 space-kill-web 的 deploy.yml 的 check job 末尾加：
+#
+#      - name: Notify portfolio to sync attachment site
+#        if: success()
+#        run: |
+#          curl -fsSL -X POST \
+#            -H "Accept: application/vnd.github+json" \
+#            -H "Authorization: Bearer ${{ secrets.REPO_DISPATCH_TOKEN }}" \
+#            https://api.github.com/repos/hxj-2888/portfolio/dispatches \
+#            -d '{"event_type":"attachment-site-changed"}'
+#
+# 3) 把本文件的 on: 段改为：
+#
+#      on:
+#        repository_dispatch:
+#          types: [attachment-site-changed]
+#        schedule:
+#          - cron: '23 */6 * * *'      # 保留定时作为兜底（webhook 漏发时兜底）
+#        workflow_dispatch:
+#
+# 保留 schedule 是有意的：webhook 会漏发，定时轮询是最后一道保险。
