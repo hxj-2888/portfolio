@@ -32,6 +32,7 @@ concurrency:
 
 permissions:
   contents: write          # 需要把产物提交回本仓 projects/space-kill/
+  actions: write            # 需要显式唤起本仓的 deploy.yml（原因见下方「GITHUB_TOKEN 不触发工作流」）
 
 jobs:
   sync:
@@ -130,6 +131,7 @@ jobs:
           echo "已同步 $(ls projects/space-kill | wc -l) 个文件"
 
       - name: Commit fingerprint + synced copy
+        id: commit
         if: steps.changed.outputs.changed == 'true'
         run: |
           echo "${{ steps.fp.outputs.sha256 }}" > .attachment-site.fingerprint
@@ -138,13 +140,36 @@ jobs:
           git add -A projects/space-kill .attachment-site.fingerprint
           if git diff --cached --quiet; then
             echo "无文件变化，无需提交"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "sync(space-kill): 附件站产物同步（指纹 ${{ steps.fp.outputs.sha256 }}）
 
           来源：hxj-2888/space-kill-web 的 attachment-site/site（由本次工作流拉取并重建校验）。
-          这次提交会触发现有 deploy.yml，把副本部署到 portfolio-ji.pages.dev。"
+          作品集上线由本工作流下一步显式唤起 deploy.yml 完成。"
           git push origin HEAD:main
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # ⚠⚠ 为什么必须显式唤起，而不能指望 push 自动触发（2026-10-07 实测踩过）：
+      #
+      #   用 GITHUB_TOKEN 认证的 push **不会创建任何 workflow run** —— 这是 GitHub 的刻意设计，
+      #   用来防止工作流互相触发形成无限递归。后果是：上面那次 git push 之后，
+      #   deploy.yml 根本没有被触发，作品集线上不会更新，而工作流本身一路绿灯、毫无异常迹象。
+      #
+      #   （首次实测时就是这样：自动提交成功、CI 全绿，但 deploy.yml 没有对应 run，
+      #     线上副本之所以是对的，只因为此前已手工同步过 —— 属于侥幸，不是机制生效。）
+      #
+      #   解法：用 actions: write 权限显式 workflow_dispatch 唤起本仓的 deploy.yml。
+      #   这条链路上「提交」只是留痕，「上线」由这一步负责，行为是确定的。
+      - name: Trigger portfolio deploy workflow
+        if: steps.commit.outputs.pushed == 'true'
+        run: |
+          curl -fsSL -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/deploy.yml/dispatches" \
+            -d '{"ref":"main"}'
+          echo "已唤起 deploy.yml（作品集即将重新部署）"
 
       - name: Smoke test attachment site
         run: |
