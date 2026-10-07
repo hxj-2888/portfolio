@@ -99,21 +99,46 @@ jobs:
           echo "sha256=$FP" >> "$GITHUB_OUTPUT"
           echo "产物指纹: $FP"
 
-      - name: Compare against last deployed fingerprint
-        id: changed
+      - name: Detect drift against portfolio copy
+        id: drift
         run: |
-          PREV=$(cat .attachment-site.fingerprint 2>/dev/null || echo "")
-          echo "上次指纹: ${PREV:-（无）}"
-          echo "本次指纹: ${{ steps.fp.outputs.sha256 }}"
-          if [ "$PREV" = "${{ steps.fp.outputs.sha256 }}" ]; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "产物无变化，跳过部署"
+          # 为什么要比对「副本」而不只是「源 vs 上次部署」：
+          #   指纹记录的是上次部署的**源**内容。若有人直接改了本仓 projects/space-kill/ 里的
+          #   副本（当年就是这么脱节的），源没变 → 指纹相同 → 只比指纹的工作流会认为无事可做，
+          #   漂移永远不被修复。故这里额外把「本次重建结果」与「仓库里现存副本」逐文件比一次，
+          #   两者任一变化都进入修复流程。
+          if [ ! -d projects/space-kill ]; then
+            echo "drift=true  (副本目录不存在)"
+          elif diff -rq projects/space-kill attachment-src/attachment-site/site > /tmp/drift.txt 2>&1; then
+            echo "drift=false (副本与源一致)"
           else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "drift=true  (副本已偏离源)："
+            sed 's/^/    /' /tmp/drift.txt
           fi
 
+      - name: Decide what to do
+        id: plan
+        run: |
+          PREV=$(cat .attachment-site.fingerprint 2>/dev/null || echo "")
+          FP="${{ steps.fp.outputs.sha256 }}"
+          DRIFT="${{ steps.drift.outputs.drift }}"
+          echo "上次部署指纹 : ${PREV:-（无）}"
+          echo "本次构建指纹 : $FP"
+          echo "副本是否漂移 : $DRIFT"
+          deploy=false; sync=false
+          [ "$PREV" != "$FP" ] && { deploy=true;  sync=true; echo "→ 源有更新：部署 + 同步副本"; }
+          if [ "$DRIFT" = "true" ]; then
+            sync=true
+            [ "$deploy" = "false" ] && echo "→ 源未变但副本漂移：只修复副本，不重新部署（线上内容本就是对的）"
+          fi
+          [ "$sync" = "false" ] && echo "→ 无事可做，全部跳过"
+          {
+            echo "deploy=$deploy"
+            echo "sync=$sync"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Deploy to Cloudflare Pages
-        if: steps.changed.outputs.changed == 'true'
+        if: steps.plan.outputs.deploy == 'true'
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
@@ -121,7 +146,7 @@ jobs:
           command: pages deploy attachment-src/attachment-site/site --project-name=space-kill --branch=main
 
       - name: Sync into portfolio copy
-        if: steps.changed.outputs.changed == 'true'
+        if: steps.plan.outputs.sync == 'true'
         run: |
           # 整目录同步：source 的文件集是超集，直接 rm -r + cp 避免残留旧文件。
           # ⚠ 若在 space-kill-web 的 attachment-site/site/ 里删过文件，这里会同步删除作品集副本，
@@ -132,7 +157,7 @@ jobs:
 
       - name: Commit fingerprint + synced copy
         id: commit
-        if: steps.changed.outputs.changed == 'true'
+        if: steps.plan.outputs.sync == 'true'
         run: |
           echo "${{ steps.fp.outputs.sha256 }}" > .attachment-site.fingerprint
           git config user.name  "github-actions[bot]"
@@ -145,8 +170,8 @@ jobs:
           fi
           git commit -m "sync(space-kill): 附件站产物同步（指纹 ${{ steps.fp.outputs.sha256 }}）
 
-          来源：hxj-2888/space-kill-web 的 attachment-site/site（由本次工作流拉取并重建校验）。
-          作品集上线由本工作流下一步显式唤起 deploy.yml 完成。"
+          来源：hxj-2888/space-kill-web 的 attachment-site/site（由本工作流拉取并在 CI 内重建校验）。
+          作品集上线由本工作流下一步显式唤起 deploy.yml 完成 —— GITHUB_TOKEN 的 push 不会自动触发工作流。"
           git push origin HEAD:main
           echo "pushed=true" >> "$GITHUB_OUTPUT"
 
