@@ -1,6 +1,6 @@
 {
   "name": "portfolio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "个人作品集 — 项目展示与预览",
   "scripts": {
     "sync": "node sync-projects.js",
