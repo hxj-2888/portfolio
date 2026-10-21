@@ -222,6 +222,62 @@
         "story-alien.html",
         "story-xeno.html"
       ]
+    },
+    {
+      "id": "game-collection",
+      "enabled": true,
+      "sourceDir": "..",
+      "targetDir": "projects/game-collection",
+      "note": "游戏合集：两个游戏的产物按白名单搬进 games/，合集页（index.html / collection.* / assets）在 projects/game-collection 内手写维护，不参与复制。分组与通配由 sync-projects.js 的 expandFileEntries 展开。",
+      "files": [
+        {
+          "base": "乒乓对决_合并/public",
+          "to": "games/ping-pong",
+          "files": [
+            "index.html",
+            "download.html",
+            "sw.js",
+            "manifest.webmanifest",
+            "css/style.css",
+            "js/**",
+            "icon-192.png",
+            "icon-512.png",
+            "audio/**"
+          ]
+        },
+        {
+          "base": "太空杀游戏-完整版",
+          "to": "games/space-kill",
+          "files": [
+            "index.html",
+            "css/**",
+            "js/**",
+            "audio/**"
+          ]
+        }
+      ],
+      "neverCopy": {
+        "_警告": "以下路径绝不可复制进合集",
+        "games/ping-pong/_worker.js": "Pages 高级模式 WS 转发，只对乒乓独立域名有意义",
+        "games/ping-pong/PingPongDuel.apk": "二进制不入库，改走外链",
+        "games/ping-pong/PingPongDuel-v321.apk": "同上",
+        "games/space-kill/SpaceKill.apk": "同上",
+        "games/*/server/**": "本地联机服务不进静态包"
+      },
+      "patches": [
+        {
+          "file": "index.html",
+          "note": "合集适配：本文件在 projects/game-collection 内手写维护；此规则只做「SW 守卫标记」存在性探测（不命中仅告警，提示人工检查，不阻断同步）",
+          "rules": [
+            {
+              "type": "string",
+              "from": "<title>",
+              "to": "<title>",
+              "okIfContains": "__ARCADE_SW__"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

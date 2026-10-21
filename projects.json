@@ -1,88 +1,136 @@
 {
+  "_说明": "作品集数据源（唯一真相）。卡片与预览弹窗都从这里渲染；新增项目只改本文件。",
+  "_schema": {
+    "id": "目录名，必须与 projects/<id>/ 一致",
+    "group": "play | tools | process —— 首页分组",
+    "order": "同组内排序，越小越靠前",
+    "countsAsGame": "计入数据带“可玩网页游戏”的数量",
+    "kicker": "卡片上方小字（类别）",
+    "name": "标题（返航录等展示名以本字段为准）",
+    "tagline": "一句话，≤28 字，不要括号补充",
+    "tags": "最多显示 3 个",
+    "links": "资源行：{label, url, icon: globe|github|doc}"
+  },
   "projects": [
     {
-      "id": "ping-pong-duel",
-      "name": "乒乓对决 · 双人联机乒乓球",
-      "description": "ITTF 标准球台与真实物理（重力 / 旋转 / 摩擦）的双人联机乒乓球游戏：支持人机对战（四档难度 + 数值调节）、AI 观战、电脑端本地双人与房间码联机（本地/公网，独立联机框），个人生涯含真人记录；手机端竖屏适配（首屏零滚动、比分栏/操作提示/发球倒计时各占一行不叠压、浮动摇杆、旗帜不裁切）+ 上滑扣球 + 蹲下，当前版本 v3.2.1；发球轨迹实时预览、判定范围虚线辅助；独立说明书页收纳全部规则与赛事标准；反击扣杀与低平快球均有操作奖励。零依赖纯 JavaScript 实现。",
-      "tags": [
-        "联机游戏",
-        "WebSocket",
-        "Canvas",
-        "物理引擎"
+      "id": "game-collection",
+      "group": "play",
+      "order": 1,
+      "countsAsGame": false,
+      "kicker": "游戏合集",
+      "name": "游戏合集 · 两个游戏",
+      "tagline": "乒乓对决与返航录的统一入口，各自独立运行。",
+      "tags": ["合集", "多端", "PWA"],
+      "thumbnail": "assets/projects/game-collection.png",
+      "entry": "index.html",
+      "type": "web",
+      "mobile": true,
+      "liveUrl": "https://ping-pong-duel.pages.dev",
+      "links": [
+        { "label": "乒乓对决", "url": "https://ping-pong-duel.pages.dev", "icon": "globe" },
+        { "label": "返航录", "url": "https://space-kill-web.pages.dev", "icon": "globe" }
       ],
+      "source": { "type": "local", "path": "projects/game-collection" }
+    },
+    {
+      "id": "ping-pong-duel",
+      "group": "play",
+      "order": 2,
+      "countsAsGame": true,
+      "kicker": "可玩 · 网页游戏",
+      "name": "乒乓对决",
+      "tagline": "ITTF 标准球台的真实物理乒乓球，人机、双人与房间码联机。",
+      "tags": ["联机", "物理引擎", "手机竖屏"],
       "thumbnail": "assets/projects/ping-pong-duel.png",
       "entry": "index.html",
       "type": "web",
       "mobile": true,
       "liveUrl": "https://ping-pong-duel.pages.dev",
-      "source": {
-        "type": "local",
-        "path": "projects/ping-pong-duel"
-      }
+      "links": [
+        { "label": "GitHub", "url": "https://github.com/hxj-2888/ping-pong-duel", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/ping-pong-duel", "icon": "github" }
+      ],
+      "qr": { "src": "assets/qr/ping-pong.png", "title": "乒乓对决 v3.2.1 · 扫码下载安卓安装包" },
+      "source": { "type": "local", "path": "projects/ping-pong-duel" }
+    },
+    {
+      "id": "space-kill",
+      "group": "play",
+      "order": 3,
+      "countsAsGame": true,
+      "kicker": "可玩 · 网页游戏",
+      "name": "返航录",
+      "tagline": "15 人三阵营身份博弈，空席位由 AI 托管，手机横屏可玩。",
+      "tags": ["规则引擎", "AI 托管", "蒙特卡洛"],
+      "thumbnail": "assets/projects/space-kill.png",
+      "entry": "index.html",
+      "type": "web",
+      "mobile": true,
+      "liveUrl": "https://space-kill-web.pages.dev",
+      "links": [
+        { "label": "规则与资料", "url": "https://space-kill.pages.dev", "icon": "doc" },
+        { "label": "GitHub", "url": "https://github.com/hxj-2888/space-kill-web", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/space-kill-web", "icon": "github" }
+      ],
+      "qr": { "src": "assets/qr/space-kill-apk.png", "title": "返航录 · 扫码下载安卓安装包" },
+      "source": { "type": "local", "path": "projects/space-kill" }
     },
     {
       "id": "delta-force",
-      "name": "落幕查 - 变卖物价格查询",
-      "description": "落幕查（三角洲行动变卖物实时价格查询工具）：分类浏览、搜索、收藏、价格异动与 30 天历史走势；网页 PWA 一键安装，安卓 APK（v3.1）扫码下载。",
-      "downloadUrl": "https://delta-force-v5.pages.dev/download.html",
-      "qr": "assets/qr/delta-force.png",
-      "tags": [
-        "PWA",
-        "API",
-        "价格查询",
-        "IndexedDB"
-      ],
+      "wide": true,
+      "group": "tools",
+      "order": 1,
+      "kicker": "工具 · PWA",
+      "name": "落幕查",
+      "tagline": "三角洲行动变卖物的实时价格查询，带 30 天走势。",
+      "tags": ["PWA", "价格查询", "IndexedDB"],
       "thumbnail": "assets/projects/delta-force.png",
       "entry": "index.html",
       "type": "web",
       "mobile": true,
       "liveUrl": "https://delta-force-v5.pages.dev",
-      "source": {
-        "type": "local",
-        "path": "projects/delta-force"
-      }
+      "links": [
+        { "label": "下载页", "url": "https://delta-force-v5.pages.dev/download.html", "icon": "doc" },
+        { "label": "GitHub", "url": "https://github.com/hxj-2888/delta-force-price-query", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/delta-force-price-query", "icon": "github" }
+      ],
+      "qr": { "src": "assets/qr/delta-force.png", "title": "落幕查 · 扫码下载应用" },
+      "source": { "type": "local", "path": "projects/delta-force" }
+    },
+    {
+      "id": "space-kill-attachment",
+      "icon": "doc",
+      "group": "process",
+      "order": 1,
+      "kicker": "过程 · 规则资料",
+      "name": "规则正文与资料",
+      "tagline": "返航录的规则正文、速查卡、术语表与判定流程图。",
+      "tags": ["规则正文", "速查卡", "术语表", "流程图"],
+      "thumbnail": null,
+      "entry": null,
+      "type": "doc",
+      "liveUrl": "https://space-kill.pages.dev",
+      "links": [
+        { "label": "规则正文 v1preview1.0", "url": "https://space-kill.pages.dev", "icon": "doc" }
+      ]
     },
     {
       "id": "portfolio-source",
-      "name": "个人作品集 · 本站",
-      "description": "本站由这些文件组成：实时预览 + 源码展示，自己展示自己。",
-      "tags": [
-        "HTML",
-        "CSS",
-        "JavaScript",
-        "自我展示"
-      ],
-      "icon": "🖥️",
+      "icon": "github",
+      "group": "process",
+      "order": 2,
+      "kicker": "过程 · 本站",
+      "name": "作品集 · 本站",
+      "tagline": "零构建静态站：数据驱动渲染，规则与代码同步。",
+      "tags": ["HTML", "CSS", "无框架"],
+      "thumbnail": null,
       "entry": "index.html",
       "type": "web",
-      "source": {
-        "type": "local",
-        "path": "projects/portfolio-source"
-      }
-    },
-    {
-      "id": "space-kill",
-      "name": "返航录 · 三阵营对抗",
-      "description": "15 人三阵营（人类 11 / 异形 3 / 外星人 1）身份博弈的可玩网页游戏（原名「太空杀」，随规则正文 v1preview1.0 更名）：24 个夜间步位 + 两个前置子阶段的真实计时窗口、实时公开讨论与紧急会议、私聊双向确认、六分区记事本、上帝视角复盘，空席位与断线者由 AI 托管。当前规则口径 v1preview1.0（原 v6.6）——本版落地：强力乔装（一次耗 2 次、兼骗蛰伏与神探查验，反制仅神探复验）、染血指认（同一凶手累计 3 次出刀致濒死后，其后的每次出刀受攻击者皆得知其编号）、发起者记账与有效输出定档，以及外星人「逃亡」次胜路径（积分门槛 10，脱离对局判次胜、对局继续）；新增两个席位变体职业——摆渡人（白天验尸调查，答有/无凶手）与疫苗研究员（诊断/研制/接种，授予 4 夜疫苗抗体）；驱逐门槛升至 3 票、票数公开只报得票、感染抑制降为 2 次、工匠速成护甲改自佩戴当夜起 3 夜有效且库存上限 3。手机横屏可玩、安卓 App 启动即锁横屏，后续将全力优化 AI 判断逻辑与 AI 语言（安卓版安装包由游戏站托管，同版本号）。配套附件站收录正式剧情（三条胜利线）、规则正文 v1preview1.0 全文（47 页 PDF + 在线阅读），以及用同一套网页版引擎离线跑出的蒙特卡洛成果（10000 局：人类 29.5% / 异形 57.1% / 外星人 13.4%，0 异常）。",
-      "tags": [
-        "网页游戏",
-        "三阵营博弈",
-        "AI 托管",
-        "蒙特卡洛模拟",
-        "博弈 AI"
+      "links": [
+        { "label": "GitHub", "url": "https://github.com/hxj-2888", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/portfolio", "icon": "github" }
       ],
-      "thumbnail": "assets/projects/space-kill.png",
-      "icon": "🚀",
-      "entry": "index.html",
-      "type": "web",
-      "liveUrl": "https://space-kill-web.pages.dev",
-      "attachmentUrl": "https://space-kill.pages.dev",
-      "downloadUrl": "https://space-kill-web.pages.dev/SpaceKill.apk",
-      "mirrorUrl": "https://gitee.com/hxj-2888/space-kill-web",
-      "source": {
-        "type": "local",
-        "path": "projects/space-kill"
-      }
+      "source": { "type": "local", "path": "projects/portfolio-source" }
     }
   ]
 }

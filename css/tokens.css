@@ -1,0 +1,54 @@
+/* ============================================================
+   tokens.css — 全局设计 token（作品集 / 游戏合集 / 各项目共用）
+   来源：docs/作品集重构方案.md §4.2
+   约定：组件只用变量，不再写十六进制色值（唯一例外：项目二级色）
+   ============================================================ */
+:root{
+  /* 底色与表面 */
+  --bg:#0B0B10;
+  --surface:#14141C;
+  --surface-2:#1A1A24;
+  --line:#23232F;
+  --line-strong:#32323F;
+
+  /* 文本 */
+  --text:#E6E6EE;
+  --muted:#8E8EA6;
+  --muted-2:#6B6B82;
+
+  /* 强调（全局唯一） */
+  --accent:#F5A524;
+  --accent-ink:#1A1204;
+
+  /* 项目二级色：只用于项目内部的主题头/卡图，不进全局组件 */
+  --proj-ping-pong:#2DD4BF;
+  --proj-return:#3B82F6;
+  --proj-delta:#F97316;
+
+  /* 圆角 */
+  --r-card:20px;
+  --r-pill:999px;
+  --r-sm:10px;
+
+  /* 间距 */
+  --sp-1:8px;  --sp-2:16px; --sp-3:24px;
+  --sp-4:40px; --sp-5:64px; --sp-6:96px;
+
+  /* 字号 */
+  --fs-xs:12px; --fs-sm:14px; --fs-base:16px;
+  --fs-lg:20px;  --fs-xl:28px;
+  --fs-h1:clamp(40px,7vw,80px);
+  --fs-h2:clamp(26px,3.4vw,40px);
+
+  /* 布局 */
+  --w-max:1120px;
+  --shadow-card:0 18px 40px rgba(0,0,0,.35);
+  --dur:.22s;
+  --ease:cubic-bezier(.2,.7,.3,1);
+}
+
+/* 减弱动效偏好：全站统一在这里关掉动画 */
+@media (prefers-reduced-motion: reduce){
+  :root{ --dur:0s; }
+  *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}

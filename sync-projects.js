@@ -71,9 +71,76 @@ function applyRule(content, rule) {
 /** 校验 neverCopy 清单里的文件没有被误列入 files */
 function checkNeverCopy(project) {
   const banned = Object.keys(project.neverCopy || {}).filter((k) => !k.startsWith('_'));
-  const violations = (project.files || []).filter((f) => banned.includes(f));
+  const violations = (project.files || []).filter((f) => typeof f === 'string' && banned.includes(f));
   violations.forEach((f) => fail(`${project.id}: 配置错误 —— ${f} 属于 neverCopy 禁复制清单：${project.neverCopy[f]}`));
   return violations.length === 0;
+}
+
+/** 极简 glob → RegExp：支持 **（任意层级）与 *（不含分隔符） */
+function globToRegExp(glob) {
+  const src = glob
+    .replace(/\\/g, '/')
+    .split('**')
+    .map((part) => part.split('*').map((s) => s.replace(/[.+^${}()|[\]\\]/g, '\\$&')).join('[^/]*'))
+    .join('.*');
+  return new RegExp('^' + src + '$');
+}
+
+/** 相对路径匹配：精确相等，或按 glob 规则匹配 */
+function matchRel(rel, pattern) {
+  if (rel === pattern) return true;
+  if (!/[*?]/.test(pattern)) return false;
+  return globToRegExp(pattern).test(rel);
+}
+
+/** 递归列出 baseAbs 下所有文件的相对路径（相对 baseAbs） */
+function walkRel(baseAbs) {
+  const out = [];
+  const visit = (dir, prefix) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const abs = path.join(dir, entry.name);
+      if (entry.isDirectory()) visit(abs, rel);
+      else out.push(rel);
+    }
+  };
+  visit(baseAbs, '');
+  return out.sort();
+}
+
+/**
+ * 把 project.files 展开成 [{ from, rel }]：
+ *   from = 相对 sourceDir 的源路径；rel = 相对 targetDir 的目标路径
+ */
+function expandFileEntries(project) {
+  const plan = [];
+  for (const entry of project.files || []) {
+    if (typeof entry === 'string') {
+      plan.push({ from: entry, rel: entry });
+      continue;
+    }
+    if (!entry || typeof entry !== 'object' || !Array.isArray(entry.files)) {
+      throw new Error(`files 条目格式错误：${JSON.stringify(entry)}`);
+    }
+    const base = entry.base || '.';
+    const to = entry.to || '.';
+    const set = new Set();
+    for (const pattern of entry.files) {
+      if (!/[*?]/.test(pattern)) { set.add(pattern); continue; }
+      const abs = path.join(ROOT, project.sourceDir, base);
+      if (!fs.existsSync(abs)) throw new Error(`分组的 base 目录不存在：${base}`);
+      const hits = walkRel(abs).filter((rel) => matchRel(rel, pattern));
+      if (hits.length === 0) throw new Error(`通配未命中任何文件：${base}/${pattern}`);
+      hits.forEach((rel) => set.add(rel));
+    }
+    for (const rel of [...set].sort()) {
+      plan.push({
+        from: path.posix.join(base, rel),
+        rel: path.posix.join(to === '.' ? '' : to, rel),
+      });
+    }
+  }
+  return plan;
 }
 
 // ==================== 同步单个项目 ====================
@@ -90,20 +157,38 @@ function syncProject(project) {
 
   let copied = 0, unchanged = 0, patched = 0, missing = 0;
 
+  // ---- 0. 分组清单展开（向后兼容）----
+  // files 既可写字符串（相对 sourceDir），也可写 { base, to, files } 分组：
+  //   base 相对 sourceDir；to 相对 targetDir；files 支持 "dir/**" 递归与 "dir/*" 单层
+  let plan;
+  try {
+    plan = expandFileEntries(project);
+  } catch (err) {
+    fail(`${project.id}: ${err.message}`);
+    return false;
+  }
+  const banned = Object.keys(project.neverCopy || {}).filter((k) => !k.startsWith('_'));
+  for (const item of plan) {
+    if (banned.some((b) => matchRel(item.rel, b))) {
+      fail(`${project.id}: 配置错误 —— ${item.rel} 命中 neverCopy 禁复制清单`);
+      return false;
+    }
+  }
+
   // ---- 1. 复制文件 ----
-  for (const rel of project.files || []) {
-    const src = path.join(srcRoot, rel);
-    const dst = path.join(dstRoot, rel);
+  for (const item of plan) {
+    const src = path.join(srcRoot, item.from);
+    const dst = path.join(dstRoot, item.rel);
 
     if (!fs.existsSync(src)) {
-      fail(`${project.id}: 源文件缺失 — ${rel}`);
+      fail(`${project.id}: 源文件缺失 — ${item.from}`);
       return false;
     }
 
     const srcBuf = fs.readFileSync(src);
     const same = fs.existsSync(dst) && fs.readFileSync(dst).equals(srcBuf);
     copyFile(src, dst);
-    if (same) unchanged++; else { copied++; log(`  更新 ${rel}`); }
+    if (same) unchanged++; else { copied++; log(`  更新 ${item.rel}`); }
   }
 
   // ---- 2. 应用内嵌适配补丁 ----

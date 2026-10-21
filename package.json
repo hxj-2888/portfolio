@@ -1,14 +1,18 @@
 {
   "name": "portfolio",
-  "version": "1.0.1",
-  "description": "个人作品集 — 项目展示与预览",
+  "version": "2.0.0",
+  "description": "个人作品集 — 数据驱动渲染 + 游戏合集托管的两个独立游戏",
   "scripts": {
     "sync": "node sync-projects.js",
     "sync:dry": "node sync-projects.js --dry-run",
     "collect": "node build-collect.js",
+    "check": "node tools/check-copy.cjs && node tools/check-rules-sync.cjs",
+    "check:copy": "node tools/check-copy.cjs",
+    "check:rules": "node tools/check-rules-sync.cjs",
+    "rules:map": "node tools/gen-rules-map.cjs",
     "dev": "npx serve . -p 3000",
-    "deploy": "npm run collect && echo '→ 推送到 Cloudflare Pages / 静态托管'"
+    "deploy": "npm run sync && npm run collect && npm run check && echo '→ 推送到 Cloudflare Pages / 静态托管'"
   },
-  "keywords": ["portfolio", "showcase"],
+  "keywords": ["portfolio", "showcase", "game-collection"],
   "license": "MIT"
 }

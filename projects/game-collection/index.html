@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<!-- 合集适配：嵌入作品集预览（iframe）时不注册 service worker，避免与宿主作用域冲突 -->
+<script>window.__ARCADE_SW__ = (window.self === window.top) ? 'allow' : 'blocked';</script><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>游戏合集 · 乒乓对决 / 返航录</title>
+<meta name="description" content="两个独立的可玩网页游戏统一入口：乒乓对决（联机乒乓球）与返航录（三阵营身份博弈）。"/>
+<meta name="theme-color" content="#0B0B10"/>
+<link rel="stylesheet" href="collection.css"/>
+</head>
+<body>
+<div class="wrap">
+  <header class="hd">
+    <div>
+      <h1>游戏合集</h1>
+      <p>两个独立的可玩网页游戏 · 各自维护、各自部署</p>
+    </div>
+    <a class="hd__back" href="../../index.html">← 返回作品集</a>
+  </header>
+
+  <div class="grid">
+    <article class="card card--pp">
+      <div class="card__media">
+        <img src="assets/card-ping-pong.png" alt="乒乓对决截图" width="960" height="600" loading="lazy"/>
+        <span class="card__tag">乒乓对决</span>
+      </div>
+      <div class="card__body">
+        <h2 class="card__title">乒乓对决</h2>
+        <p class="card__ver">v3.2.1 · 联机乒乓球</p>
+        <p class="card__line">ITTF 标准球台的真实物理：人机四档、本地双人、房间码联机；手机竖屏可玩。</p>
+        <div class="card__acts">
+          <a class="btn btn--primary" href="games/ping-pong/index.html">开始游玩</a>
+          <a class="btn btn--ghost" href="https://ping-pong-duel.pages.dev" target="_blank" rel="noopener">独立站 / 联机</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="card card--ret">
+      <div class="card__media">
+        <img src="assets/card-return.png" alt="返航录截图" width="960" height="600" loading="lazy"/>
+        <span class="card__tag">返航录</span>
+      </div>
+      <div class="card__body">
+        <h2 class="card__title">返航录</h2>
+        <p class="card__ver">v1preview1.0 · 三阵营身份博弈</p>
+        <p class="card__line">15 人三阵营对抗，24 个夜间步位，空席位由 AI 托管；手机横屏可玩。</p>
+        <div class="card__acts">
+          <a class="btn btn--primary" href="games/space-kill/index.html" data-landscape>开始游玩</a>
+          <a class="btn btn--ghost" href="https://space-kill-web.pages.dev" target="_blank" rel="noopener">独立站 / 联机</a>
+          <a class="btn btn--ghost" href="https://space-kill.pages.dev" target="_blank" rel="noopener">规则与资料</a>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <p class="note">两个游戏各自独立运行，本合集只提供统一入口；联机功能请点「独立站」进入各自域名。游戏数据保存在本机浏览器。</p>
+
+  <footer class="foot">
+    <span>何向杰 · 游戏合集</span>
+    <span>版本见 COLLECTION-CHANGELOG.md</span>
+  </footer>
+</div>
+<script src="collection.js"></script>
+</body>
+</html>

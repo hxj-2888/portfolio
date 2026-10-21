@@ -1,0 +1,7 @@
+# game-collection/_headers — 合集安全头
+# 说明：
+#   - 合集会被作品集以同源 iframe 预览，因此这里不再下发 frame-ancestors（交给站点根 _headers 统一控制）。
+#   - 两个游戏子目录（games/*）不在这里做额外约束，避免与各游戏自带的相对路径/资源冲突。
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

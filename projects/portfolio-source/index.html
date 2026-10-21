@@ -34,14 +34,16 @@ h1 .dot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135d
 <body>
 <div class="wrap">
   <h1><span class="dot"></span>个人作品集 · 本站</h1>
-  <p class="sub">这个页面由作品集本身的源码文件组成——实时预览 + 构成文件的代码展示，自己展示自己。</p>
+  <p class="sub">这个页面由作品集本身的源码文件组成：实时预览 + 数据驱动的卡片渲染 + 全局 token，自己展示自己。</p>
 
   <div class="tabs" id="tabs">
     <button class="tab active" data-target="live">实时预览</button>
     <button class="tab" data-file="index.html">index.html</button>
-    <button class="tab" data-file="js/vendor/tailwindcss.js">js/vendor/tailwindcss.js</button>
-    <button class="tab" data-file="js/vendor/iconify-icon.min.js">js/vendor/iconify-icon.min.js</button>
     <button class="tab" data-file="projects.json">projects.json</button>
+    <button class="tab" data-file="js/site.js">js/site.js</button>
+    <button class="tab" data-file="css/tokens.css">css/tokens.css</button>
+    <button class="tab" data-file="css/components.css">css/components.css</button>
+    <button class="tab" data-file="css/page.css">css/page.css</button>
   </div>
 
   <div class="panel active" id="panel-live">

@@ -39,3 +39,6 @@ Thumbs.db
 space-kill-3.0/
 乒乓对决_合并/
 delta-force-deploy/
+
+# 游戏合集同步产物（由 sync.json 的 game-collection 段从两个源仓库生成，不入库；合集页本身的手写文件仍需入库）
+projects/game-collection/games/

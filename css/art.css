@@ -1,0 +1,153 @@
+/* ============================================================
+   art.css — 视觉层（装饰、纹理、光影）
+   与 components.css 分离：这一层只做「好看」，删掉不影响功能
+   ============================================================ */
+
+/* ---- 1. 背景：网格 + 顶部光晕 + 细噪点 ---- */
+body::before{
+  content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 78% -8%, rgba(245,165,36,.10), transparent 62%),
+    radial-gradient(760px 460px at 8% 4%, rgba(45,212,191,.07), transparent 60%),
+    linear-gradient(180deg,#0B0B10 0%,#0B0B10 55%,#090910 100%);
+}
+body::after{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.5;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.028) 1px, transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 78%);
+  -webkit-mask-image:radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 78%);
+}
+
+/* ---- 2. 标题排版：更紧的字距 + 强调色描边 ---- */
+.hero__title{ text-wrap:balance; }
+.hero__title em{
+  font-style:normal; color:var(--accent);
+  position:relative; white-space:nowrap;
+}
+.hero__title em::after{
+  content:""; position:absolute; left:0; right:0; bottom:.06em; height:.09em;
+  background:linear-gradient(90deg,var(--accent),transparent 88%); border-radius:2px; opacity:.55;
+}
+.hero__lead{ text-wrap:pretty; }
+
+/* ---- 3. Hero 媒体：倾斜画框 + 光边 ---- */
+.hero__media{ position:relative; }
+.hero__media::before{
+  content:""; position:absolute; inset:-14px -10px -18px -14px; z-index:-1;
+  border-radius:calc(var(--r-card) + 12px);
+  background:linear-gradient(140deg, rgba(245,165,36,.22), rgba(59,130,246,.14) 46%, transparent 72%);
+  filter:blur(18px); opacity:.85;
+}
+.hero__media img{
+  box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.05) inset;
+  transform:rotate(-.6deg);
+  transition:transform .5s var(--ease);
+}
+.hero__media:hover img{ transform:rotate(0deg) translateY(-3px); }
+.hero__caption{ display:flex; align-items:center; gap:8px; }
+.hero__caption::before{
+  content:""; width:22px; height:1px; background:var(--accent); opacity:.7;
+}
+
+/* ---- 4. 卡片：顶部项目色条加光 + 悬浮抬升更克制 ---- */
+.card{ position:relative; }
+.card::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.035), transparent 22%);
+}
+.card:hover{ box-shadow:0 24px 60px rgba(0,0,0,.5), 0 0 0 1px var(--card-accent, var(--accent)) inset; }
+.card__accent{ box-shadow:0 0 18px -2px var(--card-accent, var(--accent)); }
+
+/* ---- 5. 数据带：数字用等宽 + 渐隐分隔 ---- */
+.stat__num{ font-variant-numeric:tabular-nums; letter-spacing:-.04em; }
+.stat{ position:relative; }
+.stat:not(:last-child)::after{
+  content:""; position:absolute; right:0; top:22%; bottom:22%; width:1px;
+  background:linear-gradient(180deg,transparent,var(--line-strong),transparent);
+}
+
+/* ---- 6. 做法三条：序号水印 ---- */
+.how__item{ position:relative; overflow:hidden; }
+.how__item::before{
+  content:attr(data-step); position:absolute; right:10px; bottom:-14px;
+  font-size:76px; font-weight:800; line-height:1;
+  color:rgba(255,255,255,.035); letter-spacing:-.06em; pointer-events:none;
+}
+.how__item:hover{ border-color:var(--line-strong); }
+
+/* ---- 7. 联系区：斜向纹理 ---- */
+.contact{ position:relative; overflow:hidden; }
+.contact::before{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:repeating-linear-gradient(135deg, rgba(255,255,255,.035) 0 1px, transparent 1px 12px);
+}
+
+/* ---- 8. 分区标题：左侧短竖线 ---- */
+.section__title{ position:relative; padding-left:14px; }
+.section__title::before{
+  content:""; position:absolute; left:0; top:.16em; bottom:.16em; width:3px;
+  border-radius:2px; background:linear-gradient(180deg,var(--accent),transparent);
+}
+
+/* ---- 9. 徽标：随滚动微亮的描边 ---- */
+.badge{ transition:border-color var(--dur) var(--ease), color var(--dur) var(--ease); }
+.card:hover .badge{ border-color:var(--line-strong); }
+
+/* ---- 10. 入场：首屏元素依次淡入（尊重 reduced-motion） ---- */
+@keyframes riseIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+.hero > *{ animation:riseIn .55s var(--ease) both; }
+.hero > *:nth-child(2){ animation-delay:.08s; }
+.section__head, .group, .how, .stats, .contact{
+  animation:riseIn .5s var(--ease) both;
+}
+
+/* ---- 11. 页脚：细线 + 版本号 ---- */
+.site-foot{ border-top:1px solid var(--line); }
+
+/* ---- 12. 宽卡：单条目的分区用横向布局，避免右侧留空 ---- */
+@media (min-width:760px){
+  .grid--wide{ grid-template-columns:1fr; }
+  .card--wide{ flex-direction:row; align-items:stretch; }
+  .card--wide .card__media{ flex:0 0 46%; aspect-ratio:auto; }
+  .card--wide .card__body{ flex:1; padding:var(--sp-4); justify-content:center; }
+  .card--wide .card__title{ font-size:clamp(22px,2.4vw,30px); }
+}
+@media (max-width:759px){
+  .card--wide .card__media{ aspect-ratio:16/9; }
+}
+
+/* ---- 13. 过程卡：无图时压缩图区高度，标题上提 ---- */
+.card__media--blank{ aspect-ratio:16/6; }
+.card__media--blank svg{ opacity:.55; }
+
+/* ---- 14. 三列时缩略图略矮，避免卡片过高 ---- */
+@media (min-width:1080px){
+  .grid--3 .card__media{ aspect-ratio:16/9; }
+}
+
+/* ---- 15. 宽卡图区：限高并裁切，避免长截图把卡片撑高 ---- */
+.card--wide .card__media{ max-height:340px; }
+.card--wide .card__media img{ height:100%; object-fit:cover; object-position:top center; }
+
+/* ---- 16. 过程卡：图区再压一档，让标题尽早出现 ---- */
+.card__media--blank{ aspect-ratio:16/4.5; }
+.card__media--blank svg{ width:34px; height:34px; }
+
+/* ---- 17. 卡片正文在宽卡里限宽，避免长行 ---- */
+.card--wide .card__line{ max-width:52ch; }
+
+/* ---- 18. 无图卡片（过程/文档类）：不再占图区，改为紧凑信息块 ---- */
+.card--note{ padding-top:3px; }
+.card--note .card__body{ padding:var(--sp-3); gap:8px; }
+.card--note .card__eyebrow{ display:flex; align-items:center; gap:6px; }
+.card--note .card__eyebrow svg{ width:14px; height:14px; color:var(--card-accent, var(--muted)); flex:none; }
+.card--note .card__title{ font-size:var(--fs-base); }
+.card--note .card__line{ font-size:var(--fs-xs); }
+
+/* 过程区两列，卡片更矮 */
+@media (min-width:760px){
+  [data-group="process"]{ grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; }
+}

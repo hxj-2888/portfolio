@@ -1,183 +1,193 @@
 <!DOCTYPE html>
-
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>何向杰｜产品设计作品集</title>
-<script src="js/vendor/tailwindcss.js"></script>
-<script src="js/vendor/iconify-icon.min.js"></script>
-<link rel="stylesheet" href="css/site.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>何向杰 · 独立开发者 · 游戏 / 工具 / 界面</title>
+<meta name="description" content="何向杰，独立开发者。做能玩的网页作品：乒乓对决、返航录、落幕查；自己设计、自己实现、自己上线。"/>
+<meta name="theme-color" content="#0B0B10"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="何向杰 · 独立开发者 · 游戏 / 工具 / 界面"/>
+<meta property="og:description" content="两个可玩的网页游戏、一个价格查询工具，以及它们背后的规则与代码同步。"/>
+<meta property="og:image" content="assets/projects/game-collection.png"/>
+<link rel="icon" type="image/png" href="assets/projects/ping-pong-duel.png"/>
+<link rel="stylesheet" href="css/tokens.css"/>
+<link rel="stylesheet" href="css/components.css"/>
+<link rel="stylesheet" href="css/page.css"/>
+<link rel="stylesheet" href="css/art.css"/>
 </head>
-<body class="bg-[#0a0a0f] text-[#e0e0e8] antialiased selection:bg-[#6366f1] selection:text-white">
-<header class="sticky top-0 z-50 border-b border-[#252535] bg-[#0a0a0f]/85 backdrop-blur-sm">
-<div class="mx-auto flex h-20 max-w-[1180px] items-center justify-between px-6 lg:px-0">
-<a aria-label="返回顶部" class="flex items-center gap-3" href="#top">
-<span class="flex h-9 w-9 items-center justify-center rounded-full bg-[#6366f1] text-sm font-bold text-white">HX</span>
-<span class="text-sm font-semibold tracking-[0.18em]">HE XIANGJIE</span>
-</a>
-<nav class="hidden items-center gap-7 text-sm text-[#8888a0] md:flex">
-<a class="transition hover:text-[#e0e0e8]" href="#work">作品</a>
-<a class="transition hover:text-[#e0e0e8]" href="#contact">联系</a>
-</nav>
-<a class="inline-flex items-center gap-2 rounded-full bg-[#6366f1] px-4 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[#4f46e5]" href="#contact">
-        开始合作 <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon>
-</a>
-</div>
+<body>
+<a class="visually-hidden" href="#work">跳到作品</a>
+
+<header class="site-head">
+  <div class="wrap site-head__in">
+    <a class="brand" href="#top" aria-label="返回顶部">
+      <span class="brand__mark" aria-hidden="true">HX</span>
+      <span>何向杰</span>
+    </a>
+    <nav class="nav" aria-label="主导航">
+      <a href="#work">作品</a>
+      <a href="#how">做法</a>
+      <a href="#facts">数据</a>
+      <a href="#contact">联系</a>
+    </nav>
+    <a class="btn btn--primary" href="#contact">联系我</a>
+  </div>
 </header>
+
 <main id="top">
-<section class="mx-auto grid min-h-[calc(100vh-80px)] max-w-[1180px] items-end gap-12 px-6 py-20 lg:grid-cols-12 lg:px-0 lg:py-28">
-<div class="lg:col-span-8">
-<p class="mb-7 flex items-center gap-2 text-sm font-medium text-[#8a8aa0]"><span class="h-2 w-2 rounded-full bg-[#96c93d]"></span>现居浙江 · 可远程协作</p>
-<h1 class="max-w-4xl text-5xl font-semibold leading-[1.08] tracking-[-0.06em] sm:text-6xl lg:text-[82px]">为复杂问题，<br/>设计清晰体验。</h1>
-<p class="mt-8 max-w-xl text-lg leading-8 text-[#8888a0]">我是何向杰，一名专注于数字产品与品牌体验的独立设计师。通过研究、系统与细节，把值得使用的想法变成可持续增长的产品。</p>
-<div class="mt-10 flex flex-wrap gap-3">
-<a class="inline-flex items-center gap-2 rounded-full bg-[#6366f1] px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#6366f1]/40" href="#work">浏览精选项目 <iconify-icon icon="solar:arrow-down-linear" width="17"></iconify-icon></a>
-</div>
-</div>
-<div class="lg:col-span-4 lg:pb-4">
-<div class="border-l border-[#3a3a55] pl-5">
-<p class="text-sm leading-6 text-[#8888a0]">最近关注</p>
-<p class="mt-2 text-xl font-medium leading-8">AI 产品中的可信交互<br/>与情感化数据叙事</p>
-</div>
-</div>
-</section>
-<section class="border-y border-[#252535] bg-[#141420]">
-<div class="mx-auto grid max-w-[1180px] grid-cols-2 divide-x divide-[#252535] px-6 md:grid-cols-4 lg:px-0">
-<div class="py-8"><p class="text-3xl font-semibold tracking-[-0.05em]">3 年</p><p class="mt-2 text-sm text-[#8a8aa0]">产品设计经验</p></div>
-<div class="px-5 py-8 md:px-8"><p class="text-3xl font-semibold tracking-[-0.05em]">4</p><p class="mt-2 text-sm text-[#8a8aa0]">个项目</p></div>
-<div class="py-8 md:px-8"><p class="text-3xl font-semibold tracking-[-0.05em]">4.8/5</p><p class="mt-2 text-sm text-[#8a8aa0]">合作满意评分</p></div>
-<div class="px-5 py-8 md:px-8"><p class="text-3xl font-semibold tracking-[-0.05em]">4</p><p class="mt-2 text-sm text-[#8a8aa0]">服务行业领域</p></div>
-</div>
-</section>
-<section class="mx-auto max-w-[1180px] px-6 py-24 lg:px-0 lg:py-32" id="work">
-<div class="flex flex-col justify-between gap-6 border-b border-[#252535] pb-8 md:flex-row md:items-end">
-<div>
-<p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#a5b4fc]">Selected work / 01—04</p>
-<h2 class="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">精选作品</h2>
-<p class="mt-4 max-w-lg leading-7 text-[#8888a0]">从业务目标到具体界面，每个项目都围绕真实的人和关键的使用场景展开。</p>
-</div>
-<div class="flex flex-wrap items-center gap-2">
-<a aria-label="GitHub 主页" class="inline-flex items-center gap-2 rounded-full border border-[#252535] px-4 py-2 text-sm font-medium text-[#a5b4fc] transition hover:border-[#6366f1] hover:text-white" href="https://github.com/hxj-2888" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:github" width="16"></iconify-icon>https://github.com/hxj-2888</a>
-<div aria-label="作品筛选" class="flex gap-2" role="tablist">
-<button class="filter-btn rounded-full bg-[#6366f1] px-4 py-2 text-sm text-white" onclick="filterWorks('all', this)" type="button">全部</button>
-<button class="filter-btn rounded-full border border-[#252535] px-4 py-2 text-sm text-[#8888a0] transition hover:border-[#6366f1]" onclick="filterWorks('web', this)" type="button">网页</button>
-<button class="filter-btn rounded-full border border-[#252535] px-4 py-2 text-sm text-[#8888a0] transition hover:border-[#6366f1]" onclick="filterWorks('sim', this)" type="button">桌游模拟</button>
-</div>
-</div>
-</div>
-<div class="mt-10 grid gap-7 lg:grid-cols-2">
-<article class="work-card group cursor-pointer overflow-hidden rounded-[28px] border border-[#252535] bg-[#141420] transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#6366f1]/20" data-category="web" onclick="openPreview('ping-pong-duel','乒乓对决 · 双人联机乒乓球','联机游戏 · 零依赖 · WebSocket · Canvas 物理','https://ping-pong-duel.pages.dev')">
-<div class="relative h-80 overflow-hidden bg-[#0a0a0f] sm:h-[390px]">
-<img src="assets/projects/ping-pong-duel.png" alt="乒乓对决游戏截图" class="absolute inset-0 h-full w-full object-cover" loading="lazy">
-<span class="absolute left-7 top-7 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white">联机游戏 · 2026</span>
-</div>
-<div class="p-7 sm:p-8">
-<div class="flex items-start justify-between gap-4"><div><p class="text-xs font-medium uppercase tracking-[0.14em] text-[#8a8aa0]">双人联机乒乓球游戏</p><h3 class="mt-2 text-2xl font-semibold tracking-[-0.04em]">乒乓对决 · 双人联机乒乓球</h3></div><span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#252535] transition group-hover:bg-[#7c3aed]"><iconify-icon icon="solar:arrow-up-right-linear" width="20"></iconify-icon></span></div>
-<p class="mt-4 leading-7 text-[#8888a0]">ITTF 标准球台与真实物理（重力 / 旋转 / 摩擦），火柴人物理骨架角色；人机对战（四档难度 + 数值调节）、AI 观战推演、本地分屏双打与房间码联机（公网 WebSocket），个人生涯含战绩与历史回放；手机端<b>竖屏适配</b>（首屏零滚动、比分栏 / 操作提示 / 发球倒计时各占一行不叠压，浮动摇杆贴拇指，旗帜不裁切），配摇杆 + 蹲下 + 双击发球 + 上滑扣球；发球轨迹实时预览、判定范围虚线辅助。网页 PWA 可安装，安卓 APK（v3.2.1 · 3.44 MB）可扫码下载（见下方二维码）。零依赖纯 JavaScript 实现。</p>
-<p class="mt-3 text-sm font-medium text-[#a5b4fc]">🤝 协作者：杨阳</p>
-<div class="mt-4 flex flex-wrap gap-2"><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">联机游戏</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">零依赖</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">WebSocket</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">Canvas 物理</span></div>
-<div class="mt-4 flex flex-wrap gap-x-4 gap-y-2">
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://ping-pong-duel.pages.dev" rel="noopener" target="_blank"><iconify-icon icon="solar:global-linear" width="15"></iconify-icon>https://ping-pong-duel.pages.dev <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://github.com/hxj-2888/ping-pong-duel" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:github" width="15"></iconify-icon>https://github.com/hxj-2888/ping-pong-duel <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://gitee.com/hxj-2888/ping-pong-duel" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:gitee" width="15"></iconify-icon>https://gitee.com/hxj-2888/ping-pong-duel <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<button class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" onclick="event.stopPropagation();showQr('assets/qr/ping-pong.png','乒乓对决 v3.2.1 · 扫码下载安卓安装包')" type="button">📱 扫码下载 APK</button>
-</div>
-</div>
-</article>
-<article class="work-card group cursor-pointer overflow-hidden rounded-[28px] border border-[#252535] bg-[#141420] transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#6366f1]/20" data-category="web" onclick="openPreview('delta-force','落幕查 - 变卖物价格查询','PWA · API · 价格查询 · IndexedDB','https://delta-force-v5.pages.dev')">
-<div class="relative h-80 overflow-hidden bg-[#0a0a0f] sm:h-[390px]">
-<img src="assets/projects/delta-force.png" alt="落幕查变卖物价格查询工具" class="absolute inset-0 h-full w-full object-cover" loading="lazy">
-<span class="absolute left-7 top-7 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white">效率工具 · PWA</span>
-</div>
-<div class="p-7 sm:p-8">
-<div class="flex items-start justify-between gap-4"><div><p class="text-xs font-medium uppercase tracking-[0.14em] text-[#8a8aa0]">实时价格查询工具</p><h3 class="mt-2 text-2xl font-semibold tracking-[-0.04em]">落幕查 - 变卖物价格查询</h3></div><span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#252535] transition group-hover:bg-[#7c3aed]"><iconify-icon icon="solar:arrow-up-right-linear" width="20"></iconify-icon></span></div>
-<p class="mt-4 leading-7 text-[#8888a0]">落幕查（三角洲行动变卖物实时价格查询）：分类浏览、搜索、收藏、价格异动提示与 30 天历史走势，数据由服务端代理每日采集；网页 PWA 一键安装到手机 / 桌面，安卓 APK（v3.1）扫码下载（见下方下载二维码），另有 Windows 安装包与微信小程序版。</p>
-<div class="mt-6 flex flex-wrap gap-2"><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">PWA</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">API</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">价格查询</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">IndexedDB</span></div>
-<div class="mt-4 flex flex-wrap gap-x-4 gap-y-2">
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://delta-force-v5.pages.dev" rel="noopener" target="_blank"><iconify-icon icon="solar:global-linear" width="15"></iconify-icon>https://delta-force-v5.pages.dev <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://github.com/hxj-2888/delta-force-price-query" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:github" width="15"></iconify-icon>https://github.com/hxj-2888/delta-force-price-query <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://gitee.com/hxj-2888/delta-force-price-query" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:gitee" width="15"></iconify-icon>https://gitee.com/hxj-2888/delta-force-price-query <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<button class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" onclick="event.stopPropagation();showQr('assets/qr/delta-force.png','落幕查 · 扫码下载应用（安卓 APK v3.1）')" type="button">📱 扫码下载应用</button>
-</div>
-</div>
-</article>
-<article class="work-card group cursor-pointer overflow-hidden rounded-[28px] border border-[#252535] bg-[#141420] transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#6366f1]/20" data-category="web sim" onclick="openPreview('space-kill','返航录 · 三阵营对抗','网页游戏 · 三阵营博弈 · 蒙特卡洛模拟 · 博弈AI','https://space-kill-web.pages.dev')">
-<div class="relative h-80 overflow-hidden bg-[#0a0a0f] sm:h-[390px]">
-<img src="assets/projects/space-kill.png" alt="返航录三阵营对抗 · 网页游戏开始界面" class="absolute inset-0 h-full w-full object-cover" loading="lazy">
-<span class="absolute left-7 top-7 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white">可玩网页游戏 · 2026</span>
-</div>
-<div class="p-7 sm:p-8">
-<div class="flex items-start justify-between gap-4"><div><p class="text-xs font-medium uppercase tracking-[0.14em] text-[#8a8aa0]">可玩网页游戏 · 三阵营博弈</p><h3 class="mt-2 text-2xl font-semibold tracking-[-0.04em]">返航录 · 三阵营对抗</h3></div><span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#252535] transition group-hover:bg-[#7c3aed]"><iconify-icon icon="solar:arrow-up-right-linear" width="20"></iconify-icon></span></div>
-<p class="mt-4 leading-7 text-[#8888a0]">15 人三阵营（人类 11 / 异形 3 / 外星人 1）身份博弈的<b class="font-medium text-[#c7c7e0]">可玩网页游戏</b>（原名「太空杀」，随规则正文 v1preview1.0 更名）：24 个夜间步位 + 两个前置子阶段的真实计时窗口、实时公开讨论与紧急会议、私聊双向确认、六分区记事本、上帝视角复盘；空席位与断线者由 AI 托管。当前规则口径<b class="font-medium text-[#c7c7e0]">v1preview1.0</b>——本版落地<b class="font-medium text-[#c7c7e0]">强力乔装与染血指认</b>、<b class="font-medium text-[#c7c7e0]">外星人逃亡（次胜）</b>，以及两个新席位变体职业<b class="font-medium text-[#c7c7e0]">摆渡人</b>（白天验尸调查，答有/无凶手）与<b class="font-medium text-[#c7c7e0]">疫苗研究员</b>（诊断/研制/接种，授予 4 夜疫苗抗体）；驱逐门槛升至 3 票、票数公开只报得票、感染抑制降为 2 次。<b class="font-medium text-[#c7c7e0]">手机横屏可玩</b>（名单横条 + 侧栏抽屉，安卓 App 启动即锁横屏），后续将全力优化 AI 判断逻辑与 AI 语言。配套附件站收录正式剧情（三条胜利线）、规则正文 v1preview1.0 全文（47 页权威 PDF 原件 + 在线阅读），以及用同一套网页版引擎离线跑出的蒙特卡洛成果（含 10000 局模拟：人类 29.5% / 异形 57.1% / 外星人 13.4%，0 异常）。</p>
-<div class="mt-6 flex flex-wrap gap-2"><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">新架构测试</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">网页游戏</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">三阵营博弈</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">AI 托管</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">蒙特卡洛模拟</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">博弈 AI</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">剧情</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">游戏规则</span></div>
-<div class="mt-4 flex flex-wrap gap-x-4 gap-y-2">
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://space-kill-web.pages.dev" rel="noopener" target="_blank"><iconify-icon icon="solar:global-linear" width="15"></iconify-icon>https://space-kill-web.pages.dev <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://space-kill.pages.dev" rel="noopener" target="_blank"><iconify-icon icon="solar:document-text-linear" width="15"></iconify-icon>附件：规则 / 剧情 / 模拟成果 <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<button class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" onclick="event.stopPropagation();showQr('assets/qr/space-kill-apk.png','返航录 · V1preview')"><iconify-icon icon="solar:qr-code-linear" width="15"></iconify-icon>扫码下载应用（安卓版 · V1preview）</button>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://github.com/hxj-2888/space-kill-web" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:github" width="15"></iconify-icon>space-kill-web <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<a class="inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://gitee.com/hxj-2888/space-kill-web" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:gitee" width="15"></iconify-icon>space-kill-web（Gitee 镜像） <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-</div>
-</div>
-</article>
-<article class="work-card group cursor-pointer overflow-hidden rounded-[28px] border border-[#252535] bg-[#141420] transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#6366f1]/20" data-category="web" onclick="openPreview('portfolio-source','个人作品集 · 本站','HTML · CSS · JavaScript · 自我展示','')">
-<div class="relative h-80 overflow-hidden bg-gradient-to-br from-[#1e1b4b] to-[#312e81] p-7 sm:h-[390px]">
-<div class="mx-auto mt-10 w-[86%] overflow-hidden rounded-2xl border border-[#3a3a55] bg-[#141420] shadow-2xl">
-<div class="flex items-center gap-1.5 border-b border-[#252535] bg-[#1a1a2e] px-3 py-2"><span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span><span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span><span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span><span class="ml-2 text-[10px] text-[#8a8aa0]">index.html</span></div>
-<div class="flex h-44 items-center justify-center gap-3 bg-[#141420]"><span class="text-4xl">🖥️</span><span class="rounded-full border border-[#252535] px-3 py-1 text-xs text-[#8a8aa0]">实时预览 · 源码展示</span></div>
-</div>
-<span class="absolute left-7 top-7 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white">网页作品 · 2026</span>
-</div>
-<div class="p-7 sm:p-8">
-<div class="flex items-start justify-between gap-4"><div><p class="text-xs font-medium uppercase tracking-[0.14em] text-[#8a8aa0]">自我展示项目</p><h3 class="mt-2 text-2xl font-semibold tracking-[-0.04em]">个人作品集 · 本站</h3></div><span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#252535] transition group-hover:bg-[#7c3aed]"><iconify-icon icon="solar:arrow-up-right-linear" width="20"></iconify-icon></span></div>
-<p class="mt-4 leading-7 text-[#8888a0]">本站由这些文件组成：实时预览 + 源码展示，自己展示自己。</p>
-<div class="mt-6 flex flex-wrap gap-2"><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">HTML</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">CSS</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">JavaScript</span><span class="rounded-full bg-[#252535] px-3 py-1.5 text-xs">自我展示</span></div>
-<a class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://github.com/hxj-2888" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:github" width="15"></iconify-icon>https://github.com/hxj-2888 <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-<a class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-[#a5b4fc] transition hover:text-white" href="https://gitee.com/hxj-2888/portfolio" rel="noopener" target="_blank"><iconify-icon icon="simple-icons:gitee" width="15"></iconify-icon>https://gitee.com/hxj-2888/portfolio <iconify-icon icon="solar:arrow-up-right-linear" width="14"></iconify-icon></a>
-</div>
-</article>
-</div>
-</section>
-<section class="mx-auto max-w-[1180px] px-6 py-24 lg:px-0 lg:py-32" id="contact">
-<div class="flex flex-col items-start justify-between gap-8 rounded-[28px] border border-[#4f46e5] bg-gradient-to-br from-[#4f46e5] to-[#7c3aed] p-10 sm:p-14 md:flex-row md:items-center">
-<div>
-<p class="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">Contact</p>
-<h2 class="mt-3 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">有项目想聊聊，随时联系。</h2>
-<p class="mt-3 max-w-md leading-7 text-white/80">我是何向杰，现居浙江 · 可远程协作。产品设计、交互方案或网页实现，都可以从这里开始。</p>
-</div>
-<a class="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg" href="mailto:hexiangjie694@gmail.com">hexiangjie694@gmail.com <iconify-icon icon="solar:arrow-right-linear" width="16"></iconify-icon></a>
-</div>
-</section>
-<footer class="mx-auto flex max-w-[1180px] flex-col gap-4 px-6 py-9 text-sm text-[#8a8aa0] sm:flex-row sm:items-center sm:justify-between lg:px-0"><p>© 2026 何向杰 · 保留所有权利</p><div class="flex gap-5"><a class="transition hover:text-[#e0e0e8]" href="#top">回到顶部</a><a class="transition hover:text-[#e0e0e8]" href="mailto:hexiangjie694@gmail.com">邮箱联系</a></div></footer>
+  <!-- ① Hero -->
+  <section class="wrap hero">
+    <div>
+      <p class="hero__status"><span class="dot" aria-hidden="true"></span>浙江 · 可远程 · 正在做游戏合集</p>
+      <h1 class="hero__title">做<em>能玩</em>的<br/>网页作品。</h1>
+      <p class="hero__lead">我是何向杰，独立开发者。游戏、工具、界面——自己设计、自己实现、自己上线。</p>
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#work">看作品</a>
+        <a class="btn btn--ghost" href="https://github.com/hxj-2888" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+    <div class="hero__media">
+      <img src="assets/projects/space-kill.png" width="960" height="600" alt="返航录开始界面"/>
+      <p class="hero__caption">返航录 · v1preview1.0 · 15 人三阵营，空席位由 AI 托管</p>
+    </div>
+  </section>
+
+  <!-- ② 作品 -->
+  <section class="wrap section" id="work">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow">Selected work</p>
+        <h2 class="section__title">作品</h2>
+        <p class="section__desc">可以玩的两个游戏、可以查的一个工具，以及它们背后的规则与过程。卡片上的每个数字都能点开验证。</p>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group__head">可以玩</p>
+      <div class="grid grid--3" data-group="play"></div>
+    </div>
+
+    <div class="group">
+      <p class="group__head">可以查</p>
+      <div class="grid grid--wide" data-group="tools"></div>
+    </div>
+
+    <div class="group">
+      <p class="group__head">过程：规则、代码与同步</p>
+      <div class="grid" data-group="process"></div>
+    </div>
+  </section>
+
+  <!-- ③ 做法 -->
+  <section class="wrap section" id="how">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow">How it's built</p>
+        <h2 class="section__title">我是怎么做的</h2>
+        <p class="section__desc">不是先画界面再填内容，而是先把规则写清楚，再让代码去守它。</p>
+      </div>
+    </div>
+    <div class="how">
+      <article class="how__item" data-step="01">
+        <p class="how__step">01 · 规则先行</p>
+        <h3 class="how__title">先写正文，再写代码</h3>
+        <p class="how__desc">返航录的规则以正文 v1preview1.0 为准，配套速查卡、术语表、判定流程图；代码与测试断言逐条对照条款。</p>
+      </article>
+      <article class="how__item" data-step="02">
+        <p class="how__step">02 · 数据说话</p>
+        <h3 class="how__title">用模拟验证平衡</h3>
+        <p class="how__desc">同一套引擎离线跑完整对局，用胜率与节奏验证规则改动，不靠“感觉还行”。</p>
+      </article>
+      <article class="how__item" data-step="03">
+        <p class="how__step">03 · 自己造工具</p>
+        <h3 class="how__title">同步器与门禁</h3>
+        <p class="how__desc">每个项目都有门禁测试、白名单同步和变更记录，任何一轮改动都能追溯。</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ④ 数据（全部可验证） -->
+  <section class="wrap section" id="facts">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow">Facts</p>
+        <h2 class="section__title">可以核对的数据</h2>
+        <p class="section__desc">只放能点开验证的数字，不放评价与估算。</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <p class="stat__num" data-count="games">2</p>
+        <p class="stat__label">可玩网页游戏</p>
+        <p class="stat__note">各自独立域名</p>
+      </div>
+      <div class="stat">
+        <p class="stat__num">10,000</p>
+        <p class="stat__label">蒙特卡洛局数</p>
+        <p class="stat__note"><a href="https://space-kill.pages.dev" target="_blank" rel="noopener">返航录平衡性验证</a></p>
+      </div>
+      <div class="stat">
+        <p class="stat__num">1</p>
+        <p class="stat__label">游戏合集</p>
+        <p class="stat__note">两个游戏 × 多端</p>
+      </div>
+      <div class="stat">
+        <p class="stat__num">0</p>
+        <p class="stat__label">外部依赖运行时</p>
+        <p class="stat__note">纯静态，无框架</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 联系 -->
+  <section class="wrap" id="contact">
+    <div class="contact">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2 class="contact__title">有想法想聊聊？</h2>
+        <p class="contact__desc">游戏、工具或网页实现，都可以直接发邮件。</p>
+      </div>
+      <a class="btn btn--primary" href="mailto:hexiangjie694@gmail.com">hexiangjie694@gmail.com</a>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap site-foot">
+  <p>© 2026 何向杰</p>
+  <p><a href="#top">回到顶部</a> · <a href="mailto:hexiangjie694@gmail.com">邮箱</a></p>
+</footer>
+
 <!-- 项目预览弹窗 -->
-<div id="previewModal" class="fixed inset-0 z-50 items-center justify-center bg-black/70 p-4 backdrop-blur-sm" style="display:none" onclick="if(event.target===this)closePreview()">
-<div class="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-[#3a3a55] bg-[#141420] shadow-2xl">
-<div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#252535] px-6 py-4">
-<div>
-<h3 id="pmTitle" class="text-xl font-semibold tracking-[-0.02em]"></h3>
-<p id="pmTags" class="mt-1 text-xs text-[#a5b4fc]"></p>
-</div>
-<div class="flex items-center gap-3">
-<a id="pmLive" class="inline-flex items-center gap-2 rounded-full bg-[#6366f1] px-4 py-2 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[#4f46e5]" href="#" target="_blank" rel="noopener">新窗口打开 <iconify-icon icon="solar:arrow-up-right-linear" width="16"></iconify-icon></a>
-<button class="flex h-9 w-9 items-center justify-center rounded-full border border-[#252535] text-[#8a8aa0] transition hover:border-[#6366f1] hover:text-white" onclick="closePreview()" aria-label="关闭">✕</button>
-</div>
-</div>
-<div class="flex-1 bg-[#0a0a0f] p-2 sm:p-4">
-<iframe id="pmFrame" class="h-[65vh] w-full rounded-xl border border-[#252535] bg-white" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads" loading="lazy" title="项目预览"></iframe>
-</div>
-</div>
+<div id="previewModal" class="modal" data-open="false" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <div class="modal__box">
+    <div class="modal__head">
+      <div>
+        <h3 class="modal__title" id="pmTitle"></h3>
+        <p class="modal__sub" id="pmSub"></p>
+      </div>
+      <div class="modal__actions">
+        <a id="pmLive" class="btn btn--primary" href="#" target="_blank" rel="noopener">新窗口打开</a>
+        <button class="modal__close" type="button" data-close="preview" aria-label="关闭预览">✕</button>
+      </div>
+    </div>
+    <div class="modal__body">
+      <iframe id="pmFrame" src="about:blank" title="项目预览" loading="lazy"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>
+    </div>
+  </div>
 </div>
 
-<!-- 下载二维码弹窗 -->
-<div id="qrModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm" onclick="if(event.target===this)closeQr()">
-<div class="flex max-w-sm flex-col items-center gap-4 rounded-3xl border border-[#3a3a55] bg-[#141420] p-8 text-center shadow-2xl">
-<div class="flex w-full items-center justify-between">
-<h3 id="qrTitle" class="text-lg font-semibold tracking-[-0.02em]"></h3>
-<button class="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[#252535] text-[#8a8aa0] transition hover:border-[#6366f1] hover:text-white" onclick="closeQr()" aria-label="关闭">✕</button>
-</div>
-<img id="qrImg" src="" alt="下载二维码" class="h-72 w-72 rounded-xl bg-white p-3">
-<p class="text-xs leading-5 text-[#8a8aa0]">使用手机浏览器扫码，可直接安装应用 / 打开应用。<br>（安卓也可直接访问下载页手动下载安装包）</p>
-</div>
+<!-- 二维码弹窗 -->
+<div id="qrModal" class="modal modal--qrcode" data-open="false" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+  <div class="modal__box">
+    <div class="modal__head">
+      <h3 class="modal__title" id="qrTitle"></h3>
+      <button class="modal__close" type="button" data-close="qr" aria-label="关闭">✕</button>
+    </div>
+    <p style="padding:0 24px"><img class="qr__img" id="qrImg" src="" alt="下载二维码"/></p>
+    <p class="qr__tip">手机浏览器扫码，可直接安装 / 打开应用。</p>
+  </div>
 </div>
 
 <script src="js/site.js"></script>

@@ -1,0 +1,26 @@
+/* ============================================================
+   page.css — 作品集页面专属样式（依赖 tokens.css / components.css）
+   ============================================================ */
+.hero__badges{ display:flex; flex-wrap:wrap; gap:8px; margin-top:var(--sp-2); }
+.projects-note{ color:var(--muted-2); font-size:var(--fs-xs); margin-top:12px; }
+.projects-note a{ color:var(--muted); text-decoration:underline; }
+
+/* 卡片里的资源图标行（GitHub / 在线） */
+.card__links{ display:flex; flex-wrap:wrap; gap:14px; color:var(--muted); font-size:var(--fs-xs); }
+.card__links a{ display:inline-flex; align-items:center; gap:5px; }
+.card__links a:hover{ color:var(--text); }
+.card__links svg{ width:14px; height:14px; }
+
+/* 分组内卡片的悬停提升只对“可点”卡片生效 */
+.card--static:hover{ transform:none; box-shadow:none; }
+
+/* 弹窗内的标题副行 */
+.modal__actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.modal[data-open="true"] .modal__box{ animation:modalIn .18s var(--ease); }
+@keyframes modalIn{ from{ opacity:0; transform:translateY(8px) scale(.99); } to{ opacity:1; transform:none; } }
+
+/* 窄屏：弹窗几乎全屏，中文长页更好读 */
+@media (max-width:640px){
+  .modal__body iframe{ height:72vh; }
+  .contact{ padding:var(--sp-3); }
+}

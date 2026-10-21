@@ -179,6 +179,17 @@ async function main() {
   for (const project of projects) {
     console.log(`\n━━━ ${project.name} (${project.id}) ━━━`);
 
+    // 源在 projects/ 内自行维护（或纯文档条目，无目录）→ 不参与收集，直接跳过
+    if (!project.source || project.source.type !== 'git') {
+      const srcPath = project.source ? path.resolve(ROOT, project.source.path) : null;
+      const destPath = path.join(PROJECTS_DIR, project.id);
+      if (!srcPath || path.resolve(srcPath) === path.resolve(destPath) || project.type === 'doc') {
+        log(`${project.name}: 目录在 projects/ 内维护或为纯文档条目，跳过收集`);
+        success++;
+        continue;
+      }
+    }
+
     try {
       const sourceType = project.source?.type || 'local';
       let result;
