@@ -1,5 +1,6 @@
 {
-  "_说明": "规则条款 ←→ 代码/测试 的登记表。由 tools/gen-rules-map.cjs 生成，tests 字段人工维护。",
+  "_说明": "规则条款 ←→ 测试锚点登记表。由 tools/gen-rules-map.cjs 生成。",
+  "_口径": "只有断言名里显式写了条款号才算覆盖，以保证覆盖率不虚高。",
   "version": "v1preview1.0",
   "source": {
     "pdf": "返航录三阵营对抗规则·正文v1preview1.0.pdf",
@@ -7,10 +8,8 @@
     "pdf_sha256_16": "e24b543cb1d0fa15",
     "md_sha256_16": "9e5a4d1acae8c54c",
     "pdf_bytes": 1535411,
-    "md_bytes": 344429
-  },
-  "counts": {
-    "clauses": 274
+    "md_bytes": 344429,
+    "tests": "test-fix-v26.cjs"
   },
   "articles": {
     "2.8.15": {
@@ -23,7 +22,9 @@
     },
     "0.3": {
       "title": "通则优先，例外须显式声明",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2670"
+      ]
     },
     "0.4": {
       "title": "复述三分法",
@@ -31,15 +32,23 @@
     },
     "0.5": {
       "title": "裁判次序",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1119",
+        "test-fix-v26.cjs#L3101"
+      ]
     },
     "0.6": {
       "title": "术语统⼀",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L633",
+        "test-fix-v26.cjs#L1125"
+      ]
     },
     "0.7": {
       "title": "引⽤约定",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1221"
+      ]
     },
     "1.1": {
       "title": "玩家配置",
@@ -47,11 +56,16 @@
     },
     "1.1.1": {
       "title": "席位",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3808",
+        "test-fix-v26.cjs#L3986"
+      ]
     },
     "1.2": {
       "title": "胜利条件与判定优先级",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3213"
+      ]
     },
     "1.2.1": {
       "title": "三阵营⽬标",
@@ -71,7 +85,9 @@
     },
     "1.2.5": {
       "title": "逃亡（次胜）与对局继续",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3409"
+      ]
     },
     "1.3": {
       "title": "停摆系统",
@@ -83,7 +99,11 @@
     },
     "3.0": {
       "title": "倒计时+2.5",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1134",
+        "test-fix-v26.cjs#L1163",
+        "test-fix-v26.cjs#L1727"
+      ]
     },
     "6.0": {
       "title": "倒计时+5.0",
@@ -95,7 +115,9 @@
     },
     "1.3.2": {
       "title": "跨越即触发与不可逆",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1144"
+      ]
     },
     "1.3.3": {
       "title": "净破坏量",
@@ -107,27 +129,10 @@
     },
     "1.4.1": {
       "title": "寂灭时刻",
-      "tests": []
-    },
-    "1.4.1.1": {
-      "title": "进⼊条件与阶段切换时点 ⼈类全灭、且异形与外星⼈均仍有存活者时进⼊寂灭时刻，异形与外星⼈互相攻击直⾄⼀⽅全",
-      "tests": []
-    },
-    "1.4.1.2": {
-      "title": "退出条件 残局中任⼀阵营存活数归零，或按僵局判定产⽣归属时，⽴即结束对局⸺不存在「残局中某⽅全灭后仍继续」",
-      "tests": []
-    },
-    "1.4.1.3": {
-      "title": "冻结项与⾮冻结项 冻结：私聊（步骤 0）、维修（4a）、破坏（4b 的破坏分⽀）、倒计时结算（步骤 11）、⽩天流程。不冻",
-      "tests": []
-    },
-    "1.4.1.4": {
-      "title": "⾏动菜单的收敛 寂灭期的异形⾏动菜单收敛为出⼑∕感染（步骤 7）与结茧（步骤 4b）三选⼀（4b 的破坏分⽀冻结；感染",
-      "tests": []
-    },
-    "1.4.1.5": {
-      "title": "清洗、假标记与出⼑顺序 清洗与假标记在寂灭时刻中⼀并移除：进⼊寂灭时刻时，全部现存假标记⽴即清除；此后清洗窗",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1122",
+        "test-fix-v26.cjs#L1124"
+      ]
     },
     "1.4.2": {
       "title": "决⽃时刻",
@@ -139,7 +144,11 @@
     },
     "1.5": {
       "title": "其他基础规则",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L378",
+        "test-fix-v26.cjs#L380",
+        "test-fix-v26.cjs#L1153"
+      ]
     },
     "1.5.1": {
       "title": "进化⽅向额度【存活占位制】",
@@ -147,7 +156,9 @@
     },
     "1.5.2": {
       "title": "夜数上限与全局平局",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2437"
+      ]
     },
     "1.5.3": {
       "title": "实际对局的时⻓制（线上∕线",
@@ -159,19 +170,9 @@
     },
     "2.1.1": {
       "title": "夜间步骤总表",
-      "tests": []
-    },
-    "0.1": {
-      "title": "外星⼈蛰伏（6.1）：查验1名并可附加沉默（当夜⽣效）；当夜选击杀∕破坏∕⾃我治疗则不发动 ⽆（⼈次并⼊③）",
-      "tests": []
-    },
-    "0.2": {
-      "title": "窃听者窃听（4.12）：读取当夜已公告之全部配对组（不设组数上限）组读取其内容；仅当夜有",
-      "tests": []
-    },
-    "3.5": {
-      "title": "嗅探（猎⼿专属，4.4.8）每夜⾄多 2 名；全局限 2个夜晚；不占⾏动窗⼝；不设公告批次",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1221"
+      ]
     },
     "2.1.2": {
       "title": "同⼀步骤的结算语义",
@@ -187,11 +188,18 @@
     },
     "2.1.5": {
       "title": "额度获取时点（默认发放时序）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3907"
+      ]
     },
     "2.1.6": {
       "title": "公告批次⼀览",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1375",
+        "test-fix-v26.cjs#L1377",
+        "test-fix-v26.cjs#L2351",
+        "test-fix-v26.cjs#L4875"
+      ]
     },
     "2.1.7": {
       "title": "各批次统计⼝径",
@@ -199,15 +207,27 @@
     },
     "2.2": {
       "title": "私聊",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L4678"
+      ]
     },
     "2.3": {
       "title": "⽩天流程与开局讨论",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1134",
+        "test-fix-v26.cjs#L1153",
+        "test-fix-v26.cjs#L1163",
+        "test-fix-v26.cjs#L1172",
+        "test-fix-v26.cjs#L1202",
+        "test-fix-v26.cjs#L1212"
+      ]
     },
     "2.3.0": {
       "title": "开局职业公告（职业选定后·第 1 夜之前）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2575",
+        "test-fix-v26.cjs#L4929"
+      ]
     },
     "2.3.1": {
       "title": "开局公开讨论（第 1 夜之前）",
@@ -215,7 +235,11 @@
     },
     "2.3.2": {
       "title": "⽩天流程",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3584",
+        "test-fix-v26.cjs#L3651",
+        "test-fix-v26.cjs#L3675"
+      ]
     },
     "2.3.3": {
       "title": "并列的夜晚会议",
@@ -223,7 +247,12 @@
     },
     "2.3.4": {
       "title": "讨论与投票",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1113",
+        "test-fix-v26.cjs#L1350",
+        "test-fix-v26.cjs#L2473",
+        "test-fix-v26.cjs#L2995"
+      ]
     },
     "2.3.5": {
       "title": "票型可⻅的两项例外",
@@ -233,17 +262,17 @@
       "title": "⾃由决策原则（通则）",
       "tests": []
     },
-    "2.4.1": {
-      "title": "原则。附则·提交与执⾏（通则）：提交⾏动≠⾏动已执⾏⸺玩家提交⾏动后，若在其实际结算前因被沉默、感染抑制、濒死",
-      "tests": []
-    },
     "2.4.2": {
       "title": "主动技能与被动（通",
       "tests": []
     },
     "2.5": {
       "title": "额度制技能的多⽬标投放（通则）2.5.1 原则",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1134",
+        "test-fix-v26.cjs#L1144",
+        "test-fix-v26.cjs#L3891"
+      ]
     },
     "2.5.3": {
       "title": "保留的互斥",
@@ -267,7 +296,9 @@
     },
     "2.6.3": {
       "title": "全知视⻆",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2144"
+      ]
     },
     "2.6.4": {
       "title": "押注",
@@ -287,11 +318,9 @@
     },
     "2.8.1": {
       "title": "字⾯⾝份判定与例外",
-      "tests": []
-    },
-    "2.8.2": {
-      "title": "减免层序通则【伤害侧层序的唯⼀权威源；感染侧层序的唯⼀权威源为 5.3.3】①分类：⼀切减免层先依「存续⽅式」分为「时限",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3166"
+      ]
     },
     "2.8.3": {
       "title": "主动与被动的封锁通则【封锁事项的唯⼀权威源】",
@@ -311,15 +340,25 @@
     },
     "2.8.7": {
       "title": "默认不公开原则",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3547",
+        "test-fix-v26.cjs#L4788"
+      ]
     },
     "2.8.9": {
       "title": "例外登记册",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2998",
+        "test-fix-v26.cjs#L3134",
+        "test-fix-v26.cjs#L3484",
+        "test-fix-v26.cjs#L3951"
+      ]
     },
     "2.8.10": {
       "title": "接⼊检查（⼗关）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2977"
+      ]
     },
     "2.8.11": {
       "title": "信息类通则索引",
@@ -327,15 +366,15 @@
     },
     "2.8.12": {
       "title": "官⽅公告最⼩信息通则",
-      "tests": []
-    },
-    "2.9": {
-      "title": "资源⽣产通则（进程型产出）【进程型产出的唯⼀权威源】",
-      "tests": []
-    },
-    "2.8.13": {
-      "title": "管「产出数值本⾝的修正」（动作照常执⾏⽽产出量被放⼤或折减），本通则管「产出是否须经多夜投⼊之进程形态」，两者分",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1089",
+        "test-fix-v26.cjs#L2914",
+        "test-fix-v26.cjs#L2916",
+        "test-fix-v26.cjs#L2998",
+        "test-fix-v26.cjs#L3035",
+        "test-fix-v26.cjs#L3052",
+        "test-fix-v26.cjs#L3237"
+      ]
     },
     "3.1": {
       "title": "倒计时",
@@ -363,11 +402,18 @@
     },
     "3.2.5": {
       "title": "停转夜",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2892"
+      ]
     },
     "3.2.6": {
       "title": "维修效⼒削减（破坏进化的连带效果）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3188",
+        "test-fix-v26.cjs#L3200",
+        "test-fix-v26.cjs#L3216",
+        "test-fix-v26.cjs#L3221"
+      ]
     },
     "3.3": {
       "title": "感染机制",
@@ -385,10 +431,6 @@
       "title": "感染标记与致死时点",
       "tests": []
     },
-    "0.55": {
-      "title": "致死；由感染进化者施加",
-      "tests": []
-    },
     "3.3.4": {
       "title": "感染抑制",
       "tests": []
@@ -403,7 +445,9 @@
     },
     "3.3.7": {
       "title": "统计⼝径与不予通报项",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2215"
+      ]
     },
     "3.3.8": {
       "title": "抗体",
@@ -423,7 +467,10 @@
     },
     "3.3.12": {
       "title": "对称例外",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L4788",
+        "test-fix-v26.cjs#L4820"
+      ]
     },
     "4.1": {
       "title": "普通船员（×4）",
@@ -431,11 +478,22 @@
     },
     "4.1.1": {
       "title": "查验（验证",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1238",
+        "test-fix-v26.cjs#L1245",
+        "test-fix-v26.cjs#L1934",
+        "test-fix-v26.cjs#L1939",
+        "test-fix-v26.cjs#L1961",
+        "test-fix-v26.cjs#L1992",
+        "test-fix-v26.cjs#L3132"
+      ]
     },
     "4.1.2": {
       "title": "协助维修",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1172",
+        "test-fix-v26.cjs#L4875"
+      ]
     },
     "4.1.3": {
       "title": "维修⼈数消息（船员专属）",
@@ -447,11 +505,15 @@
     },
     "4.2": {
       "title": "普通船员转职",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L893"
+      ]
     },
     "4.2.1": {
       "title": "触发与限制",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1253"
+      ]
     },
     "4.2.2": {
       "title": "三个转职⽅向",
@@ -459,10 +521,6 @@
     },
     "4.3": {
       "title": "⼯程师4.3.1 安全室（限定技）",
-      "tests": []
-    },
-    "4.3.1": {
-      "title": "⼗关核验（不带流⽔号，与其余各处核验格式统⼀）①⾏动位＝步骤3（与保镖保护（4.8）∕⼯匠护甲（4.11）同⾏动位）｜①之",
       "tests": []
     },
     "4.3.2": {
@@ -491,15 +549,25 @@
     },
     "4.4.1": {
       "title": "开枪",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1295"
+      ]
     },
     "4.4.2": {
       "title": "悬赏（⼦弹回复）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1304",
+        "test-fix-v26.cjs#L3480"
+      ]
     },
     "4.4.3": {
       "title": "额外⼦弹（被动获取）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2740",
+        "test-fix-v26.cjs#L2753",
+        "test-fix-v26.cjs#L2755",
+        "test-fix-v26.cjs#L3480"
+      ]
     },
     "4.4.4": {
       "title": "巡逻",
@@ -507,23 +575,44 @@
     },
     "4.4.5": {
       "title": "武装识别（双向）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3480"
+      ]
     },
     "4.4.6": {
       "title": "⼦弹存储上限（2 发）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1212",
+        "test-fix-v26.cjs#L2947",
+        "test-fix-v26.cjs#L3484",
+        "test-fix-v26.cjs#L3488"
+      ]
     },
     "4.4.7": {
       "title": "猎⼿（警⻓同席位）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3474",
+        "test-fix-v26.cjs#L3480",
+        "test-fix-v26.cjs#L3484",
+        "test-fix-v26.cjs#L3511"
+      ]
     },
     "4.4.8": {
       "title": "嗅探（猎⼿专属技能）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3538",
+        "test-fix-v26.cjs#L3544",
+        "test-fix-v26.cjs#L3545",
+        "test-fix-v26.cjs#L3551"
+      ]
     },
     "4.5": {
       "title": "⽣化医师",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L380",
+        "test-fix-v26.cjs#L4792",
+        "test-fix-v26.cjs#L4817"
+      ]
     },
     "4.5.1": {
       "title": "治疗额度（上限 3 次）",
@@ -559,11 +648,15 @@
     },
     "4.6.4": {
       "title": "毒师（与救援医师同席位）",
-      "tests": []
-    },
-    "5.3.2": {
-      "title": "效果免疫、5.3.3感染侧层序、5.3.5 假标记、5.9清洗均不适⽤⸺⾮〔例外〕，乃适⽤范围之外",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1505",
+        "test-fix-v26.cjs#L2922",
+        "test-fix-v26.cjs#L3900",
+        "test-fix-v26.cjs#L3920",
+        "test-fix-v26.cjs#L3928",
+        "test-fix-v26.cjs#L3937",
+        "test-fix-v26.cjs#L3981"
+      ]
     },
     "4.7": {
       "title": "神探",
@@ -571,15 +664,27 @@
     },
     "4.7.1": {
       "title": "查验",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1100",
+        "test-fix-v26.cjs#L2630",
+        "test-fix-v26.cjs#L2967",
+        "test-fix-v26.cjs#L3057",
+        "test-fix-v26.cjs#L4097"
+      ]
     },
     "4.7.2": {
       "title": "发布公告（替代查验）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1106",
+        "test-fix-v26.cjs#L2998"
+      ]
     },
     "4.7.3": {
       "title": "已查验池（定⻓池·上限 3）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3166",
+        "test-fix-v26.cjs#L3298"
+      ]
     },
     "4.7.4": {
       "title": "⾝份标注",
@@ -587,7 +692,12 @@
     },
     "4.7.5": {
       "title": "限制与效⼒",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1106",
+        "test-fix-v26.cjs#L3001",
+        "test-fix-v26.cjs#L3057",
+        "test-fix-v26.cjs#L4097"
+      ]
     },
     "4.7.6": {
       "title": "匿名性与时点",
@@ -615,7 +725,9 @@
     },
     "4.9.1": {
       "title": "票源可⻅",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2621"
+      ]
     },
     "4.9.2": {
       "title": "紧急会议（夜晚会议）",
@@ -647,7 +759,10 @@
     },
     "4.10.0": {
       "title": "有效输出与⽆效输出【机制类·唯⼀权威源】",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3351",
+        "test-fix-v26.cjs#L3362"
+      ]
     },
     "4.10.1": {
       "title": "致死伤害⾏为（统⼀术语）",
@@ -663,7 +778,10 @@
     },
     "4.10.4": {
       "title": "濒死（即时状态，不跨夜）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3928",
+        "test-fix-v26.cjs#L4820"
+      ]
     },
     "4.10.5": {
       "title": "抵挡层与层序〔适⽤〕",
@@ -671,7 +789,12 @@
     },
     "4.10.6": {
       "title": "当夜死亡结算（濒死不跨夜）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2473",
+        "test-fix-v26.cjs#L2995",
+        "test-fix-v26.cjs#L3046",
+        "test-fix-v26.cjs#L3232"
+      ]
     },
     "4.11": {
       "title": "⼯匠（与保镖同席位）",
@@ -679,15 +802,28 @@
     },
     "4.11.1": {
       "title": "护甲",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3804",
+        "test-fix-v26.cjs#L3826",
+        "test-fix-v26.cjs#L3839",
+        "test-fix-v26.cjs#L3891"
+      ]
     },
     "4.11.2": {
       "title": "每夜⾏动（三选⼀）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2767",
+        "test-fix-v26.cjs#L2770",
+        "test-fix-v26.cjs#L2802",
+        "test-fix-v26.cjs#L3849",
+        "test-fix-v26.cjs#L3882"
+      ]
     },
     "4.11.3": {
       "title": "库存与分配后果",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2776"
+      ]
     },
     "4.11.4": {
       "title": "可⻅性",
@@ -707,15 +843,28 @@
     },
     "4.12.1": {
       "title": "窃听（步骤 0.2）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3564",
+        "test-fix-v26.cjs#L3569",
+        "test-fix-v26.cjs#L3600"
+      ]
     },
     "4.12.2": {
       "title": "报告（择定提交）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3587",
+        "test-fix-v26.cjs#L3593",
+        "test-fix-v26.cjs#L3600",
+        "test-fix-v26.cjs#L3607",
+        "test-fix-v26.cjs#L3612",
+        "test-fix-v26.cjs#L3654"
+      ]
     },
     "4.12.3": {
       "title": "边界与排除",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3578"
+      ]
     },
     "4.12.4": {
       "title": "可⻅性与封锁",
@@ -813,9 +962,15 @@
       "title": "感染名额与⽬标",
       "tests": []
     },
+    "5.3.2": {
+      "title": "抵挡的三种强度",
+      "tests": []
+    },
     "5.3.3": {
       "title": "抵挡范围与层序（层序通则⻅ 2.8.2）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1313"
+      ]
     },
     "5.3.4": {
       "title": "感染友⽅异形与⾃⼰",
@@ -867,11 +1022,17 @@
     },
     "5.6.3": {
       "title": "出⼑⽬标不受阵营限制（含友⽅异形与⾃⼰）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1298"
+      ]
     },
     "5.7": {
       "title": "结茧（护盾）〔指定任意⽬标施加〕",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1265",
+        "test-fix-v26.cjs#L1269",
+        "test-fix-v26.cjs#L1511"
+      ]
     },
     "5.8": {
       "title": "⾏动菜单与⽬标限制",
@@ -879,7 +1040,9 @@
     },
     "5.8.1": {
       "title": "每夜四选⼀",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1136"
+      ]
     },
     "5.8.2": {
       "title": "多只异形同夜指向同⼀⽬标",
@@ -887,7 +1050,10 @@
     },
     "5.9": {
       "title": "清洗（独⽴⾏动步骤）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1505",
+        "test-fix-v26.cjs#L1511"
+      ]
     },
     "5.10": {
       "title": "异形出局与队内共享",
@@ -899,15 +1065,22 @@
     },
     "6.1": {
       "title": "蛰伏",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1287"
+      ]
     },
     "6.1.1": {
       "title": "蛰伏两步",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1103"
+      ]
     },
     "6.1.2": {
       "title": "沉默机制（蛰伏专属）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1281",
+        "test-fix-v26.cjs#L4788"
+      ]
     },
     "6.2": {
       "title": "觉醒（双⼑）",
@@ -919,11 +1092,15 @@
     },
     "6.4": {
       "title": "夜晚免疫",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2762"
+      ]
     },
     "6.4.1": {
       "title": "四项参数",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1202"
+      ]
     },
     "6.4.2": {
       "title": "三个致死来源（须分别",
@@ -935,11 +1112,15 @@
     },
     "6.5": {
       "title": "感染治疗额度（⾃⽤）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L5060"
+      ]
     },
     "6.6": {
       "title": "击杀",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1298"
+      ]
     },
     "6.7": {
       "title": "乔装（外星⼈）",
@@ -955,11 +1136,19 @@
     },
     "6.8.2": {
       "title": "不具有经典技能",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L5020",
+        "test-fix-v26.cjs#L5036",
+        "test-fix-v26.cjs#L5047"
+      ]
     },
     "6.8.3": {
       "title": "变形",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L5051",
+        "test-fix-v26.cjs#L5103",
+        "test-fix-v26.cjs#L5110"
+      ]
     },
     "6.8.4": {
       "title": "复⽣",
@@ -983,11 +1172,21 @@
     },
     "6.9.1": {
       "title": "积分构成〔唯⼀权威源〕",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3351",
+        "test-fix-v26.cjs#L3371",
+        "test-fix-v26.cjs#L3375",
+        "test-fix-v26.cjs#L3379"
+      ]
     },
     "6.9.2": {
       "title": "达标与逃亡资格",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3371",
+        "test-fix-v26.cjs#L3383",
+        "test-fix-v26.cjs#L3392",
+        "test-fix-v26.cjs#L3404"
+      ]
     },
     "6.9.3": {
       "title": "逃亡窗⼝与执⾏",
@@ -995,11 +1194,16 @@
     },
     "6.9.4": {
       "title": "出局效应与公告",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3409",
+        "test-fix-v26.cjs#L3414"
+      ]
     },
     "6.9.5": {
       "title": "限制：不得送另⼀⽅获胜",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3424"
+      ]
     },
     "6.9.6": {
       "title": "未逃亡⽽出局者",
@@ -1007,7 +1211,9 @@
     },
     "6.9.7": {
       "title": "阶段适⽤",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3428"
+      ]
     },
     "6.9.8": {
       "title": "⼗关核验",
@@ -1015,11 +1221,16 @@
     },
     "7.0": {
       "title": "推理⾃由",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L4052",
+        "test-fix-v26.cjs#L4084"
+      ]
     },
     "7.1": {
       "title": "公告机制与最⼩信息",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3134"
+      ]
     },
     "7.1.1": {
       "title": "分批次公告原则",
@@ -1039,15 +1250,22 @@
     },
     "7.2": {
       "title": "私⼈反馈",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2239"
+      ]
     },
     "7.2.1": {
       "title": "被查验者的查",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1380",
+        "test-fix-v26.cjs#L1822"
+      ]
     },
     "7.2.2": {
       "title": "攻击⽅的攻击",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1822"
+      ]
     },
     "7.2.3": {
       "title": "被沉默者的沉",
@@ -1057,17 +1275,28 @@
       "title": "外星⼈的夜晚免疫消耗告知夜晚免疫实际消耗",
       "tests": []
     },
-    "7.2.5": {
-      "title": "被保护者的保护告知于步骤 3 被保镖指定为保护⽬标且该保护已结算时，⽴即向该被保护",
-      "tests": []
-    },
     "7.2.6": {
       "title": "结茧护盾的施加告知于步骤 4b 结茧实际",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1265",
+        "test-fix-v26.cjs#L1380",
+        "test-fix-v26.cjs#L1822"
+      ]
+    },
+    "7.2.5": {
+      "title": "被保护者的保护告知",
+      "tests": [
+        "test-fix-v26.cjs#L1822"
+      ]
     },
     "7.2.7": {
       "title": "染⾎指认（受攻击者的攻击",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3311",
+        "test-fix-v26.cjs#L3317",
+        "test-fix-v26.cjs#L3325",
+        "test-fix-v26.cjs#L3334"
+      ]
     },
     "7.3": {
       "title": "乔装通则",
@@ -1075,11 +1304,20 @@
     },
     "7.3.0": {
       "title": "两型：普通乔装与强⼒乔装",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3282",
+        "test-fix-v26.cjs#L3290",
+        "test-fix-v26.cjs#L3298"
+      ]
     },
     "7.3.1": {
       "title": "发动与伪装⾝份",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3119",
+        "test-fix-v26.cjs#L3126",
+        "test-fix-v26.cjs#L3174",
+        "test-fix-v26.cjs#L3261"
+      ]
     },
     "7.3.2": {
       "title": "对查验的影响〔适⽤〕",
@@ -1095,7 +1333,10 @@
     },
     "7.3.5": {
       "title": "可⻅性与封锁〔适⽤〕",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3101",
+        "test-fix-v26.cjs#L3105"
+      ]
     },
     "7.3.6": {
       "title": "寂灭时刻",
@@ -1109,5 +1350,12 @@
       "title": "⼗关核验",
       "tests": []
     }
+  },
+  "counts": {
+    "clauses": 260,
+    "covered": 88,
+    "uncovered": 172,
+    "coverage": 33.8,
+    "anchors": 248
   }
 }

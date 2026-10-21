@@ -25,18 +25,47 @@ const fail = (msg) => { console.log(`  ✗ ${msg}`); failures++; };
 let failures = 0;
 
 /* 条款编号集合：
-   - Markdown（规则 md）：标题行以编号开头（行可能含 \r，故用 \s*$）
-   - HTML（站点 rules.html）：<h2~h4>编号 标题</h4>，先剥标签再按行匹配 */
+/* 条款编号集合：
+   - Markdown（规则 md）：标题行以编号开头；**必须与 gen-rules-map.cjs 同一套过滤**，
+     否则「正文数 274 / 登记 260」会永远差 14 条（那 14 条是夜间步骤号被折断的正文行，
+     不是条款）。两处口径必须一致，这是本工具的第一纪律。
+   - HTML（站点 rules.html）：<h2~h4>编号 标题</h4>，先剥标签再按行匹配。 */
+function looksLikeStepHeading(id, title) {
+  if (!title) return false;
+  if (title.length > 24) return true;
+  if (/^[、，。；：（）()「」【】]/.test(title)) return true;
+  if (/^(及其后|原则|于本步骤|及其|发⽣什么)/.test(title)) return true;
+  if (/^0\./.test(id) || id === '3.5') {
+    if (/步骤|当夜|每夜|查验|读取|进化|转职|蛰伏|窃听|致死|抑制/.test(title)) return true;
+  }
+  return false;
+}
+
 function clauseIds(text, kind) {
   const ids = new Set();
-  const src = kind === 'html' ? text.replace(/<[^>]+>/g, '\n') : text;
-  const re = kind === 'html'
-    ? /^\s*(\d+(?:\.\d+)+)\s+.{0,80}?\s*$/gm
-    : /^#{2,4}\s+(\d+(?:\.\d+)+)(?:\s+.{0,80}?)?\s*$/gm;
+  if (kind === 'html') {
+    const src = text.replace(/<[^>]+>/g, '\n');
+    const re = /^\s*(\d+(?:\.\d+)+)\s+.{0,80}?\s*$/gm;
+    let m;
+    while ((m = re.exec(src)) !== null) ids.add(m[1]);
+    return ids;
+  }
+  /* ⚠ 标题可能独占一行（`#### 3.3.10` 换行 `感染标记可⻅性①医生可⻅…`）——PDF 抽取把
+     条款号与标题折成了两行。此时标题为空，不能按「空标题＝无内容」丢掉；
+     与 gen-rules-map.cjs 同口径：**空标题的裸编号行照收**（它确实是条款起点）。 */
+  /* ⚠ 分隔符必须用 [ \t] 而不是 \s：`\s` 会**跨行**匹配，把标题行吞进来，
+     于是 `#### 3.3.10` 后面那行正文被当成标题，长标题又被 looksLikeStepHeading 过滤掉，
+     3.3.10 就凭空消失（259 vs 260 的来源）。 */
+  const re = /^#{2,4}[ \t]+(\d+(?:\.\d+)+)(?:[ \t]+([^\r\n]{0,80}?))?[ \t]*$/gm;
   let m;
-  while ((m = re.exec(src)) !== null) ids.add(m[1]);
+  while ((m = re.exec(text)) !== null) {
+    const id = m[1];
+    const title = (m[2] || '').trim();
+    if (title && looksLikeStepHeading(id, title)) continue;
+    ids.add(id);
+  }
   const chap = /^##\s+(第[0-9一二三四五六七八九十百零两]+[章节篇部回][^\s（(]*)/gm;
-  if (kind !== 'html') { while ((m = chap.exec(src)) !== null) ids.add(m[1]); }
+  while ((m = chap.exec(text)) !== null) ids.add(m[1]);
   return ids;
 }
 
@@ -65,7 +94,7 @@ if (fs.existsSync(RULES_MD)) {
 const broken = [];
 for (const [id, v] of Object.entries(map.articles)) {
   for (const t of v.tests || []) {
-    const file = path.join(SKILL_REPO, t.split('#')[0]);
+    const file = path.join(SKILL_REPO, 'tools', t.split('#')[0]);
     if (!fs.existsSync(file)) broken.push(`${id} → ${t}`);
   }
 }
