@@ -77,7 +77,9 @@
     },
     "1.2.3": {
       "title": "判定顺序",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2452"
+      ]
     },
     "1.2.4": {
       "title": "补充裁定",
@@ -95,7 +97,10 @@
     },
     "1.3.1": {
       "title": "停摆档位",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1134",
+        "test-fix-v26.cjs#L1144"
+      ]
     },
     "3.0": {
       "title": "倒计时+2.5",
@@ -121,7 +126,10 @@
     },
     "1.3.3": {
       "title": "净破坏量",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1165",
+        "test-fix-v26.cjs#L1172"
+      ]
     },
     "1.4": {
       "title": "残局：寂灭时刻与决⽃时刻",
@@ -131,12 +139,16 @@
       "title": "寂灭时刻",
       "tests": [
         "test-fix-v26.cjs#L1122",
-        "test-fix-v26.cjs#L1124"
+        "test-fix-v26.cjs#L1124",
+        "test-fix-v26.cjs#L1125"
       ]
     },
     "1.4.2": {
       "title": "决⽃时刻",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1119",
+        "test-fix-v26.cjs#L1121"
+      ]
     },
     "1.4.4": {
       "title": "倒计时胜利线的取消",
@@ -214,7 +226,6 @@
     "2.3": {
       "title": "⽩天流程与开局讨论",
       "tests": [
-        "test-fix-v26.cjs#L1134",
         "test-fix-v26.cjs#L1153",
         "test-fix-v26.cjs#L1163",
         "test-fix-v26.cjs#L1172",
@@ -251,6 +262,8 @@
         "test-fix-v26.cjs#L1113",
         "test-fix-v26.cjs#L1350",
         "test-fix-v26.cjs#L2473",
+        "test-fix-v26.cjs#L2538",
+        "test-fix-v26.cjs#L2542",
         "test-fix-v26.cjs#L2995"
       ]
     },
@@ -421,7 +434,9 @@
     },
     "3.3.1": {
       "title": "制药（医⽣通⽤·产出药剂）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1851"
+      ]
     },
     "3.3.2": {
       "title": "医⽣出⼿同属步骤 8",
@@ -429,11 +444,16 @@
     },
     "3.3.3": {
       "title": "感染标记与致死时点",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1313",
+        "test-fix-v26.cjs#L2535"
+      ]
     },
     "3.3.4": {
       "title": "感染抑制",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2295"
+      ]
     },
     "3.3.5": {
       "title": "外星⼈与感染",
@@ -636,7 +656,9 @@
     },
     "4.6.1": {
       "title": "救援额度（上限 2 次）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3900"
+      ]
     },
     "4.6.2": {
       "title": "治疗额度",
@@ -688,7 +710,11 @@
     },
     "4.7.4": {
       "title": "⾝份标注",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L833",
+        "test-fix-v26.cjs#L2916",
+        "test-fix-v26.cjs#L3001"
+      ]
     },
     "4.7.5": {
       "title": "限制与效⼒",
@@ -731,11 +757,15 @@
     },
     "4.9.2": {
       "title": "紧急会议（夜晚会议）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L1793"
+      ]
     },
     "4.9.3": {
       "title": "公开票源图（限定技能）",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L2621"
+      ]
     },
     "4.9.4": {
       "title": "会议与常规投票的关系",
@@ -952,7 +982,10 @@
     },
     "5.2": {
       "title": "破坏进化",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3188",
+        "test-fix-v26.cjs#L3200"
+      ]
     },
     "5.3": {
       "title": "感染进化5.3.0 感染进化·核⼼效果",
@@ -1088,7 +1121,9 @@
     },
     "6.3": {
       "title": "破坏",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L3200"
+      ]
     },
     "6.4": {
       "title": "夜晚免疫",
@@ -1139,7 +1174,8 @@
       "tests": [
         "test-fix-v26.cjs#L5020",
         "test-fix-v26.cjs#L5036",
-        "test-fix-v26.cjs#L5047"
+        "test-fix-v26.cjs#L5047",
+        "test-fix-v26.cjs#L5060"
       ]
     },
     "6.8.3": {
@@ -1152,7 +1188,9 @@
     },
     "6.8.4": {
       "title": "复⽣",
-      "tests": []
+      "tests": [
+        "test-fix-v26.cjs#L5038"
+      ]
     },
     "6.8.5": {
       "title": "判定（依 2.8.1）",
@@ -1353,9 +1391,9 @@
   },
   "counts": {
     "clauses": 260,
-    "covered": 88,
-    "uncovered": 172,
-    "coverage": 33.8,
-    "anchors": 248
+    "covered": 102,
+    "uncovered": 158,
+    "coverage": 39.2,
+    "anchors": 274
   }
 }
