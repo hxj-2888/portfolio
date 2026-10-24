@@ -19,6 +19,13 @@ const path = require('path');
 const ROOT = __dirname;
 const CONFIG_PATH = path.join(ROOT, 'sync.json');
 const DRY_RUN = process.argv.includes('--dry-run');
+// --src-root=<dir>：把 sourceDir 的相对基准换成该目录。
+// CI 用它把两个源仓库 clone 到临时目录后同步（CI 里没有 ../乒乓对决_合并 这类兄弟目录）。
+// 不传时仍以本脚本所在目录为基准，本地行为完全不变。
+const SRC_ROOT = (() => {
+  const arg = process.argv.find((a) => a.startsWith('--src-root='));
+  return arg ? path.resolve(ROOT, arg.slice('--src-root='.length)) : ROOT;
+})();
 
 // ==================== 日志 ====================
 const C = {
@@ -127,7 +134,7 @@ function expandFileEntries(project) {
     const set = new Set();
     for (const pattern of entry.files) {
       if (!/[*?]/.test(pattern)) { set.add(pattern); continue; }
-      const abs = path.join(ROOT, project.sourceDir, base);
+      const abs = path.join(SRC_ROOT, project.sourceDir, base);
       if (!fs.existsSync(abs)) throw new Error(`分组的 base 目录不存在：${base}`);
       const hits = walkRel(abs).filter((rel) => matchRel(rel, pattern));
       if (hits.length === 0) throw new Error(`通配未命中任何文件：${base}/${pattern}`);
@@ -145,7 +152,7 @@ function expandFileEntries(project) {
 
 // ==================== 同步单个项目 ====================
 function syncProject(project) {
-  const srcRoot = path.resolve(ROOT, project.sourceDir);
+  const srcRoot = path.resolve(SRC_ROOT, project.sourceDir);
   const dstRoot = path.resolve(ROOT, project.targetDir);
 
   if (!fs.existsSync(srcRoot)) {

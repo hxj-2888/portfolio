@@ -64,22 +64,69 @@ jobs:
       #   本地部署脚本 deploy-cloudflare.ps1 的白名单里一直有它，两处需保持一致
       #   注意 3：【2026-10-24 改】projects/game-collection/games/ 原先被 .gitignore
       #   排除，CI checkout 后为空，线上合集 games/ 只剩 SPA 回退，合集实际打不开。
-      #   现改为将同步产物入库（约 9.8 MB），本地同步改完随代码一起提交即可，
-      #   CI 不再需要源仓库。此处加一道存在性门禁，防止再次静默为空。
-      - name: Verify collection games/ present
+      #   现改为将同步产物入库（约 9.8 MB）。
+      #
+      # ★ 自动同步校验（取代原「仅检查存在」）：
+      #   CI 没有 ../乒乓对决_合并 这类兄弟目录，故把两个源仓库 clone 到临时目录，
+      #   用 sync-projects.js --src-root 在临时副本上重跑同步，再与本仓库已入库的
+      #   projects/ 比对。一致 = 本地没忘记同步；不一致 = 有人改了游戏但没跑
+      #   node sync-projects.js 就提交，此时明确报错而不是让旧版静默上线。
+      - name: Clone source repos for sync verification
         run: |
-          if [ ! -f projects/game-collection/games/ping-pong/js/render.js ]; then
-            echo "::error::projects/game-collection/games/ 缺失——合集将无法打开。请本地运行 node sync-projects.js 后提交该目录。"
-            exit 1
-          fi
-          echo "✓ games/ 就绪：$(find projects/game-collection/games -name '*.js' | wc -l) 个 JS"
+          ws="$RUNNER_TEMP/sync-ws"
+          mkdir -p "$ws/portfolio-copy"
+          # sync.json 的 sourceDir 是相对 portfolio 根目录的 ../X，所以源仓库
+          # 必须落在与 portfolio 同级的目录下；--src-root 指向 portfolio-copy。
+          git clone --depth 1 https://github.com/hxj-2888/ping-pong-duel.git "$ws/乒乓对决_合并"
+          git clone --depth 1 https://github.com/hxj-2888/space-kill-web.git "$ws/太空杀游戏-完整版"
+          git clone --depth 1 https://github.com/hxj-2888/delta-force-price-query.git "$ws/delta-force-deploy"
+          echo "SYNC_WS=$ws" >> "$GITHUB_ENV"
+          ls -1 "$ws"
+
+      - name: Re-sync from sources into a scratch copy
+        run: |
+          ws="$SYNC_WS"
+          cp -r sync.json sync-projects.js "$ws/portfolio-copy/"
+          mkdir -p "$ws/portfolio-copy/projects"
+          # 从本仓库已入库的 projects/ 出发，重跑同步后看是否有差异
+          cp -r projects "$ws/portfolio-copy/"
+          cd "$ws/portfolio-copy"
+          # --src-root 指向副本目录自身：sync.json 的 sourceDir 是 ../X，
+          # 于是解析为 $ws/X，正好是上面 clone 下来的源仓库位置。
+          node sync-projects.js --src-root="$ws/portfolio-copy" 2>&1 | tail -20
+
+      - name: Verify committed projects/ is up to date with upstream
+        run: |
+          fail=0
+          # 比对本仓库入库的副本与 CI 从源仓库重跑同步的结果
+          for rel in ping-pong-duel/js/render.js \
+                     ping-pong-duel/js/app/render.js \
+                     ping-pong-duel/js/boot.js \
+                     game-collection/games/ping-pong/js/render.js \
+                     game-collection/games/ping-pong/js/app/render.js; do
+            a="projects/$rel"
+            b="$SYNC_WS/portfolio-copy/projects/$rel"
+            if [ ! -f "$a" ] || [ ! -f "$b" ]; then
+              echo "::error::缺少 $rel（仓库内或同步结果）"; fail=1; continue
+            fi
+            ha=$(tr -d '\r' < "$a" | sha256sum | cut -d' ' -f1)
+            hb=$(tr -d '\r' < "$b" | sha256sum | cut -d' ' -f1)
+            if [ "$ha" != "$hb" ]; then
+              echo "::error::$rel 落后于源仓库——请本地运行 node sync-projects.js 后提交。"
+              echo "  仓库内 ${ha:0:12}"
+              echo "  源仓库 ${hb:0:12}"
+              fail=1
+            else
+              echo "✓ $rel 与源一致（${ha:0:12}）"
+            fi
+          done
+          exit $fail
 
       # ★ 一致性校验：合集里的乒乓副本与独立副本必须同源。
-      #   合集 games/ 由 sync-projects.js 从源仓库生成并入库，CI 环境没有源仓库，
-      #   无法在此重新同步——若本地忘记跑同步就提交，合集会静默停留在旧版，
-      #   页面照常能打开，不会报错。这里比对两处核心渲染文件，不一致即失败。
+      #   （已由上面的「重跑同步并与源比对」覆盖，这里保留一份轻量互校，
+      #     用于同步脚本本身出问题时的兜底——两者不一致说明产物被手工改过。）
       #   ⚠ 先 tr -d '\r' 归一换行符，避免 Windows/Linux 换行差异造成假红灯。
-      - name: Verify collection copies match standalone copies
+      - name: Cross-check collection vs standalone copies
         run: |
           fail=0
           for rel in js/render.js js/app/render.js; do
@@ -91,12 +138,12 @@ jobs:
             ha=$(tr -d '\r' < "$a" | sha256sum | cut -d' ' -f1)
             hb=$(tr -d '\r' < "$b" | sha256sum | cut -d' ' -f1)
             if [ "$ha" != "$hb" ]; then
-              echo "::error::$rel 两份副本不一致——合集未同步。请运行 node sync-projects.js 后重新提交。"
-              echo "  独立副本 $ha"
-              echo "  合集副本 $hb"
+              echo "::error::$rel 两份副本不一致——产物被手工改过或同步不完整。"
+              echo "  独立副本 ${ha:0:12}"
+              echo "  合集副本 ${hb:0:12}"
               fail=1
             else
-              echo "✓ $rel 一致（${ha:0:12}）"
+              echo "✓ $rel 两份副本一致（${ha:0:12}）"
             fi
           done
           exit $fail

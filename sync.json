@@ -265,10 +265,10 @@
         }
       ],
       "neverCopy": {
-        "_警告": "以下路径绝不可复制进合集",
+        "_警告": "以下路径绝不可复制进合集（支持 ** 与 * 通配）",
         "games/ping-pong/_worker.js": "Pages 高级模式 WS 转发，只对乒乓独立域名有意义",
         "games/ping-pong/PingPongDuel.apk": "二进制不入库，改走外链",
-        "games/ping-pong/PingPongDuel-v321.apk": "同上",
+        "games/ping-pong/PingPongDuel-v*.apk": "同上；用通配以免 APK 升版后此处漏改（曾硬编码 v321）",
         "games/space-kill/SpaceKill.apk": "同上",
         "games/*/server/**": "本地联机服务不进静态包"
       },
