@@ -74,6 +74,33 @@ jobs:
           fi
           echo "✓ games/ 就绪：$(find projects/game-collection/games -name '*.js' | wc -l) 个 JS"
 
+      # ★ 一致性校验：合集里的乒乓副本与独立副本必须同源。
+      #   合集 games/ 由 sync-projects.js 从源仓库生成并入库，CI 环境没有源仓库，
+      #   无法在此重新同步——若本地忘记跑同步就提交，合集会静默停留在旧版，
+      #   页面照常能打开，不会报错。这里比对两处核心渲染文件，不一致即失败。
+      #   ⚠ 先 tr -d '\r' 归一换行符，避免 Windows/Linux 换行差异造成假红灯。
+      - name: Verify collection copies match standalone copies
+        run: |
+          fail=0
+          for rel in js/render.js js/app/render.js; do
+            a="projects/ping-pong-duel/$rel"
+            b="projects/game-collection/games/ping-pong/$rel"
+            if [ ! -f "$a" ] || [ ! -f "$b" ]; then
+              echo "::error::缺少 $rel（独立副本或合集副本不存在）"; fail=1; continue
+            fi
+            ha=$(tr -d '\r' < "$a" | sha256sum | cut -d' ' -f1)
+            hb=$(tr -d '\r' < "$b" | sha256sum | cut -d' ' -f1)
+            if [ "$ha" != "$hb" ]; then
+              echo "::error::$rel 两份副本不一致——合集未同步。请运行 node sync-projects.js 后重新提交。"
+              echo "  独立副本 $ha"
+              echo "  合集副本 $hb"
+              fail=1
+            else
+              echo "✓ $rel 一致（${ha:0:12}）"
+            fi
+          done
+          exit $fail
+
       - name: Stage site files (allowlist)
         run: |
           mkdir -p /tmp/site-deploy
