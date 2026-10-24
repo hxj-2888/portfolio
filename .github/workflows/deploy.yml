@@ -62,6 +62,18 @@ jobs:
       #   注意 2：必须带 _headers——漏了它 CI 部署会把线上的安全响应头
       #   （X-Frame-Options / HSTS / CSP）一并清掉（2026-09-13 实测踩过），
       #   本地部署脚本 deploy-cloudflare.ps1 的白名单里一直有它，两处需保持一致
+      #   注意 3：【2026-10-24 改】projects/game-collection/games/ 原先被 .gitignore
+      #   排除，CI checkout 后为空，线上合集 games/ 只剩 SPA 回退，合集实际打不开。
+      #   现改为将同步产物入库（约 9.8 MB），本地同步改完随代码一起提交即可，
+      #   CI 不再需要源仓库。此处加一道存在性门禁，防止再次静默为空。
+      - name: Verify collection games/ present
+        run: |
+          if [ ! -f projects/game-collection/games/ping-pong/js/render.js ]; then
+            echo "::error::projects/game-collection/games/ 缺失——合集将无法打开。请本地运行 node sync-projects.js 后提交该目录。"
+            exit 1
+          fi
+          echo "✓ games/ 就绪：$(find projects/game-collection/games -name '*.js' | wc -l) 个 JS"
+
       - name: Stage site files (allowlist)
         run: |
           mkdir -p /tmp/site-deploy

@@ -40,5 +40,9 @@ space-kill-3.0/
 乒乓对决_合并/
 delta-force-deploy/
 
-# 游戏合集同步产物（由 sync.json 的 game-collection 段从两个源仓库生成，不入库；合集页本身的手写文件仍需入库）
-projects/game-collection/games/
+# 游戏合集同步产物（由 sync.json 的 game-collection 段从两个源仓库生成）
+# 【2026-10-24 改】原不入库，导致 CI 部署时该目录不存在、线上合集 games/ 只剩
+# SPA 回退（合集实际打不开）。现改为入库（约 9.8 MB），本地 node sync-projects.js
+# 后连同改动一起提交；deploy.yml 已加存在性门禁，缺失会直接失败。合集页本身的
+# 手写文件（index.html / collection.* / assets/card-*.png）一直入库。
+# projects/game-collection/games/
