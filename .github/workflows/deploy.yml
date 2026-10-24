@@ -184,3 +184,85 @@ jobs:
             echo "$H" | grep -qi "^$k:" || { echo "缺少响应头: $k（_headers 未部署）"; exit 1; }
           done
           echo "_headers OK"
+
+  # ===== 失败通知：创建/关闭 Issue =====
+  # 背景：2026-10-23 乒乓站点 CI 失败后未部署，站点静默停在旧版一天无人发现。
+  # 这里在工作流失败时自动开 Issue（带失败 job、提交、链接），成功后自动关闭，
+  # 让「部署挂了」在 GitHub 站内可见，而不只依赖容易被忽略的邮件。
+  # 不需要任何外部凭据，只需 issues: write 权限。
+  # 成功时自动关闭遗留的失败 Issue（恢复通知）。
+  close-failure-issue:
+    name: Close stale failure issue
+    if: success()
+    needs: [check, deploy-cloudflare, smoke-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Close open deploy-failure issues
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'deploy-failure',
+            });
+            for (const issue of open.data) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ 已恢复：${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+              core.info(`已关闭 #${issue.number}`);
+            }
+
+  notify:
+    name: Notify on failure
+    if: always() && contains(needs.*.result, 'failure')
+    needs: [check, deploy-cloudflare, smoke-test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Open or update failure issue
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const results = ${{ toJSON(needs) }};
+            const failed = Object.entries(results)
+              .filter(([, v]) => v.result === 'failure')
+              .map(([k]) => k);
+            const title = `🚨 部署失败：${context.workflow}（${context.ref_name}）`;
+            const body = [
+              `**工作流**：${context.workflow}`,
+              `**分支**：${context.ref_name}`,
+              `**失败 job**：${failed.join('、') || '（未知）'}`,
+              `**提交**：${context.sha.slice(0, 7)} — ${context.payload.head_commit?.message?.split('\n')[0] ?? '-'}`,
+              `**运行记录**：${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              '',
+              '> 处理完成后本 Issue 会在下次成功部署时自动关闭。',
+            ].join('\n');
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'deploy-failure',
+            });
+            if (existing.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: existing.data[0].number, body,
+              });
+              core.info(`已追加评论到 #${existing.data[0].number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['deploy-failure'],
+              });
+              core.info(`已创建 Issue #${created.data.number}`);
+            }
