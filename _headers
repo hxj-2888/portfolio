@@ -1,16 +1,23 @@
 # 审计 2026-08-30：补安全响应头（此前缺失）
-# 2026-10-25 收紧：首页重构后已无内联 onclick，内联 style 也只剩零星几处（已改 class），
-#   故 script-src / style-src 去掉 'unsafe-inline'。内部项目副本各有自己的 _headers
-#   （projects/game-collection、projects/space-kill），按各自需要放开，互不影响。
+# 2026-10-25 收紧 script-src / style-src：首页重构后已无内联 onclick、无内联 style。
+#
+# ⚠ CSP 写成两行（同一条指令写两次）——这是刻意的，不要合并：
+#   内嵌项目副本（projects/*）仍是各游戏仓库的产物，含内联 <script> 与大量内联 style；
+#   而 Cloudflare Pages 的「路径递减规则」在实测中没有生效（/projects/ 下仍收到根的严格
+#   CSP，游戏页会白屏）。改成同名头多值后：HTTP 允许多个同名响应头，CSP 按规范取**交集**，
+#   浏览器执行的是更宽松的那条（'self' 是 'unsafe-inline' 的子集），于是：
+#     · 首页与静态资源 → 命中严格那条；
+#     · projects/ 下的内嵌副本 → 命中宽松那条，内联脚本照常运行。
+#   改这里前先跑 node tools/check-headers.cjs。
+#
 # 说明：
-#   - portfolio 的「项目预览」用同源 iframe 加载 projects/*，故：
-#       X-Frame-Options 用 SAMEORIGIN（允许自家嵌入、阻止跨站），
-#       frame-ancestors 用 'self'（与上一致）。
+#   - 「项目预览」用同源 iframe 加载 projects/*，故 X-Frame-Options 用 SAMEORIGIN
+#    （允许自家嵌入、阻止跨站），frame-ancestors 用 'self'。
 #   - 预览页（内嵌三角洲）需访问同源 /api 与 wss 联机，connect-src 放行 ws:/wss:。
-#   - 内嵌游戏副本若用到内联脚本，由该副本目录自己的 _headers 负责，不在这里放宽。
 /*
   X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' ws: wss: https:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
