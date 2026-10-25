@@ -3,15 +3,20 @@
   "version": "2.0.0",
   "description": "个人作品集 — 数据驱动渲染 + 游戏合集托管的两个独立游戏",
   "scripts": {
-    "sync": "node sync-projects.js",
+    "sync": "node sync-projects.js && node tools/fix-embedded-games.cjs",
     "sync:dry": "node sync-projects.js --dry-run",
+    "sync:verify": "node tools/verify-sync.cjs",
+    "sync:verify:fix": "node tools/verify-sync.cjs --fix",
+    "fix:embedded": "node tools/fix-embedded-games.cjs",
     "collect": "node build-collect.js",
-    "check": "node tools/check-copy.cjs && node tools/check-rules-sync.cjs",
+    "check": "node tools/check-copy.cjs && node tools/check-rules-sync.cjs && node tools/check-headers.cjs && node tools/fix-embedded-games.cjs --check",
     "check:copy": "node tools/check-copy.cjs",
     "check:rules": "node tools/check-rules-sync.cjs",
+    "check:headers": "node tools/check-headers.cjs",
+    "check:embedded": "node tools/fix-embedded-games.cjs --check",
     "rules:map": "node tools/gen-rules-map.cjs",
     "dev": "npx serve . -p 3000",
-    "deploy": "npm run sync && npm run collect && npm run check && echo '→ 推送到 Cloudflare Pages / 静态托管'"
+    "deploy": "npm run sync && npm run check && npm run sync:verify && echo '→ 推送到 Cloudflare Pages / 静态托管'"
   },
   "keywords": ["portfolio", "showcase", "game-collection"],
   "license": "MIT"

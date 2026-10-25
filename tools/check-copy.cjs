@@ -12,8 +12,8 @@ const ROOT = path.resolve(__dirname, '..');
 const TARGETS = [
   'index.html',
   'projects.json',
-  'projects/game-collection/index.html',
   'js/site.js',
+  'projects/game-collection/index.html',
 ];
 
 // 违禁词：不可验证的评价/数据 + 作品集里不该出现的旧展示名

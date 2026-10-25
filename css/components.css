@@ -75,6 +75,7 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
 .card{ display:flex; flex-direction:column; position:relative; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-card); overflow:hidden; transition:transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
 .card:hover{ transform:translateY(-4px); border-color:var(--line-strong); box-shadow:var(--shadow-hover); }
 .card__media{ position:relative; aspect-ratio:16/10; background:var(--surface-2); overflow:hidden; }
+.card__media picture{ display:block; width:100%; height:100%; }
 .card__media img{ width:100%; height:100%; object-fit:cover; transition:transform .5s var(--ease); }
 .card:hover .card__media img{ transform:scale(1.025); }
 /* 项目色只作为一个圆点，不再做整条彩条 */
@@ -106,6 +107,16 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
 .card__links a{ display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
 .card__links a:hover{ color:var(--text); }
 .card__links svg{ width:14px; height:14px; flex:none; }
+
+/* 扫码入口：与次要链接同级的按钮，点开二维码弹窗 */
+.card__qr{
+  display:inline-flex; align-items:center; gap:6px; padding:8px 12px;
+  border:1px solid var(--line); border-radius:var(--r-pill); background:var(--surface);
+  color:var(--muted); font-size:14px; font-weight:600;
+  transition:color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.card__qr:hover{ color:var(--text); border-color:var(--line-strong); }
+.card__qr svg{ width:15px; height:15px; flex:none; }
 
 /* 无图卡片（过程 / 文档类）：紧凑信息块 */
 .card--note{ justify-content:flex-start; }

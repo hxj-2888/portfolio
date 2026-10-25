@@ -15,7 +15,8 @@ const ICON = {
   globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg>',
   github:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.8a5.3 5.3 0 0 0-1.4-3.7 4.9 4.9 0 0 0-.1-3.7s-1.1-.3-3.7 1.4a12.7 12.7 0 0 0-6.6 0C6 4.6 4.9 4.9 4.9 4.9a4.9 4.9 0 0 0-.1 3.7A5.3 5.3 0 0 0 3.4 12.3c0 5.3 3.2 6.5 6.2 6.8a3.4 3.4 0 0 0-.9 2.6V21"/></svg>',
   doc:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
-  play:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>'
+  play:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>',
+  qr:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v2M14 20h2M20 18v3h-3"/></svg>'
 };
 
 /* ---------- 数据加载 ---------- */
@@ -58,6 +59,17 @@ function buildActions(p) {
     live.insertAdjacentHTML('beforeend', ICON.arrow);
     actions.appendChild(live);
   }
+  // 扫码入口：只有配了 qr 的项目才出现（三张二维码图一直存在，之前没有入口）
+  if (p.qr && p.qr.src) {
+    const qr = el('button', 'card__qr');
+    qr.type = 'button';
+    qr.dataset.qr = p.qr.src;
+    qr.dataset.qrTitle = p.qr.title || (p.name + ' · 扫码');
+    qr.setAttribute('aria-label', (p.qr.title || p.name) + '，扫码打开');
+    qr.insertAdjacentHTML('afterbegin', ICON.qr);
+    qr.appendChild(document.createTextNode('扫码'));
+    actions.appendChild(qr);
+  }
   return actions;
 }
 
@@ -90,11 +102,22 @@ function renderCard(p) {
     const media = el('div', 'card__media');
     if (p.id) media.classList.add('card__media--' + p.id);
     const img = el('img');
+    // WebP 优先：1200 宽给桌面，640 宽给窄屏（四张合计 934 KB → 142 KB）
+    const webp = p.thumbnail.replace(/\.png$/, '.webp');
+    const webpSmall = p.thumbnail.replace(/\.png$/, '-640.webp');
+    const picture = document.createElement('picture');
+    const source = el('source');
+    source.type = 'image/webp';
+    source.srcset = `${webpSmall} 640w, ${webp} 1200w`;
+    source.sizes = '(max-width: 760px) 100vw, 560px';
+    picture.appendChild(source);
     img.src = p.thumbnail;
     img.alt = p.name + ' 截图';
     img.loading = 'lazy';
+    img.decoding = 'async';
     img.width = 960; img.height = 600;
-    media.appendChild(img);
+    picture.appendChild(img);
+    media.appendChild(picture);
     media.appendChild(el('span', 'card__accent'));
     article.appendChild(media);
   } else {

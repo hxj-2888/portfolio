@@ -284,6 +284,48 @@
               "okIfContains": "__ARCADE_SW__"
             }
           ]
+        },
+        {
+          "file": "games/ping-pong/download.html",
+          "note": "合集适配（2026-10-25）：作品集不承载 APK（见 .gitignore「作品集不承载二进制」），相对链接在作品集域名下会落到 SPA 回退——返回 200 + HTML，用户下到一个改名成 .apk 的网页，正是「解析包错误」的成因之一。这里把相对链接改写为游戏站绝对地址；与 ping-pong-duel 段同口径，改 APK 版本号时两处都会自动跟上",
+          "rules": [
+            {
+              "type": "regex",
+              "from": "href=\"PingPongDuel-v",
+              "to": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            },
+            {
+              "type": "regex",
+              "from": "var APK = 'PingPongDuel-v",
+              "to": "var APK = 'https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "var APK = 'https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            }
+          ]
+        },
+        {
+          "file": "games/ping-pong/index.html",
+          "note": "合集适配（2026-10-25）：同上——APK 直链改游戏站绝对地址；「下载有问题？」指向不存在的 `download`（无扩展名，Pages 会回退成页面），改成 download.html",
+          "rules": [
+            {
+              "type": "regex",
+              "from": "href=\"PingPongDuel-v",
+              "to": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            },
+            {
+              "type": "regex",
+              "from": "download=\"PingPongDuel-v",
+              "to": "download=\"https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "download=\"https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            },
+            {
+              "type": "regex",
+              "from": "href=\"download\"",
+              "to": "href=\"download.html\"",
+              "okIfContains": "href=\"download.html\""
+            }
+          ]
         }
       ]
     }
