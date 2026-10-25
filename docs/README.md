@@ -13,15 +13,22 @@
 ## 一分钟上手
 
 ```bash
-npm run check      # 文案守门 + 规则同步
+npm run check      # 文案守门 + 规则同步 + 响应头 + 内嵌适配
 npm run collect    # 项目收集（应 6/6）
 npm run sync:dry   # 同步预演（应 3 同步 / 2 跳过 / 0 失败）
+npm run check:demo # 演示视频守门（首屏/作品卡/合集页的视频可播）
 npx serve . -p 3000   # 本地预览
 ```
 
 ## 三个最容易踩的坑
 
 1. **卡片不是手写的**——由 `projects.json` + `js/site.js` 渲染，改 `index.html` 没用。
-2. **`games/` 是同步产物**，被 `.gitignore` 排除；要改游戏内容请改源仓库再 `npm run sync`。
+2. **`projects/game-collection/games/` 是同步产物，但已入库**（2026-10-24 起，约 117 个文件）。
+   要改游戏内容请改源仓库再 `npm run sync`——直接改这里的文件会被 `verify-sync` 判为
+   「产物被手工改过」，CI 也会红。
 3. **推送前先 `git fetch origin`**——`sync-attachment-site` 工作流会在你推送间隙提交，
    发现分叉用 `git rebase`（不是 merge），rebase 后 Gitee 需 `--force`。
+
+> ⚠️ 本地 `node tools/verify-sync.cjs` 会把 `delta-force` 的差异也报出来。
+> 若该仓库本地领先远端（有未推送提交），那几个文件的"落后"是**本地假象**，
+> CI 走远端克隆不受影响——别为了让它变绿去 `--fix`，那会把未发布的改动带进作品集。
