@@ -72,7 +72,8 @@
         </div>
       </div>
 
-      <!-- 展示台：三张项目截图按「浏览器窗口」组织 -->
+      <!-- 展示台：按「浏览器窗口」组织——返航录 / 落幕查是静态截图，
+           乒乓对决换成了游玩演示视频（2026-10-25：静态图看不出玩法，换成实机对打） -->
       <div class="stage">
         <div class="stage__frame">
           <div class="stage__bar" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -80,7 +81,14 @@
             <img src="assets/projects/space-kill.webp" width="960" height="600" alt="返航录开始界面"/>
           </div>
           <div class="stage__pane" data-mock="ping-pong-duel">
-            <img src="assets/projects/ping-pong-duel.webp" width="960" height="600" alt="乒乓对决主页"/>
+            <!-- 2026-10-25：静态截图换成游玩演示视频（AI 对打 · 看台侧视角，真实物理回合、未剪辑）。
+                 静音 + 循环 + playsinline：切到该标签即自动播放，移动端不会弹全屏播放器。 -->
+            <video class="stage__video" data-stage-video
+              src="assets/projects/ping-pong-duel-demo.mp4"
+              poster="assets/projects/ping-pong-duel-demo-poster.jpg"
+              muted loop playsinline preload="metadata"
+              aria-label="乒乓对决游玩演示：两个 AI 在看台侧视角对打"></video>
+            <span class="stage__badge" aria-hidden="true">▶ 游玩演示</span>
           </div>
           <div class="stage__pane" data-mock="delta-force">
             <img src="assets/projects/delta-force.webp" width="960" height="600" alt="落幕查行情界面"/>

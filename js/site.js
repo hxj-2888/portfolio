@@ -101,6 +101,25 @@ function renderCard(p) {
   if (p.thumbnail) {
     const media = el('div', 'card__media');
     if (p.id) media.classList.add('card__media--' + p.id);
+    // 有演示视频的项目：卡片媒体区直接放视频（静音循环 + poster 兜底）。
+    // 静态缩略图看不出「这游戏能玩」，视频是最短的证明；不支持/被拦截时
+    // poster 帧仍然显示，信息不丢。
+    if (p.demo) {
+      const v = el('video', 'card__video');
+      v.src = p.demo.src;
+      if (p.demo.poster) v.poster = p.demo.poster;
+      v.muted = true;
+      v.loop = true;
+      v.playsInline = true;
+      v.preload = 'none';           // 不自动拉流：进入视口再加载，省流量
+      v.setAttribute('aria-label', p.name + ' 游玩演示');
+      v.dataset.demoVideo = '1';
+      media.appendChild(v);
+      media.appendChild(el('span', 'card__badge', '▶ 演示'));
+      media.appendChild(el('span', 'card__accent'));
+      article.appendChild(media);
+      return finishCard(article, p);
+    }
     const img = el('img');
     // WebP 优先：1200 宽给桌面，640 宽给窄屏（四张合计 934 KB → 142 KB）
     const webp = p.thumbnail.replace(/\.png$/, '.webp');
@@ -125,6 +144,11 @@ function renderCard(p) {
     article.appendChild(el('span', 'card__accent'));
   }
 
+  return finishCard(article, p);
+}
+
+/* 卡片正文：标题 / 一句话 / 标签 / 动作 / 资源行（视频卡与图片卡共用） */
+function finishCard(article, p) {
   const body = el('div', 'card__body');
   const eyebrow = el('p', 'card__eyebrow');
   if (!p.thumbnail) eyebrow.innerHTML = iconFor(p.icon || (p.type === 'doc' ? 'doc' : 'globe'));
@@ -257,22 +281,52 @@ async function copyMail(btn) {
   }
 }
 
-/* ---------- 首屏展示台：三张截图按标签切换 ---------- */
+/* ---------- 首屏展示台：静态截图 + 一段游玩演示视频，按标签切换 ---------- */
 const STAGE_CAPS = {
   'space-kill': '返航录 · v1preview1.0 · 15 人三阵营，空席位由 AI 托管',
-  'ping-pong-duel': '乒乓对决 · ITTF 标准球台的真实物理乒乓球，人机、双人与房间码联机。',
+  'ping-pong-duel': '乒乓对决 · 两个 AI 在看台侧视角对打（实机录制，未剪辑）：发球、推挡、扣杀与得分都在这一段里。',
   'delta-force': '落幕查 · 三角洲行动变卖物的实时价格查询，带 30 天走势。'
 };
 function bindStage() {
   const tabs = $$('.stage__tabs [data-mock]');
   if (!tabs.length) return;
+
+  // 演示视频只在它自己那一页播放：切走就暂停并回到开头，
+  // 既省流量/CPU，也保证下次点回来是从头看一遍完整回合。
+  // 注意选择器只认 [data-stage-video]（首屏展示台的那一支）；作品卡里的视频由
+  // bindDemoVideos 按「是否进入视口」独立管理，两者互不干扰。
+  const demos = $$('[data-stage-video]');
+  const syncVideo = (key) => {
+    demos.forEach((v) => {
+      const pane = v.closest('.stage__pane');
+      const active = pane && pane.dataset.mock === key;
+      if (active) {
+        // 静音自动播放是浏览器允许的；被策略拦下就静默停在 poster 帧，不影响其它内容
+        const p = v.play();
+        if (p && typeof p.catch === 'function') p.catch(() => {});
+      } else {
+        v.pause();
+        try { v.currentTime = 0; } catch (_) { /* 尚未载入元数据 */ }
+      }
+    });
+  };
+
   const show = (key) => {
     $$('.stage__pane').forEach((p) => p.classList.toggle('is-on', p.dataset.mock === key));
     tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.mock === key)));
     const cap = $('[data-stage-caption]');
     if (cap && STAGE_CAPS[key]) setText(cap, STAGE_CAPS[key]);
+    syncVideo(key);
   };
   tabs.forEach((b) => b.addEventListener('click', () => show(b.dataset.mock)));
+
+  // 首屏默认停在「返航录」：乒乓视频不抢开局，用户点「乒乓对决」标签才播。
+  // 标签页被切到后台时也暂停，回来再续播（避免后台空转）。
+  document.addEventListener('visibilitychange', () => {
+    const active = $('.stage__pane.is-on');
+    if (!active) return;
+    syncVideo(document.hidden ? '' : active.dataset.mock);
+  });
 }
 
 /* ---------- 导航：滚动毛玻璃 + 当前分区高亮 ---------- */
@@ -333,6 +387,32 @@ function bindReveal() {
   targets.forEach((t) => io.observe(t));
 }
 
+/* ---------- 作品卡里的演示视频：进入视口才播，离开即停 ----------
+   为什么用 IntersectionObserver 而不是直接 autoplay：卡片可能同时在屏外，
+   静音自动播放虽被允许，但多支视频一起解码会拖慢首屏滚动。这里按可见性开关，
+   既保证滚到卡片时「正在动」，也不为看不见的内容付解码成本。 */
+function bindDemoVideos() {
+  const vids = $$('video[data-demo-video]');
+  if (!vids.length) return;
+  const play = (v) => {
+    v.preload = 'auto';
+    const p = v.play();
+    if (p && typeof p.catch === 'function') p.catch(() => {}); // 被策略拦下就停在 poster 帧
+  };
+  if (!('IntersectionObserver' in window) || reduceMotion()) {
+    vids.forEach(play); // 无 IO 或用户要求减少动效：一次性加载（reduced-motion 下仍静音播放，无闪烁）
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const v = entry.target;
+      if (entry.isIntersecting) play(v);
+      else v.pause();
+    });
+  }, { threshold: 0.35 });
+  vids.forEach((v) => io.observe(v));
+}
+
 /* ---------- 启动 ---------- */
 bindStage();
 bindNav();
@@ -342,6 +422,7 @@ fetch('projects.json', { cache: 'no-cache' })
     // 排序：置顶优先，其次按 order 升序
     PROJECTS = (data.projects || []).slice().sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
     renderProjects();
+    bindDemoVideos();
     bindReveal();
   })
   .catch((err) => {

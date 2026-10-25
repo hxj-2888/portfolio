@@ -14,6 +14,7 @@
     "check:rules": "node tools/check-rules-sync.cjs",
     "check:headers": "node tools/check-headers.cjs",
     "check:embedded": "node tools/fix-embedded-games.cjs --check",
+    "check:demo": "node tools/verify-demo.cjs",
     "rules:map": "node tools/gen-rules-map.cjs",
     "dev": "npx serve . -p 3000",
     "deploy": "npm run sync && npm run check && npm run sync:verify && echo '→ 推送到 Cloudflare Pages / 静态托管'"

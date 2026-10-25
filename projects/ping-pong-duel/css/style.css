@@ -114,7 +114,7 @@ input:focus { border-color: var(--blue); }
 .career-page-label { color: #b9c6dd; font-size: 13px; }
 .career-pager .btn { min-width: 84px; }
 
-/* 养成系统（v1.8.0：能力训练 + 特效兑换）——主菜单积分黄字已移除（v2.2），积分在训练/装扮页显示 */
+/* 养成系统（v1.8.0：能力训练 + 特效兑换）——主菜单积分黄字已移除（v2.2），积分在训练/战功页显示 */
 .training-h { color: var(--primary-100); font-size: 14px; margin: 8px 0 4px; letter-spacing: 1px; }
 .training-list { display: flex; flex-direction: column; gap: 6px; }
 .t-item, .s-item {
@@ -127,7 +127,7 @@ input:focus { border-color: var(--blue); }
 .t-desc { color: #7f90ad; font-size: 11.5px; }
 .t-owned { color: #7fd0a8; font-size: 12px; white-space: nowrap; }
 .t-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; } /* 训练项按钮组(降级+升级) */
-/* 能力训练/装扮系统：纯黑实底，打开时不透出主菜单/球场任何内容（覆盖 career-panel 半透明） */
+/* 能力训练/战功系统：纯黑实底，打开时不透出主菜单/球场任何内容（覆盖 career-panel 半透明） */
 .pure-panel { background: #04060c; backdrop-filter: none; }
 .training-reset-row { display: flex; justify-content: center; padding: 2px 0 4px; }
 .plan-form { display: flex; gap: 8px; align-items: center; }
@@ -246,10 +246,13 @@ input:focus { border-color: var(--blue); }
 }
 .overlay-card {
   background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-  padding: 28px 34px; text-align: center; display: flex; flex-direction: column; gap: 12px; min-width: 300px;
+  padding: 28px 34px; text-align: center; display: flex; flex-direction: column; gap: 12px;
+  min-width: 300px; max-width: min(620px, 92vw);
 }
 .overlay-card h2 { color: var(--primary-100); letter-spacing: 3px; }
-.overlay-card p { color: #b9c6dd; }
+/* 说明文案：正文里的 \n 是分段意图（探索中弹层等），用 pre-line 保留换行；
+   限宽避免长句把卡片撑成一条超宽横条 */
+.overlay-card p { color: #b9c6dd; white-space: pre-line; line-height: 1.7; }
 
 /* ---------- 一局结束结算屏：渐变成黑屏 ---------- */
 .game-over-screen {
@@ -1400,7 +1403,7 @@ input[type="range"]:focus-visible,
 }
 
 /* ---------- E5 列表条目：左侧主信息 + 右侧操作 ---------- */
-/* 训练项 .t-item / 装扮项 .s-item / 战绩项 .career-item / 回放项 .history-item 统一为行卡片 */
+/* 训练项 .t-item / 战功奖励项 .s-item / 战绩项 .career-item / 回放项 .history-item 统一为行卡片 */
 .t-item, .s-item {
   position: relative;
   display: flex; align-items: center; gap: var(--sp-2);
@@ -1422,7 +1425,7 @@ input[type="range"]:focus-visible,
   transition: opacity var(--dur) var(--ease);
 }
 .t-item:hover .t-btns, .s-item:hover .t-btns { opacity: 1; }
-/* 装备/外观预览区（装扮项左侧 40×40） */
+/* 装备/特效预览区（战功奖励项左侧 40×40） */
 .item-preview {
   flex: none; width: 40px; height: 40px; border-radius: var(--r-ico);
   border: 1px solid var(--line-1); background: var(--bg-base);
@@ -1982,6 +1985,18 @@ input[type="range"]:focus-visible,
   content: '🔒'; position: absolute; top: 4px; right: 8px; font-size: 11px; line-height: 1;
 }
 .home-side.right .plate.locked::after { right: auto; left: 8px; }
+/* 网页版暂不开放的入口（战功系统）：置灰但**不隐藏、不抹除**——保留入口位置与可点性，
+   点开由 app/dressup.js 给「战功系统 · 探索中」说明；桌面版 / APK 不受影响（不挂此 class）。
+   与 .locked 区分：没有锁图标，用「探索中」小签表达「功能在建」而非「需要解锁」。 */
+.plate.web-locked { opacity: 0.5; cursor: help; }
+.plate.web-locked b { font-weight: 700; }
+.plate.web-locked::after {
+  content: '探索中'; position: absolute; top: 5px; right: 8px;
+  font-size: 10px; line-height: 1; letter-spacing: 0.04em;
+  padding: 2px 5px; border-radius: 999px;
+  color: var(--primary-100); background: var(--primary-15);
+  border: 1px solid rgba(0, 229, 176, 0.28);
+}
 
 /* 哨子：整页唯一会呼吸的元素（青绿强调） */
 .whistle {
@@ -2058,6 +2073,11 @@ input[type="range"]:focus-visible,
 }
 .endless-seg button.on { background: var(--primary-100); color: #032019; border-color: var(--primary-100); }
 .endless-seg button.lock { opacity: 0.45; cursor: not-allowed; }
+
+/* 〔2026-10-25 图标双轨〕data-icon-style="alt"（game-icons 实心图标）：
+   内联 path 已带 fill="currentColor"；覆盖线条风格约束（stroke 关闭）。 */
+body[data-icon-style="alt"] [data-icon] svg { fill: currentColor; stroke: none; }
+body[data-icon-style="alt"] .settings-btn svg { width: 20px; height: 20px; display: block; }
 
 /* 主页状态 toast（#statusBar 的主页形态：setStatus 落点，自动淡出由 home.js 驱动） */
 .home-toast {

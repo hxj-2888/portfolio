@@ -533,6 +533,7 @@
   PPD.ui.btnSettings.addEventListener('click', openSettings);
   PPD.ui.btnSettingsGame.addEventListener('click', openSettings);
   PPD.ui.btnSettingsClose.addEventListener('click', () => { PPD.GameAudio.ui(); closeSettings(); });
+
   // 判定范围虚线：局内随时可关（设置面板开关，立即生效 + 本地记忆）
   PPD.ui.setShowHitRanges.addEventListener('change', () => {
     PPD.app.showHitRanges = PPD.ui.setShowHitRanges.checked;

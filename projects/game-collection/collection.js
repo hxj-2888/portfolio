@@ -17,4 +17,20 @@
       if (!confirm('返航录需要横屏游玩，继续进入吗？')) e.preventDefault();
     });
   });
+  // 演示视频（2026-10-25）：静音自动播放；浏览器策略拦下时保持 poster 帧，不报错。
+  // 进视口才播、离开即停——两个卡片的视频不一起解码。
+  var vids = Array.prototype.slice.call(document.querySelectorAll('.card__media video'));
+  if (!vids.length) return;
+  var play = function (v) {
+    v.preload = 'auto';
+    var p = v.play();
+    if (p && p.catch) p.catch(function () { /* 被策略拦下：停在 poster */ });
+  };
+  if (!('IntersectionObserver' in window)) { vids.forEach(play); return; }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) {
+      if (en.isIntersecting) play(en.target); else en.target.pause();
+    });
+  }, { threshold: 0.35 });
+  vids.forEach(function (v) { io.observe(v); });
 })();

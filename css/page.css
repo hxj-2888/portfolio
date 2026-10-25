@@ -34,6 +34,22 @@
 @keyframes stageIn{ from{ opacity:0; transform:translateY(8px); } }
 /* 截图按等比缩放完整显示（contain），不再裁切掉左右两侧的界面内容 */
 .stage__pane img{ width:100%; height:auto; aspect-ratio:16/10; object-fit:contain; background:var(--surface-2); }
+/* 演示视频：16:9 原生比例，黑底铺满（游戏本身就是 16:9 画面，contain 不会留白边） */
+.stage__pane{ position:relative; }
+.stage__video{
+  display:block; width:100%; height:auto; aspect-ratio:16/9;
+  object-fit:contain; background:#05070d;
+}
+/* 「▶ 游玩演示」角标：说明这是实机录屏而不是静态图 */
+.stage__badge{
+  position:absolute; left:12px; bottom:12px; z-index:2;
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 10px; border-radius:var(--r-pill);
+  font-size:12px; font-weight:700; letter-spacing:.02em;
+  color:#eaf4ff; background:rgba(8,12,22,.66);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(6px); pointer-events:none;
+}
 .stage__tabs{ display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
 .stage__tabs button{
   padding:7px 16px; border:1px solid var(--line); border-radius:var(--r-pill);

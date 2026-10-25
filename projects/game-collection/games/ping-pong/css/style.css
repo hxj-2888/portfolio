@@ -114,7 +114,7 @@ input:focus { border-color: var(--blue); }
 .career-page-label { color: #b9c6dd; font-size: 13px; }
 .career-pager .btn { min-width: 84px; }
 
-/* 养成系统（v1.8.0：能力训练 + 特效兑换）——主菜单积分黄字已移除（v2.2），积分在训练/装扮页显示 */
+/* 养成系统（v1.8.0：能力训练 + 特效兑换）——主菜单积分黄字已移除（v2.2），积分在训练/战功页显示 */
 .training-h { color: var(--primary-100); font-size: 14px; margin: 8px 0 4px; letter-spacing: 1px; }
 .training-list { display: flex; flex-direction: column; gap: 6px; }
 .t-item, .s-item {
@@ -127,7 +127,7 @@ input:focus { border-color: var(--blue); }
 .t-desc { color: #7f90ad; font-size: 11.5px; }
 .t-owned { color: #7fd0a8; font-size: 12px; white-space: nowrap; }
 .t-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; } /* 训练项按钮组(降级+升级) */
-/* 能力训练/装扮系统：纯黑实底，打开时不透出主菜单/球场任何内容（覆盖 career-panel 半透明） */
+/* 能力训练/战功系统：纯黑实底，打开时不透出主菜单/球场任何内容（覆盖 career-panel 半透明） */
 .pure-panel { background: #04060c; backdrop-filter: none; }
 .training-reset-row { display: flex; justify-content: center; padding: 2px 0 4px; }
 .plan-form { display: flex; gap: 8px; align-items: center; }
@@ -246,10 +246,13 @@ input:focus { border-color: var(--blue); }
 }
 .overlay-card {
   background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-  padding: 28px 34px; text-align: center; display: flex; flex-direction: column; gap: 12px; min-width: 300px;
+  padding: 28px 34px; text-align: center; display: flex; flex-direction: column; gap: 12px;
+  min-width: 300px; max-width: min(620px, 92vw);
 }
 .overlay-card h2 { color: var(--primary-100); letter-spacing: 3px; }
-.overlay-card p { color: #b9c6dd; }
+/* 说明文案：正文里的 \n 是分段意图（探索中弹层等），用 pre-line 保留换行；
+   限宽避免长句把卡片撑成一条超宽横条 */
+.overlay-card p { color: #b9c6dd; white-space: pre-line; line-height: 1.7; }
 
 /* ---------- 一局结束结算屏：渐变成黑屏 ---------- */
 .game-over-screen {
@@ -1400,7 +1403,7 @@ input[type="range"]:focus-visible,
 }
 
 /* ---------- E5 列表条目：左侧主信息 + 右侧操作 ---------- */
-/* 训练项 .t-item / 装扮项 .s-item / 战绩项 .career-item / 回放项 .history-item 统一为行卡片 */
+/* 训练项 .t-item / 战功奖励项 .s-item / 战绩项 .career-item / 回放项 .history-item 统一为行卡片 */
 .t-item, .s-item {
   position: relative;
   display: flex; align-items: center; gap: var(--sp-2);
@@ -1422,7 +1425,7 @@ input[type="range"]:focus-visible,
   transition: opacity var(--dur) var(--ease);
 }
 .t-item:hover .t-btns, .s-item:hover .t-btns { opacity: 1; }
-/* 装备/外观预览区（装扮项左侧 40×40） */
+/* 装备/特效预览区（战功奖励项左侧 40×40） */
 .item-preview {
   flex: none; width: 40px; height: 40px; border-radius: var(--r-ico);
   border: 1px solid var(--line-1); background: var(--bg-base);
@@ -1982,6 +1985,18 @@ input[type="range"]:focus-visible,
   content: '🔒'; position: absolute; top: 4px; right: 8px; font-size: 11px; line-height: 1;
 }
 .home-side.right .plate.locked::after { right: auto; left: 8px; }
+/* 网页版暂不开放的入口（战功系统）：置灰但**不隐藏、不抹除**——保留入口位置与可点性，
+   点开由 app/dressup.js 给「战功系统 · 探索中」说明；桌面版 / APK 不受影响（不挂此 class）。
+   与 .locked 区分：没有锁图标，用「探索中」小签表达「功能在建」而非「需要解锁」。 */
+.plate.web-locked { opacity: 0.5; cursor: help; }
+.plate.web-locked b { font-weight: 700; }
+.plate.web-locked::after {
+  content: '探索中'; position: absolute; top: 5px; right: 8px;
+  font-size: 10px; line-height: 1; letter-spacing: 0.04em;
+  padding: 2px 5px; border-radius: 999px;
+  color: var(--primary-100); background: var(--primary-15);
+  border: 1px solid rgba(0, 229, 176, 0.28);
+}
 
 /* 哨子：整页唯一会呼吸的元素（青绿强调） */
 .whistle {
@@ -2058,6 +2073,11 @@ input[type="range"]:focus-visible,
 }
 .endless-seg button.on { background: var(--primary-100); color: #032019; border-color: var(--primary-100); }
 .endless-seg button.lock { opacity: 0.45; cursor: not-allowed; }
+
+/* 〔2026-10-25 图标双轨〕data-icon-style="alt"（game-icons 实心图标）：
+   内联 path 已带 fill="currentColor"；覆盖线条风格约束（stroke 关闭）。 */
+body[data-icon-style="alt"] [data-icon] svg { fill: currentColor; stroke: none; }
+body[data-icon-style="alt"] .settings-btn svg { width: 20px; height: 20px; display: block; }
 
 /* 主页状态 toast（#statusBar 的主页形态：setStatus 落点，自动淡出由 home.js 驱动） */
 .home-toast {
@@ -2185,3 +2205,132 @@ input[type="range"]:focus-visible,
   border-right: 3px solid rgba(255, 255, 255, 0.55);
 }
 .home-stage .settings-btn:hover { border-right-color: var(--primary-100); background: rgba(0, 229, 176, 0.16); }
+
+/* ============================================================
+ * 〔2026-10-25 联机框视觉统一〕场景背景 + 玻璃卡片 + 创建/加入标签 +
+ * 四位数字输入 + 双哨子准备 + 高级折叠；对齐统一居中、返回按钮 ≥44px。
+ * ============================================================ */
+/* 场景背景：与主页同一世界（左红右蓝环境色 + 顶部聚光灯），取代纯深蓝底 */
+.net-panel {
+  background:
+    radial-gradient(52% 80% at 0% 58%, rgba(208, 50, 30, 0.30), transparent 72%),
+    radial-gradient(52% 80% at 100% 58%, rgba(37, 99, 235, 0.30), transparent 72%),
+    radial-gradient(46% 42% at 50% 0%, rgba(255, 246, 230, 0.10), transparent 70%),
+    linear-gradient(#0b1220, #050a14);
+  align-items: center; justify-content: center;
+}
+/* 玻璃卡片：半透明 + 毛玻璃 + 青绿顶线；按内容撑开（不再固定大高度留空） */
+.net-glass {
+  width: min(520px, 94vw);
+  background: rgba(10, 15, 26, 0.62);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--line-2); border-top: 3px solid var(--primary-100);
+  border-radius: var(--r-card);
+  gap: var(--sp-2);
+  animation: net-slide-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes net-slide-in {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .net-glass { animation: none; } }
+
+/* 返回按钮：≥44px 点击区 */
+.net-back { min-height: 44px; padding: 10px 16px; }
+
+/* Beta 小标签（替代首屏黄色警告条）：点击/悬停展开完整说明 */
+.net-beta {
+  display: inline-block; vertical-align: 4px; margin-left: 10px;
+  padding: 2px 8px; border-radius: 999px; cursor: pointer;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: var(--state-warn); border: 1px solid rgba(255, 212, 121, 0.45);
+}
+.net-beta:hover { background: rgba(255, 212, 121, 0.12); }
+.net-beta-note {
+  font-size: 12px; line-height: 1.7; color: var(--text-2); text-align: center;
+  background: rgba(255, 212, 121, 0.07); border: 1px solid rgba(255, 212, 121, 0.25);
+  border-radius: 10px; padding: 8px 12px;
+}
+
+/* 创建/加入两标签 */
+.net-tabs { display: flex; gap: 6px; }
+.net-tab {
+  flex: 1; padding: 12px 0; border-radius: 10px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--line-1);
+  color: var(--text-2); font-size: 15px; font-weight: 700; letter-spacing: 2px;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.net-tab.on { background: rgba(0, 229, 176, 0.15); border-color: var(--primary-100); color: var(--primary-100); }
+.net-view { display: flex; flex-direction: column; gap: 12px; text-align: center; }
+.net-cta { min-height: 52px; font-size: 17px; letter-spacing: 2px; }
+.net-view-hint { font-size: 12px; color: var(--text-3); }
+
+/* 加入视图：四位独立数字框 */
+.net-digits { display: flex; gap: 10px; justify-content: center; }
+.net-digit {
+  width: 62px; height: 74px; text-align: center;
+  font-size: 32px; font-weight: 800; letter-spacing: 0; text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.35); border: 1px solid var(--line-1); border-radius: 12px;
+  color: var(--text-1);
+}
+.net-digit:focus { border-color: var(--primary-100); box-shadow: 0 0 0 2px var(--primary-15); }
+.net-join-err { font-size: 13px; color: var(--state-down); text-align: center; }
+
+/* 等待区：大房间码 + 复制 */
+.net-code-row { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.net-code-row .room-code { margin: 0; }
+.net-copy {
+  padding: 10px 14px; border-radius: 10px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid var(--line-1);
+  color: var(--text-2); font-size: 13px; font-weight: 700;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.net-copy:hover { border-color: var(--primary-100); color: var(--primary-100); }
+.net-wait-hint { text-align: center; color: var(--text-1); font-size: 14px; font-weight: 700; }
+.net-wait-sub { text-align: center; color: var(--text-3); font-size: 12px; }
+
+/* 双哨子准备（配对成功；与主页哨子同一视觉） */
+.net-ready { display: flex; flex-direction: column; gap: 10px; }
+.nr-row { display: flex; align-items: stretch; justify-content: center; gap: 18px; }
+.nr-side { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.nr-name { font-size: 14px; font-weight: 700; color: var(--text-1); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nr-vs { align-self: center; color: var(--text-3); font-size: 12px; letter-spacing: 2px; }
+.nr-whistle {
+  background: none; border: none; cursor: pointer; color: var(--text-1);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 700;
+}
+.nr-whistle .ring {
+  width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center;
+  border: 2px solid var(--primary-100); color: var(--primary-100);
+  background: rgba(4, 8, 14, 0.7);
+  box-shadow: 0 0 0 0 rgba(0, 229, 176, 0.5); animation: whistle-pulse 2.4s ease-out infinite;
+  transition: background 0.2s, color 0.2s;
+}
+.nr-whistle svg { width: 30px; height: 30px; }
+.nr-whistle:hover .ring { background: rgba(0, 229, 176, 0.18); }
+.nr-whistle.ready .ring { background: var(--primary-100); color: #032019; animation: none; box-shadow: 0 0 24px rgba(0, 229, 176, 0.55); }
+.nr-whistle.ghost { cursor: default; }
+.nr-whistle.ghost .ring { border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.4); animation: none; }
+.nr-hint { text-align: center; font-size: 12px; color: var(--text-3); }
+
+/* 高级折叠 */
+.net-advanced { border: 1px solid var(--line-1); border-radius: 10px; padding: 0; }
+.net-advanced summary {
+  padding: 9px 14px; cursor: pointer; user-select: none;
+  font-size: 12px; letter-spacing: 1px; color: var(--text-3); list-style: none;
+}
+.net-advanced summary::before { content: "▸ "; color: var(--primary-100); }
+.net-advanced[open] summary::before { content: "▾ "; }
+.net-adv-body { display: flex; flex-direction: column; gap: 10px; padding: 4px 14px 12px; }
+.net-line-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.net-line-label { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+.net-line-label select {
+  padding: 5px 8px; border-radius: 8px; font-size: 12px;
+  border: 1px solid var(--line-1); background: rgba(0, 0, 0, 0.3); color: var(--text-1);
+}
+.net-line-ping {
+  min-width: 52px; text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--primary-100); background: var(--primary-08);
+  border-radius: 999px; padding: 3px 10px;
+}

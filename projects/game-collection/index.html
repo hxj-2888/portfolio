@@ -22,13 +22,17 @@
   <div class="grid">
     <article class="card card--pp">
       <div class="card__media">
-        <img src="assets/card-ping-pong.png" alt="乒乓对决截图" width="960" height="600" loading="lazy"/>
+        <!-- 2026-10-25：静态截图换成实机演示（AI 对打 · 看台侧视角，未剪辑）。
+             合集页在 projects/game-collection 内手写维护，视频放同目录 assets/。 -->
+        <video src="assets/demo-ping-pong-card.mp4" poster="assets/demo-ping-pong-card-poster.jpg"
+          muted loop playsinline preload="metadata"
+          aria-label="乒乓对决游玩演示：两个 AI 在看台侧视角对打"></video>
         <span class="card__tag">乒乓对决</span>
       </div>
       <div class="card__body">
         <h2 class="card__title">乒乓对决</h2>
-        <p class="card__ver">v3.2.1 · 联机乒乓球</p>
-        <p class="card__line">ITTF 标准球台的真实物理：人机四档、本地双人、房间码联机；手机竖屏可玩。</p>
+        <p class="card__ver">v3.5.0 · 联机乒乓球</p>
+        <p class="card__line">ITTF 标准球台的真实物理：人机四档、本地双人、房间码联机；手机横屏可玩。</p>
         <div class="card__acts">
           <a class="btn btn--primary" href="games/ping-pong/index.html">开始游玩</a>
           <a class="btn btn--ghost" href="https://ping-pong-duel.pages.dev" target="_blank" rel="noopener">独立站 / 联机</a>

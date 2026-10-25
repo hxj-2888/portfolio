@@ -78,6 +78,19 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
 .card__media picture{ display:block; width:100%; height:100%; }
 .card__media img{ width:100%; height:100%; object-fit:cover; transition:transform .5s var(--ease); }
 .card:hover .card__media img{ transform:scale(1.025); }
+/* 演示视频卡（2026-10-25）：媒体区直接放实机录屏，按 16:9 裁满（与静态图的 16:10 观感一致） */
+.card__media video{ display:block; width:100%; height:100%; object-fit:cover; background:#05070d; transition:transform .5s var(--ease); }
+.card:hover .card__media video{ transform:scale(1.015); }
+/* 「▶ 演示」角标：与静态截图区分开，说明这是实机录制 */
+.card__badge{
+  position:absolute; left:12px; bottom:12px; z-index:2;
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 9px; border-radius:var(--r-pill);
+  font-size:12px; font-weight:700; letter-spacing:.02em;
+  color:#eaf4ff; background:rgba(8,12,22,.66);
+  border:1px solid rgba(255,255,255,.18); backdrop-filter:blur(6px);
+  pointer-events:none;
+}
 /* 项目色只作为一个圆点，不再做整条彩条 */
 .card__accent{ position:absolute; top:14px; right:14px; width:10px; height:10px; border-radius:50%; background:var(--card-accent, var(--accent)); box-shadow:0 0 0 3px rgba(255,255,255,.75); z-index:2; }
 .card__media--ping-pong-duel{ --card-accent:var(--proj-ping-pong); }

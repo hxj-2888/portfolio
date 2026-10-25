@@ -10,7 +10,8 @@
     "name": "标题（返航录等展示名以本字段为准）",
     "tagline": "一句话，≤28 字，不要括号补充",
     "tags": "最多显示 3 个",
-    "links": "资源行：{label, url, icon: globe|github|doc}"
+    "links": "资源行：{label, url, icon: globe|github|doc}",
+    "demo": "可选：{src, poster} —— 卡片与首屏展示台改放游玩演示视频（静音循环），thumbnail 仍作回退图"
   },
   "projects": [
     {
@@ -42,8 +43,12 @@
       "kicker": "可玩 · 网页游戏",
       "name": "乒乓对决",
       "tagline": "ITTF 标准球台的真实物理乒乓球，人机、双人与房间码联机。",
-      "tags": ["联机", "物理引擎", "手机竖屏"],
+      "tags": ["联机", "物理引擎", "实机演示"],
       "thumbnail": "assets/projects/ping-pong-duel.png",
+      "demo": {
+        "src": "assets/projects/ping-pong-duel-demo-card.mp4",
+        "poster": "assets/projects/ping-pong-duel-demo-card-poster.jpg"
+      },
       "entry": "index.html",
       "type": "web",
       "mobile": true,

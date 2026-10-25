@@ -9,6 +9,7 @@
   let ctx = null;
   let master = null;
   let noiseBuf = null;
+
   // 音效开关（设置面板，localStorage 持久化）：muted=true 时游戏音效静音
   let muted = false;
   try { muted = typeof localStorage !== 'undefined' && localStorage.getItem('ppd_sound_on') === '0'; } catch (e) { /* ignore */ }
@@ -402,6 +403,7 @@
     setMusicOn, isMusicOn() { return musicOn; },
     setMusicVol, getMusicVol() { return musicVol; },
     setSfxVol, getSfxVol() { return sfxVol; },
+
     musicMode, bgmPath, bgmInfo, // musicMode 恒为 'raw'；bgmPath: buffer/element/none
     setIntensity,
     hit() { noise(0.06, 0.35, 1800); tone(260, 0.07, 'square', 0.12, 90); },
