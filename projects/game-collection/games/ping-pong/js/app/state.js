@@ -123,7 +123,6 @@
     careerPageLabel: document.getElementById('careerPageLabel'),
     btnCareerPrev: document.getElementById('btnCareerPrev'),
     btnCareerNext: document.getElementById('btnCareerNext'),
-    btnCareerBack: document.getElementById('btnCareerBack'),
     careerTab: document.getElementById('careerTab'),             // 战绩记录标签体
     btnCareerTab: document.getElementById('btnCareerTab'),       // 标签按钮：战绩记录
     btnHistoryTab: document.getElementById('btnHistoryTab'),     // 标签按钮：历史回放
