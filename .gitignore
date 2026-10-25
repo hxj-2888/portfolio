@@ -46,3 +46,7 @@ delta-force-deploy/
 # 后连同改动一起提交；deploy.yml 已加存在性门禁，缺失会直接失败。合集页本身的
 # 手写文件（index.html / collection.* / assets/card-*.png）一直入库。
 # projects/game-collection/games/
+
+# 本地提交信息临时文件（勿入库）
+commit-msg.tmp.txt
+

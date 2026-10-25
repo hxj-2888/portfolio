@@ -135,13 +135,19 @@ function main() {
     }
 
     // 3. 与仓库里入库的副本逐字节比对
+    // ⚠ 必须归一化换行符再比：Windows 上 core.autocrlf=true 时，git checkout 写工作区是 CRLF，
+    //   而"重跑同步"是用 fs.copyFileSync 从源仓库工作区复制——源仓库工作区也是 CRLF，
+    //   但入库的 blob 是 LF。不归一化就会把「同一份内容、只是行尾不同」误报成差异
+    //   （实测 2026-10-25：home.js/icons.js/boot.js 三个文件 blob 完全相同却被判为"落后"）。
+    //   CI 侧（deploy.yml）一直用 `tr -d '\r'` 归一，本地工具此前漏了这一步。
+    const norm = (buf) => Buffer.from(buf.toString('utf8').replace(/\r\n/g, '\n'), 'utf8');
     const resynced = walk(path.join(copy, 'projects')).filter((rel) => !inSkippedDir(rel));
     const diffs = [];
     for (const rel of resynced) {
       const a = path.join(copy, 'projects', rel);
       const b = path.join(ROOT, 'projects', rel);
       if (!fs.existsSync(b)) { diffs.push(`新增 ${rel.replace(/\\/g, '/')}`); continue; }
-      if (!fs.readFileSync(a).equals(fs.readFileSync(b))) diffs.push(`变更 ${rel.replace(/\\/g, '/')}`);
+      if (!norm(fs.readFileSync(a)).equals(norm(fs.readFileSync(b)))) diffs.push(`变更 ${rel.replace(/\\/g, '/')}`);
     }
 
     if (diffs.length === 0) {
