@@ -1,26 +1,54 @@
 /* ============================================================
-   page.css — 作品集页面专属样式（依赖 tokens.css / components.css）
+   page.css — 作品集页面专属布局（依赖 tokens.css / components.css）
+   2026-10-25 白底改版：Hero 全屏居中 + 展示台、联系方式、窄屏调整。
    ============================================================ */
-.hero__badges{ display:flex; flex-wrap:wrap; gap:8px; margin-top:var(--sp-2); }
-.projects-note{ color:var(--muted-2); font-size:var(--fs-xs); margin-top:12px; }
-.projects-note a{ color:var(--muted); text-decoration:underline; }
 
-/* 卡片里的资源图标行（GitHub / 在线） */
-.card__links{ display:flex; flex-wrap:wrap; gap:14px; color:var(--muted); font-size:var(--fs-xs); }
-.card__links a{ display:inline-flex; align-items:center; gap:5px; }
-.card__links a:hover{ color:var(--text); }
-.card__links svg{ width:14px; height:14px; }
+/* ---- Hero：占满首屏并垂直居中 ---- */
+.hero{ min-height:100vh; display:flex; align-items:center; padding:calc(var(--h-nav) + 40px) 0 60px; }
+.hero__grid{ display:grid; grid-template-columns:1fr; gap:var(--sp-4); align-items:center; width:100%; }
+@media (min-width:980px){
+  .hero__grid{ grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:56px; }
+  .hero{ min-height:auto; padding:calc(var(--h-nav) + 96px) 0 96px; }
+}
+.hero__tag{
+  display:inline-flex; align-items:center; gap:10px; padding:6px 14px;
+  border:1px solid var(--line); border-radius:var(--r-pill);
+  background:var(--surface); color:var(--muted); font-size:14px;
+}
+.dot{ width:8px; height:8px; border-radius:50%; background:var(--status-online); box-shadow:0 0 0 4px rgba(21,128,61,.12); flex:none; }
+.hero__title{ margin:22px 0; font-size:var(--fs-h1); line-height:1.08; letter-spacing:-.03em; font-weight:900; text-wrap:balance; }
+.hero__title em{ font-style:normal; color:var(--accent); }
+.hero__lead{ margin:0; color:var(--muted); font-size:clamp(16px,1.4vw,19px); max-width:30em; }
+.hero__actions{ display:flex; flex-wrap:wrap; gap:12px; margin-top:30px; }
 
-/* 分组内卡片的悬停提升只对“可点”卡片生效 */
-.card--static:hover{ transform:none; box-shadow:none; }
+/* ---- 展示台：把三张项目截图按「浏览器窗口」组织 ---- */
+.stage{ position:relative; }
+.stage__frame{
+  border:1px solid var(--line); border-radius:14px; overflow:hidden;
+  background:var(--surface); box-shadow:var(--shadow-card);
+}
+.stage__bar{ display:flex; gap:6px; padding:11px 14px; border-bottom:1px solid var(--line); background:var(--surface-2); }
+.stage__bar i{ width:9px; height:9px; border-radius:50%; background:var(--line-strong); }
+.stage__pane{ display:none; }
+.stage__pane.is-on{ display:block; animation:stageIn .45s var(--ease); }
+@keyframes stageIn{ from{ opacity:0; transform:translateY(8px); } }
+/* 截图按等比缩放完整显示（contain），不再裁切掉左右两侧的界面内容 */
+.stage__pane img{ width:100%; height:auto; aspect-ratio:16/10; object-fit:contain; background:var(--surface-2); }
+.stage__tabs{ display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+.stage__tabs button{
+  padding:7px 16px; border:1px solid var(--line); border-radius:var(--r-pill);
+  color:var(--muted); font-weight:600; font-size:14px; background:var(--surface);
+  transition:color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.stage__tabs button:hover{ color:var(--text); border-color:var(--line-strong); }
+.stage__tabs button[aria-selected="true"]{ background:var(--text); border-color:var(--text); color:var(--surface); }
+.stage__cap{ display:flex; gap:12px; align-items:center; margin-top:14px; color:var(--muted); font-size:14px; min-height:24px; }
+.stage__cap::before{ content:""; width:22px; height:2px; background:var(--accent); flex:none; }
 
-/* 弹窗内的标题副行 */
-.modal__actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.modal[data-open="true"] .modal__box{ animation:modalIn .18s var(--ease); }
-@keyframes modalIn{ from{ opacity:0; transform:translateY(8px) scale(.99); } to{ opacity:1; transform:none; } }
-
-/* 窄屏：弹窗几乎全屏，中文长页更好读 */
+/* ---- 窄屏 ---- */
 @media (max-width:640px){
   .modal__body iframe{ height:72vh; }
-  .contact{ padding:var(--sp-3); }
+  .contact{ padding:32px 24px; }
+  .band{ padding:20px 22px; }
+  .section{ padding:64px 0; }
 }

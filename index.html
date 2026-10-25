@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>何向杰 · 独立开发者 · 游戏 / 工具 / 界面</title>
 <meta name="description" content="何向杰，独立开发者。做能玩的网页作品：乒乓对决、返航录、落幕查；自己设计、自己实现、自己上线。"/>
-<meta name="theme-color" content="#0B0B10"/>
+<meta name="theme-color" content="#F7F8FA"/>
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="何向杰 · 独立开发者 · 游戏 / 工具 / 界面"/>
 <meta property="og:description" content="两个可玩的网页游戏、一个价格查询工具，以及它们背后的规则与代码同步。"/>
@@ -19,16 +19,16 @@
 <body>
 <a class="visually-hidden" href="#work">跳到作品</a>
 
-<header class="site-head">
+<header class="site-head" id="siteHead" data-scrolled="false">
   <div class="wrap site-head__in">
     <a class="brand" href="#top" aria-label="返回顶部">
       <span class="brand__mark" aria-hidden="true">HX</span>
       <span>何向杰</span>
     </a>
-    <nav class="nav" aria-label="主导航">
+    <nav class="nav" aria-label="主导航" data-section-nav>
       <a href="#work">作品</a>
-      <a href="#how">做法</a>
       <a href="#facts">数据</a>
+      <a href="#how">做法</a>
       <a href="#contact">联系</a>
     </nav>
     <a class="btn btn--primary" href="#contact">联系我</a>
@@ -36,126 +36,157 @@
 </header>
 
 <main id="top">
-  <!-- ① Hero -->
-  <section class="wrap hero">
-    <div>
-      <p class="hero__status"><span class="dot" aria-hidden="true"></span>浙江 · 可远程 · 正在做游戏合集</p>
-      <h1 class="hero__title">做<em>能玩</em>的<br/>网页作品。</h1>
-      <p class="hero__lead">我是何向杰，独立开发者。游戏、工具、界面——自己设计、自己实现、自己上线。</p>
-      <div class="hero__actions">
-        <a class="btn btn--primary" href="#work">看作品</a>
-        <a class="btn btn--ghost" href="https://github.com/hxj-2888" target="_blank" rel="noopener">GitHub</a>
+  <!-- ① Hero：全屏居中 + 展示台 -->
+  <section class="hero" id="hero">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="hero__tag"><span class="dot" aria-hidden="true"></span>浙江 · 可远程 · 正在做游戏合集</p>
+        <h1 class="hero__title">做<em>能玩</em>的<br/>网页作品。</h1>
+        <p class="hero__lead">我是何向杰，独立开发者。游戏、工具、界面——自己设计、自己实现、自己上线。</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#work">看作品</a>
+          <a class="btn btn--ghost" href="https://github.com/hxj-2888" target="_blank" rel="noopener">GitHub</a>
+        </div>
       </div>
-    </div>
-    <div class="hero__media">
-      <img src="assets/projects/space-kill.png" width="960" height="600" alt="返航录开始界面"/>
-      <p class="hero__caption">返航录 · v1preview1.0 · 15 人三阵营，空席位由 AI 托管</p>
+
+      <!-- 展示台：三张项目截图按「浏览器窗口」组织 -->
+      <div class="stage">
+        <div class="stage__frame">
+          <div class="stage__bar" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="stage__pane is-on" data-mock="space-kill">
+            <img src="assets/projects/space-kill.png" width="960" height="600" alt="返航录开始界面"/>
+          </div>
+          <div class="stage__pane" data-mock="ping-pong-duel">
+            <img src="assets/projects/ping-pong-duel.png" width="960" height="600" alt="乒乓对决主页"/>
+          </div>
+          <div class="stage__pane" data-mock="delta-force">
+            <img src="assets/projects/delta-force.png" width="960" height="600" alt="落幕查行情界面"/>
+          </div>
+        </div>
+        <div class="stage__tabs" role="tablist" aria-label="首屏作品预览">
+          <button type="button" role="tab" data-mock="space-kill" aria-selected="true">返航录</button>
+          <button type="button" role="tab" data-mock="ping-pong-duel" aria-selected="false">乒乓对决</button>
+          <button type="button" role="tab" data-mock="delta-force" aria-selected="false">落幕查</button>
+        </div>
+        <p class="stage__cap" data-stage-caption>返航录 · v1preview1.0 · 15 人三阵营，空席位由 AI 托管</p>
+      </div>
     </div>
   </section>
 
-  <!-- ② 作品 -->
-  <section class="wrap section" id="work">
-    <div class="section__head">
-      <div>
-        <p class="eyebrow">Selected work</p>
-        <h2 class="section__title">作品</h2>
-        <p class="section__desc">可以玩的两个游戏、可以查的一个工具，以及它们背后的规则与过程。卡片上的每个数字都能点开验证。</p>
-      </div>
-    </div>
-
-    <div class="group">
-      <p class="group__head">可以玩</p>
-      <div class="grid grid--3" data-group="play"></div>
-    </div>
-
-    <div class="group">
-      <p class="group__head">可以查</p>
-      <div class="grid grid--wide" data-group="tools"></div>
-    </div>
-
-    <div class="group">
-      <p class="group__head">过程：规则、代码与同步</p>
-      <div class="grid" data-group="process"></div>
-    </div>
-  </section>
-
-  <!-- ③ 做法 -->
-  <section class="wrap section" id="how">
-    <div class="section__head">
-      <div>
-        <p class="eyebrow">How it's built</p>
-        <h2 class="section__title">我是怎么做的</h2>
-        <p class="section__desc">不是先画界面再填内容，而是先把规则写清楚，再让代码去守它。</p>
-      </div>
-    </div>
-    <div class="how">
-      <article class="how__item" data-step="01">
-        <p class="how__step">01 · 规则先行</p>
-        <h3 class="how__title">先写正文，再写代码</h3>
-        <p class="how__desc">返航录的规则以正文 v1preview1.0 为准，配套速查卡、术语表、判定流程图；代码与测试断言逐条对照条款。</p>
-      </article>
-      <article class="how__item" data-step="02">
-        <p class="how__step">02 · 数据说话</p>
-        <h3 class="how__title">用模拟验证平衡</h3>
-        <p class="how__desc">同一套引擎离线跑完整对局，用胜率与节奏验证规则改动，不靠“感觉还行”。</p>
-      </article>
-      <article class="how__item" data-step="03">
-        <p class="how__step">03 · 自己造工具</p>
-        <h3 class="how__title">同步器与门禁</h3>
-        <p class="how__desc">每个项目都有门禁测试、白名单同步和变更记录，任何一轮改动都能追溯。</p>
-      </article>
-    </div>
-  </section>
-
-  <!-- ④ 数据（全部可验证） -->
-  <section class="wrap section" id="facts">
-    <div class="section__head">
-      <div>
+  <!-- ② 数据（上移：招聘方最先想核对的东西） -->
+  <section class="section" id="facts">
+    <div class="wrap">
+      <div class="section__head rv">
         <p class="eyebrow">Facts</p>
         <h2 class="section__title">可以核对的数据</h2>
         <p class="section__desc">只放能点开验证的数字，不放评价与估算。</p>
       </div>
-    </div>
-    <div class="stats">
-      <div class="stat">
-        <p class="stat__num" data-count="games">2</p>
-        <p class="stat__label">可玩网页游戏</p>
-        <p class="stat__note">各自独立域名</p>
-      </div>
-      <div class="stat">
-        <p class="stat__num">10,000</p>
-        <p class="stat__label">蒙特卡洛局数</p>
-        <p class="stat__note"><a href="https://space-kill.pages.dev" target="_blank" rel="noopener">返航录平衡性验证</a></p>
-      </div>
-      <div class="stat">
-        <p class="stat__num">1</p>
-        <p class="stat__label">游戏合集</p>
-        <p class="stat__note">两个游戏 × 多端</p>
-      </div>
-      <div class="stat">
-        <p class="stat__num">0</p>
-        <p class="stat__label">外部依赖运行时</p>
-        <p class="stat__note">纯静态，无框架</p>
+      <div class="stats rv">
+        <div class="stat stat--big">
+          <p class="stat__num num" data-to="10000">10,000</p>
+          <p class="stat__label">蒙特卡洛局数</p>
+          <p class="stat__note"><a href="https://space-kill.pages.dev" target="_blank" rel="noopener">返航录平衡性验证</a></p>
+        </div>
+        <div class="stat">
+          <p class="stat__num num" data-count="games">2</p>
+          <p class="stat__label">可玩网页游戏</p>
+          <p class="stat__note">各自独立域名</p>
+        </div>
+        <div class="stat">
+          <p class="stat__num num">1</p>
+          <p class="stat__label">游戏合集</p>
+          <p class="stat__note">两个游戏 × 多端</p>
+        </div>
+        <div class="stat">
+          <p class="stat__num num">0</p>
+          <p class="stat__label">外部依赖运行时</p>
+          <p class="stat__note">纯静态，无框架</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ⑤ 联系 -->
-  <section class="wrap" id="contact">
-    <div class="contact">
-      <div>
-        <p class="eyebrow">Contact</p>
-        <h2 class="contact__title">有想法想聊聊？</h2>
-        <p class="contact__desc">游戏、工具或网页实现，都可以直接发邮件。</p>
+  <!-- ③ 作品：合集横幅 → 两个游戏 → 工具 → 过程 -->
+  <section class="section section--alt" id="work">
+    <div class="wrap">
+      <div class="section__head rv">
+        <p class="eyebrow">Work</p>
+        <h2 class="section__title">作品</h2>
+        <p class="section__desc">可以玩的两个游戏、可以查的一个工具，以及它们背后的规则与过程。卡片上的每个数字都能点开验证。</p>
       </div>
-      <a class="btn btn--primary" href="mailto:hexiangjie694@gmail.com">hexiangjie694@gmail.com</a>
+
+      <div class="group rv">
+        <p class="group__head">可以玩</p>
+        <div id="bandMount"></div>
+        <div class="grid grid--3" data-group="play"></div>
+      </div>
+
+      <div class="group rv">
+        <p class="group__head">可以查</p>
+        <div class="grid grid--wide" data-group="tools"></div>
+      </div>
+
+      <div class="group rv">
+        <p class="group__head">过程：规则、代码与同步</p>
+        <div class="grid" data-group="process"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ 做法 -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <div class="section__head rv">
+        <p class="eyebrow">How it's built</p>
+        <h2 class="section__title">我是怎么做的</h2>
+        <p class="section__desc">不是先画界面再填内容，而是先把规则写清楚，再让代码去守它。</p>
+      </div>
+      <div class="steps">
+        <article class="how__item rv">
+          <span class="how__num" aria-hidden="true">01</span>
+          <p class="how__kicker">规则先行</p>
+          <h3 class="how__title">先写正文，再写代码</h3>
+          <p class="how__desc">返航录的规则以正文 v1preview1.0 为准，配套速查卡、术语表、判定流程图；代码与测试断言逐条对照条款。</p>
+        </article>
+        <article class="how__item rv">
+          <span class="how__num" aria-hidden="true">02</span>
+          <p class="how__kicker">数据说话</p>
+          <h3 class="how__title">用模拟验证平衡</h3>
+          <p class="how__desc">同一套引擎离线跑完整对局，用胜率与节奏验证规则改动，不靠“感觉还行”。</p>
+        </article>
+        <article class="how__item rv">
+          <span class="how__num" aria-hidden="true">03</span>
+          <p class="how__kicker">自己造工具</p>
+          <h3 class="how__title">同步器与门禁</h3>
+          <p class="how__desc">每个项目都有门禁测试、白名单同步和变更记录，任何一轮改动都能追溯。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 联系：收尾大区块 -->
+  <section class="contact__wrap" id="contact">
+    <div class="wrap">
+      <div class="contact rv">
+        <div>
+          <p class="eyebrow">Contact</p>
+          <h2 class="section__title">有想法想聊聊？</h2>
+          <p class="contact__desc">游戏、工具或网页实现，都可以直接发邮件。</p>
+        </div>
+        <div class="mail">
+          <a class="btn btn--primary" href="mailto:hexiangjie694@gmail.com">hexiangjie694@gmail.com</a>
+          <button class="mail__copy" type="button" data-copy-mail="hexiangjie694@gmail.com">复制</button>
+        </div>
+      </div>
     </div>
   </section>
 </main>
 
-<footer class="wrap site-foot">
-  <p>© 2026 何向杰</p>
-  <p><a href="#top">回到顶部</a> · <a href="mailto:hexiangjie694@gmail.com">邮箱</a></p>
+<footer class="site-foot">
+  <div class="wrap site-foot__in">
+    <span>© 2026 何向杰</span>
+    <span><a href="#top">回到顶部</a> · <a href="mailto:hexiangjie694@gmail.com">邮箱</a></span>
+  </div>
 </footer>
 
 <!-- 项目预览弹窗 -->
@@ -185,7 +216,7 @@
       <h3 class="modal__title" id="qrTitle"></h3>
       <button class="modal__close" type="button" data-close="qr" aria-label="关闭">✕</button>
     </div>
-    <p style="padding:0 24px"><img class="qr__img" id="qrImg" src="" alt="下载二维码"/></p>
+    <p class="qr__pad"><img class="qr__img" id="qrImg" src="" alt="下载二维码" width="264" height="264"/></p>
     <p class="qr__tip">手机浏览器扫码，可直接安装 / 打开应用。</p>
   </div>
 </div>

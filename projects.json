@@ -5,6 +5,7 @@
     "group": "play | tools | process —— 首页分组",
     "order": "同组内排序，越小越靠前",
     "countsAsGame": "计入数据带“可玩网页游戏”的数量",
+    "band": "true 时渲染成一条横向横幅（放在同组卡片上方），而不是一张作品卡",
     "kicker": "卡片上方小字（类别）",
     "name": "标题（返航录等展示名以本字段为准）",
     "tagline": "一句话，≤28 字，不要括号补充",
@@ -15,6 +16,7 @@
     {
       "id": "game-collection",
       "group": "play",
+      "band": true,
       "order": 1,
       "countsAsGame": false,
       "kicker": "游戏合集",
