@@ -283,6 +283,8 @@ async function copyMail(btn) {
 
 /* ---------- 首屏展示台：静态截图 + 一段游玩演示视频，按标签切换 ---------- */
 const STAGE_CAPS = {
+  /* 2026-11-01：新返航录接替旧《返航录》占据首屏默认位；旧作降为普通游戏卡片。 */
+  'returnlog': '新返航录 · 11 人类对 4 异形 · AI 会推理，也会撒谎',
   'space-kill': '返航录 · v1preview1.0 · 15 人三阵营，空席位由 AI 托管',
   'ping-pong-duel': '乒乓对决 · 两个 AI 在看台侧视角对打（实机录制，未剪辑）：发球、推挡、扣杀与得分都在这一段里。',
   'delta-force': '落幕查 · 三角洲行动变卖物的实时价格查询，带 30 天走势。'
@@ -320,7 +322,7 @@ function bindStage() {
   };
   tabs.forEach((b) => b.addEventListener('click', () => show(b.dataset.mock)));
 
-  // 首屏默认停在「返航录」：乒乓视频不抢开局，用户点「乒乓对决」标签才播。
+  // 首屏默认停在「新返航录」：其余视频不抢开局，用户点标签才播。
   // 标签页被切到后台时也暂停，回来再续播（避免后台空转）。
   document.addEventListener('visibilitychange', () => {
     const active = $('.stage__pane.is-on');

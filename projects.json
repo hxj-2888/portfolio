@@ -17,8 +17,7 @@
     {
       "id": "game-collection",
       "group": "play",
-      "band": true,
-      "order": 1,
+      "order": 3,
       "countsAsGame": false,
       "kicker": "游戏合集",
       "name": "游戏合集 · 两个游戏",
@@ -61,9 +60,35 @@
       "source": { "type": "local", "path": "projects/ping-pong-duel" }
     },
     {
+      "id": "returnlog",
+      "group": "play",
+      "band": true,
+      "order": 1,
+      "countsAsGame": true,
+      "kicker": "可玩 · 网页游戏",
+      "name": "新返航录",
+      "tagline": "废案重构：11 人类对 4 异形的实时对抗，AI 会推理也会撒谎",
+      "tags": ["实时对抗", "AI 认知", "废案重构"],
+      "thumbnail": "assets/projects/returnlog.png",
+      "demo": {
+        "src": "assets/projects/returnlog-demo.mp4",
+        "poster": "assets/projects/returnlog-demo-poster.jpg"
+      },
+      "entry": null,
+      "type": "web",
+      "mobile": true,
+      "liveUrl": "https://space-kill-web.pages.dev",
+      "links": [
+        { "label": "GitHub", "url": "https://github.com/hxj-2888/space-kill-web", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/space-kill-web", "icon": "github" },
+        { "label": "安卓安装包", "url": "https://github.com/hxj-2888/space-kill-web/releases/download/returnlog-v3/ReturnLog.apk", "icon": "doc" }
+      ],
+      "qr": { "src": "assets/qr/returnlog.png", "title": "新返航录 · 扫码下载安卓安装包" }
+    },
+    {
       "id": "space-kill",
       "group": "play",
-      "order": 3,
+      "order": 4,
       "countsAsGame": true,
       "kicker": "可玩 · 网页游戏",
       "name": "返航录",

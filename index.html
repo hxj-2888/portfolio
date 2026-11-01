@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>何向杰 · 独立开发者 · 游戏 / 工具 / 界面</title>
-<meta name="description" content="何向杰，独立开发者。做能玩的网页作品：乒乓对决、返航录、落幕查；自己设计、自己实现、自己上线。"/>
+<meta name="description" content="何向杰，独立开发者。做能玩的网页作品：新返航录、乒乓对决、落幕查；自己设计、自己实现、自己上线。"/>
 <meta name="theme-color" content="#F7F8FA"/>
 <link rel="canonical" href="https://portfolio-ji.pages.dev/"/>
 <meta property="og:type" content="website"/>
@@ -72,13 +72,19 @@
         </div>
       </div>
 
-      <!-- 展示台：按「浏览器窗口」组织——返航录 / 落幕查是静态截图，
-           乒乓对决换成了游玩演示视频（2026-10-25：静态图看不出玩法，换成实机对打） -->
+      <!-- 展示台：按「浏览器窗口」组织，默认停在**新返航录**（2026-11-01 换太子）。
+           旧《返航录》退出首屏，只保留在下方「普通游戏」卡片里。 -->
       <div class="stage">
         <div class="stage__frame">
           <div class="stage__bar" aria-hidden="true"><i></i><i></i><i></i></div>
-          <div class="stage__pane is-on" data-mock="space-kill">
-            <img src="assets/projects/space-kill.webp" width="960" height="600" alt="返航录开始界面"/>
+          <div class="stage__pane is-on" data-mock="returnlog">
+            <!-- 新返航录的实机演示：会议里 AI 互相指控、诬陷、对质的那一段 -->
+            <video class="stage__video" data-stage-video
+              src="assets/projects/returnlog-demo.mp4"
+              poster="assets/projects/returnlog-demo-poster.jpg"
+              muted loop playsinline preload="metadata"
+              aria-label="新返航录游玩演示：会议讨论与投票"></video>
+            <span class="stage__badge" aria-hidden="true">▶ 游玩演示</span>
           </div>
           <div class="stage__pane" data-mock="ping-pong-duel">
             <!-- 2026-10-25：静态截图换成游玩演示视频（AI 对打 · 看台侧视角，真实物理回合、未剪辑）。
@@ -95,11 +101,11 @@
           </div>
         </div>
         <div class="stage__tabs" role="tablist" aria-label="首屏作品预览">
-          <button type="button" role="tab" data-mock="space-kill" aria-selected="true">返航录</button>
+          <button type="button" role="tab" data-mock="returnlog" aria-selected="true">新返航录</button>
           <button type="button" role="tab" data-mock="ping-pong-duel" aria-selected="false">乒乓对决</button>
           <button type="button" role="tab" data-mock="delta-force" aria-selected="false">落幕查</button>
         </div>
-        <p class="stage__cap" data-stage-caption>返航录 · v1preview1.0 · 15 人三阵营，空席位由 AI 托管</p>
+        <p class="stage__cap" data-stage-caption>新返航录 · 11 人类对 4 异形 · AI 会推理，也会撒谎</p>
       </div>
     </div>
   </section>
@@ -116,7 +122,7 @@
         <div class="stat stat--big">
           <p class="stat__num num" data-to="10000">10,000</p>
           <p class="stat__label">蒙特卡洛局数</p>
-          <p class="stat__note"><a href="https://space-kill.pages.dev" target="_blank" rel="noopener">返航录平衡性验证</a></p>
+          <p class="stat__note"><a href="https://space-kill-web.pages.dev" target="_blank" rel="noopener">新返航录平衡性验证</a></p>
         </div>
         <div class="stat">
           <p class="stat__num num" data-count="games">2</p>
