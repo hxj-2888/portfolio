@@ -46,6 +46,9 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: hxj-2888/space-kill-web
+          # space-kill-web 的 main 在 2026-10-29 被《新返航录》替换，
+          # attachment-site 只保留在该提交的父提交里；固定到这个最后的附件站提交。
+          ref: ec1a517766b908db228bbdbe324de53000ee8993
           # 注意：checkout 的 path 是「工作目录」，而 sparse-checkout 的模式相对**仓库根**。
           # 所以内容实际落在 attachment-src/attachment-site/site —— 这里最容易写错，
           # 故下面第一步立即断言路径，错了当场报「路径错」而不是在 diff 里报「产物不一致」。
