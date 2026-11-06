@@ -91,6 +91,17 @@ jobs:
             exit 1
           fi
 
+      - name: Rewrite legacy domains in rebuilt site
+        run: |
+          # 附件站源固定在 returnlog 的历史提交（ec1a517），重建产物里的链接仍是旧域名。
+          # 在「重建校验」之后、指纹/部署/同步之前统一改写，避免每次重建把旧链接带回线上。
+          find attachment-src/attachment-site/site -type f \( -name '*.html' -o -name '*.csv' -o -name '*.txt' \) -print0 \
+            | xargs -0 -r sed -i \
+                -e 's|https://space-kill-web\.pages\.dev|https://returnlog.pages.dev|g' \
+                -e 's|https://space-kill\.pages\.dev|https://returnlog-attachment.pages.dev|g' \
+                -e 's|hxj-2888/space-kill-web|hxj-2888/returnlog|g'
+          echo "域名改写完成：$(grep -rl 'returnlog.pages.dev\|returnlog-attachment.pages.dev' attachment-src/attachment-site/site | wc -l) 个文件含新域名"
+
       - name: Compute content fingerprint
         id: fp
         run: |
