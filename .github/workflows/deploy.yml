@@ -78,7 +78,7 @@ jobs:
           # sync.json 的 sourceDir 是相对 portfolio 根目录的 ../X，所以源仓库
           # 必须落在与 portfolio 同级的目录下；--src-root 指向 portfolio-copy。
           git clone --depth 1 https://github.com/hxj-2888/ping-pong-duel.git "$ws/乒乓对决_合并"
-          git clone --depth 1 https://github.com/hxj-2888/space-kill-web.git "$ws/太空杀游戏-完整版"
+          git clone --depth 1 https://github.com/hxj-2888/returnlog.git "$ws/太空杀游戏-完整版"
           git clone --depth 1 https://github.com/hxj-2888/delta-force-price-query.git "$ws/delta-force-deploy"
           echo "SYNC_WS=$ws" >> "$GITHUB_ENV"
           ls -1 "$ws"

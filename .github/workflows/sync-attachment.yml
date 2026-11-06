@@ -1,20 +1,20 @@
-# ===== GitHub Actions — 附件站同步与部署（太空杀 · 附件站） =====
+# ===== GitHub Actions — 附件站同步与部署（返航录 · 附件站） =====
 #
 # 做什么（一次跑完三件事）：
-#   1. 从 space-kill-web 拉取 attachment-site/（该仓是附件站源码的唯一所在地）
+#   1. 从 returnlog 拉取 attachment-site/（该仓是附件站源码的唯一所在地）
 #   2. 在 CI 内用 python-docx 重新构建 site/，并与仓库里提交的那份逐字节比对
 #      —— 这道门禁是当年真源与产物长期脱节的直接补丁
-#   3. 部署到 Cloudflare Pages（space-kill.pages.dev），
+#   3. 部署到 Cloudflare Pages（returnlog-attachment.pages.dev），
 #      并把产物复制进本仓 projects/space-kill/ 后提交 → 触发现有 deploy.yml 上线作品集
 #
-# 为什么这个工作流放在作品集仓、而不是 space-kill-web：
-#   - Cloudflare 凭据只有本仓有（CF_API_TOKEN / CF_ACCOUNT_ID）；space-kill-web 一个 secret 都没有
+# 为什么这个工作流放在作品集仓、而不是 returnlog：
+#   - 本仓与 returnlog 仓都配有 CF_API_TOKEN / CF_ACCOUNT_ID
 #   - GitHub 的 GITHUB_TOKEN 只能写本仓。工作流要提交 projects/space-kill/ 就必须在作品集仓里
 #   - 两个仓都是 public，跨仓**读取**用默认 token 即可（已实测，无需 PAT）
-#   反向（让 space-kill-web 主持）需要额外 3 个 secret（2 个 Cloudflare + 1 个跨仓 PAT），故不取。
+#   反向（让 returnlog 主持）仍需一个可写本仓的跨仓 PAT，故不取。
 #
 # 触发：定时轮询（默认）+ 手动。
-#   定时而非 webhook，是因为 webhook 需要在 space-kill-web 里放一个 PAT；
+#   定时而非 webhook，是因为 webhook 需要在 returnlog 里放一个 PAT；
 #   代价是最多延迟一个轮询周期。要改成 push 即联动，见文末「改成秒级联动」。
 
 name: sync-attachment-site
@@ -45,8 +45,8 @@ jobs:
       - name: Checkout attachment-site source (public, default token)
         uses: actions/checkout@v7
         with:
-          repository: hxj-2888/space-kill-web
-          # space-kill-web 的 main 在 2026-10-29 被《新返航录》替换，
+          repository: hxj-2888/returnlog
+          # returnlog 的 main 在 2026-10-29 被《新返航录》替换，
           # attachment-site 只保留在该提交的父提交里；固定到这个最后的附件站提交。
           ref: ec1a517766b908db228bbdbe324de53000ee8993
           # 注意：checkout 的 path 是「工作目录」，而 sparse-checkout 的模式相对**仓库根**。
@@ -149,13 +149,13 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy attachment-src/attachment-site/site --project-name=space-kill --branch=main
+          command: pages deploy attachment-src/attachment-site/site --project-name=returnlog-attachment --branch=main
 
       - name: Sync into portfolio copy
         if: steps.plan.outputs.sync == 'true'
         run: |
           # 整目录同步：source 的文件集是超集，直接 rm -r + cp 避免残留旧文件。
-          # ⚠ 若在 space-kill-web 的 attachment-site/site/ 里删过文件，这里会同步删除作品集副本，
+          # ⚠ 若在 returnlog 的 attachment-site/site/ 里删过文件，这里会同步删除作品集副本，
           #   这是预期行为（作品集副本必须是附件站的忠实镜像）。
           rm -rf projects/space-kill
           cp -r attachment-src/attachment-site/site projects/space-kill
@@ -176,7 +176,7 @@ jobs:
           fi
           git commit -m "sync(space-kill): 附件站产物同步（指纹 ${{ steps.fp.outputs.sha256 }}）
 
-          来源：hxj-2888/space-kill-web 的 attachment-site/site（由本工作流拉取并在 CI 内重建校验）。
+          来源：hxj-2888/returnlog 的 attachment-site/site（由本工作流拉取并在 CI 内重建校验）。
           作品集上线由本工作流下一步显式唤起 deploy.yml 完成 —— GITHUB_TOKEN 的 push 不会自动触发工作流。"
           git push origin HEAD:main
           echo "pushed=true" >> "$GITHUB_OUTPUT"
@@ -206,7 +206,7 @@ jobs:
         run: |
           ok=0
           for i in 1 2 3 4 5 6; do
-            if curl -fsSL --max-time 30 -o /dev/null "https://space-kill.pages.dev/mc-10000.html"; then ok=1; break; fi
+            if curl -fsSL --max-time 30 -o /dev/null "https://returnlog-attachment.pages.dev/mc-10000.html"; then ok=1; break; fi
             echo "重试 $i（该站边缘节点偶发超时，属已知现象）"
             sleep 10
           done
@@ -214,9 +214,9 @@ jobs:
           echo "附件站可达"
 
 # ===== 改成「push 即联动」（秒级，代价是 1 个新 secret）=====
-# 1) 在 space-kill-web 仓创建一个 PAT，权限只需 public_repo + workflow（勾选
+# 1) 在 returnlog 仓创建一个 PAT，权限只需 public_repo + workflow（勾选
 #    "Contents: Read-only" 即可），存为该仓 secret： REPO_DISPATCH_TOKEN
-# 2) 在 space-kill-web 的 deploy.yml 的 check job 末尾加：
+# 2) 在 returnlog 的 deploy.yml 的 check job 末尾加：
 #
 #      - name: Notify portfolio to sync attachment site
 #        if: success()

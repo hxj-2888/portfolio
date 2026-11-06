@@ -6,7 +6,7 @@
      2. 用本仓的 sync.json + sync-projects.js，在 projects/ 的副本上重跑同步
      3. 逐字节比较「重跑结果」与「仓库里入库的 projects/」，列出差异
 
-   注意：space-kill-web 是同步源之一，但太空杀正在重做，其产物随时会变。
+   注意：returnlog 是同步源之一，但太空杀正在重做，其产物随时会变。
    默认**不克隆**它——克隆失败时 game-collection 段的 space-kill 分组会被跳过，
    于是该目录不参与比对（其余文件照常校验）。
    需要连太空杀一起校验时加 `--with-space-kill`。
@@ -38,7 +38,7 @@ const GAME_SOURCES = [
   { repo: 'https://github.com/hxj-2888/delta-force-price-query.git', dir: 'delta-force-deploy' },
 ];
 /** 默认跳过：太空杀重做中（见文件头注释）。 */
-const SPACE_KILL_SOURCE = { repo: 'https://github.com/hxj-2888/space-kill-web.git', dir: '太空杀游戏-完整版' };
+const SPACE_KILL_SOURCE = { repo: 'https://github.com/hxj-2888/returnlog.git', dir: '太空杀游戏-完整版' };
 
 function git(args, cwd) {
   // 国内网络下拉 GitHub 偶尔 early EOF（curl 56）：同一命令重试几次，

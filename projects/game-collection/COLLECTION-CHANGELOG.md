@@ -15,7 +15,7 @@
 
 ### 约定
 - **两个游戏代码零改动**（除源仓库自己的版本演进）；合集不改游戏逻辑、不改各游戏 `localStorage` 键
-- 联机跳各游戏独立站：`ping-pong-duel.pages.dev` / `space-kill-web.pages.dev`
+- 联机跳各游戏独立站：`ping-pong-duel.pages.dev` / `returnlog.pages.dev`
 - 合集在作品集 iframe 中预览时**不注册 Service Worker**（`window.__ARCADE_SW__` 标记位由 `sync-projects.js` 探测）
 
 ### 验证（2026-10-21）

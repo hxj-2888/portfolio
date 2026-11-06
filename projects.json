@@ -30,7 +30,7 @@
       "liveUrl": "https://ping-pong-duel.pages.dev",
       "links": [
         { "label": "乒乓对决", "url": "https://ping-pong-duel.pages.dev", "icon": "globe" },
-        { "label": "返航录", "url": "https://space-kill-web.pages.dev", "icon": "globe" }
+        { "label": "返航录", "url": "https://returnlog.pages.dev", "icon": "globe" }
       ],
       "source": { "type": "local", "path": "projects/game-collection" }
     },
@@ -77,11 +77,11 @@
       "entry": null,
       "type": "web",
       "mobile": true,
-      "liveUrl": "https://space-kill-web.pages.dev",
+      "liveUrl": "https://returnlog.pages.dev",
       "links": [
-        { "label": "GitHub", "url": "https://github.com/hxj-2888/space-kill-web", "icon": "github" },
-        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/space-kill-web", "icon": "github" },
-        { "label": "安卓安装包", "url": "https://github.com/hxj-2888/space-kill-web/releases/download/returnlog-v3/ReturnLog.apk", "icon": "doc" }
+        { "label": "GitHub", "url": "https://github.com/hxj-2888/returnlog", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/returnlog", "icon": "github" },
+        { "label": "安卓安装包", "url": "https://github.com/hxj-2888/returnlog/releases/download/returnlog-v3/ReturnLog.apk", "icon": "doc" }
       ],
       "qr": { "src": "assets/qr/returnlog.png", "title": "新返航录 · 扫码下载安卓安装包" }
     },
@@ -98,11 +98,11 @@
       "entry": "index.html",
       "type": "web",
       "mobile": true,
-      "liveUrl": "https://space-kill-web.pages.dev",
+      "liveUrl": "https://returnlog.pages.dev",
       "links": [
-        { "label": "规则与资料", "url": "https://space-kill.pages.dev", "icon": "doc" },
-        { "label": "GitHub", "url": "https://github.com/hxj-2888/space-kill-web", "icon": "github" },
-        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/space-kill-web", "icon": "github" }
+        { "label": "规则与资料", "url": "https://returnlog-attachment.pages.dev", "icon": "doc" },
+        { "label": "GitHub", "url": "https://github.com/hxj-2888/returnlog", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/returnlog", "icon": "github" }
       ],
       "qr": { "src": "assets/qr/space-kill-apk.png", "title": "返航录 · 扫码下载安卓安装包" },
       "source": { "type": "local", "path": "projects/space-kill" }
@@ -141,9 +141,9 @@
       "thumbnail": null,
       "entry": null,
       "type": "doc",
-      "liveUrl": "https://space-kill.pages.dev",
+      "liveUrl": "https://returnlog-attachment.pages.dev",
       "links": [
-        { "label": "规则正文 v1preview1.0", "url": "https://space-kill.pages.dev", "icon": "doc" }
+        { "label": "规则正文 v1preview1.0", "url": "https://returnlog-attachment.pages.dev", "icon": "doc" }
       ]
     },
     {
