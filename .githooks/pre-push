@@ -1,0 +1,10 @@
+#!/bin/sh
+# portfolio pre-push — 三道文档门禁，不绿不许推
+# 启用：git config core.hooksPath .githooks
+# 关闭：git config --unset core.hooksPath
+# 紧急绕过（不推荐，事后必须补记录）：git push --no-verify
+set -e
+
+node tools/check-push-docs.cjs --stdin --quiet
+node tools/check-doc-facts.mjs --quiet
+node tools/check-docs-fresh.cjs --quiet

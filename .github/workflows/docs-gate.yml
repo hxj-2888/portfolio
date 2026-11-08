@@ -1,0 +1,66 @@
+# ===== GitHub Actions — 文档一致性门禁（portfolio）=====
+# 独立 workflow：不改动 deploy.yml，不会因为文档问题卡住线上部署，
+# 但会在 commit / PR 上给出明确的红绿状态；想强制卡部署就把本 job 设为分支保护必需检查。
+#
+# 三道检查各管一件事：
+#   ① facts  文档里的数字/TTL/端点/索引 == 代码事实
+#   ② fresh  记录日期 / 修改记录索引 / 交接文档 HEAD 跟得上
+#   ③ push   本次提交改了实质文件，是否同时带了记录与索引刷新
+# 机器人提交（sync( / github-actions）在 ②③ 里都按 AGENTS.md §2.5 放行。
+
+name: docs-gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: 文档 ↔ 代码一致性
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout（全量历史，diff 门禁要用）
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: 解析本次变更的 base
+        id: range
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          ZERO=0000000000000000000000000000000000000000
+          if [ "$EVENT" = "pull_request" ] && [ -n "$PR_BASE" ]; then
+            echo "base=$PR_BASE" >> "$GITHUB_OUTPUT"
+          elif [ -n "$BEFORE" ] && [ "$BEFORE" != "$ZERO" ]; then
+            echo "base=$BEFORE" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=$(git rev-parse HEAD^)" >> "$GITHUB_OUTPUT"
+          fi
+          echo "事件 $EVENT → base=$(tail -1 "$GITHUB_OUTPUT" | cut -d= -f2)"
+
+      - name: ① 事实契约（数字 / TTL / 端点 / 索引，含实跑命令）
+        run: node tools/check-doc-facts.mjs --full
+
+      - name: ② 新鲜度（记录日期 / 索引指向 / 交接文档 HEAD）
+        run: node tools/check-docs-fresh.cjs
+
+      - name: ③ 本次推送联动（改动是否带文档）
+        run: node tools/check-push-docs.cjs --base "${{ steps.range.outputs.base }}" --head HEAD
