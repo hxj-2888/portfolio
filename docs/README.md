@@ -19,7 +19,7 @@ npm run check:facts     # 只跑事实契约：文档数字/读数/索引 == 代
 npm run check:push      # 只跑联动：本次提交是否带了记录与索引
 npm run check:docs:full # 额外实跑 collect（CI 用）
 npm run check           # 文案守门 + 规则同步 + 响应头 + 内嵌适配
-npm run collect         # 项目收集（应 6/6）
+npm run collect         # 项目收集（应 7/7）
 npm run sync:dry   # 同步预演（应 2 同步 / 2 跳过 / 1 失败，失败项见下）
 npm run check:demo # 演示视频守门（首屏/作品卡/合集页的视频可播）
 npx serve . -p 3000   # 本地预览

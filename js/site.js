@@ -1,25 +1,23 @@
 /* ============================================================
    site.js — 作品集交互（零依赖，数据驱动）
-   数据源：projects.json（唯一真相）。卡片、合集横幅与弹窗都从这里渲染。
-   约定：不写内联 onclick；所有可点元素都是 <a>/<button>，键盘可用。
-   2026-10-25 UI 改版：
-     · 游戏合集卡降级为一条横幅，排在其他作品卡上方；
-     · 卡片主次动作拆开（实心「在线预览」+ 次要「打开站点」）；
-     · 导航当前分区高亮、滚动淡入、数据带数字递增、首屏展示台切换；
-     · 动效统一走 prefers-reduced-motion 开关。
+   数据源：projects.json（唯一真相）。首屏核对清单、作品面板、弹窗都从这里渲染。
+
+   2026-11-09 重做要点：
+     · 首屏 = 核对清单 + 正在运行的产物。清单行**从 DOM 里已存在的
+       .artifact__pane 反查项目**，而不是各写一份名单 —— 否则「清单说在跑」
+       和「实际能切的产物」迟早会漂移。
+     · 版式由 layout 决定：versions / split / data / note。三款软件各按自己
+       的性质排，不再共用一张「图+标题+三标签+两按钮」的卡片模板。
+     · status=local 的形态**不给链接**。没有可打开的产物，给个按钮就是
+       把它画成「可做」，这正是本站声称要避免的事。
+     · 不写内联 style：首页 CSP 是 style-src 'self'，作品色走 .hue-* 类。
    ============================================================ */
 
-/* ---------- 内联图标（线性 SVG，stroke 1.6，24 网格） ---------- */
-const ICON = {
-  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>',
-  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg>',
-  github:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.8a5.3 5.3 0 0 0-1.4-3.7 4.9 4.9 0 0 0-.1-3.7s-1.1-.3-3.7 1.4a12.7 12.7 0 0 0-6.6 0C6 4.6 4.9 4.9 4.9 4.9a4.9 4.9 0 0 0-.1 3.7A5.3 5.3 0 0 0 3.4 12.3c0 5.3 3.2 6.5 6.2 6.8a3.4 3.4 0 0 0-.9 2.6V21"/></svg>',
-  doc:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
-  play:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>',
-  qr:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3h-3zM20 14v2M14 20h2M20 18v3h-3"/></svg>'
-};
-
-/* ---------- 数据加载 ---------- */
+/* ---------- 基础 ----------
+   2026-11-09：移除手绘 inline SVG 图标层。
+   依据 portfolio AGENTS.md §2.8（四项目统一裁定）：素材优先取公开/开源且必须留署名，
+   缺署名一律不上站；自绘图标既非开源来源也无署名，属于该删的装饰。
+   文字链接（GitHub / 打开站点 / 扫码）本身已足够清楚，不需要图标陪衬。 */
 let PROJECTS = [];
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -35,173 +33,356 @@ const escapeHtml = (s = '') => String(s).replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
 const setText = (node, text) => { node.textContent = text; };
-const iconFor = (name) => ICON[name] || ICON.globe;
 
-/* 卡片动作：一个实心主按钮 + 一个次要文字链 */
-function buildActions(p) {
-  const actions = el('div', 'card__actions');
-  const canPreview = Boolean(p.entry && p.source);
+/* 只挡危险协议；相对素材路径（assets/…、projects/…）与 http(s)/mailto/# 都放行。
+   上一版用白名单前缀，把 assets/ 误判成 null，导致面板图与演示视频 src 被置空。 */
+const safeUrl = (u) => {
+  if (!u) return null;
+  const s = String(u).trim();
+  if (/^(javascript|data|vbscript|file):/i.test(s)) return null;
+  return s;
+};
+const hueClass = (p) => 'hue-' + (p.hue || 'none');
+const isExternal = (u) => /^https?:/i.test(u);
 
-  if (canPreview) {
-    const cta = el('a', 'card__cta');
-    cta.href = '#preview';
-    cta.dataset.preview = p.id;
-    cta.appendChild(document.createTextNode('在线预览'));
-    cta.insertAdjacentHTML('beforeend', ICON.play);
-    actions.appendChild(cta);
-  }
-  if (p.liveUrl) {
-    const live = el('a', canPreview ? 'card__link' : 'card__cta');
-    live.href = p.liveUrl;
-    live.target = '_blank';
-    live.rel = 'noopener';
-    live.appendChild(document.createTextNode('打开站点'));
-    live.insertAdjacentHTML('beforeend', ICON.arrow);
-    actions.appendChild(live);
-  }
-  // 扫码入口：只有配了 qr 的项目才出现（三张二维码图一直存在，之前没有入口）
-  if (p.qr && p.qr.src) {
-    const qr = el('button', 'card__qr');
-    qr.type = 'button';
-    qr.dataset.qr = p.qr.src;
-    qr.dataset.qrTitle = p.qr.title || (p.name + ' · 扫码');
-    qr.setAttribute('aria-label', (p.qr.title || p.name) + '，扫码打开');
-    qr.insertAdjacentHTML('afterbegin', ICON.qr);
-    qr.appendChild(document.createTextNode('扫码'));
-    actions.appendChild(qr);
-  }
-  return actions;
+/* 状态词：只陈述事实，不用形容词 */
+const STATE_TEXT = { live: '在线', local: '仅本机工程', collection: '在游戏合集里' };
+
+function linkEl(url, label, cls) {
+  const u = safeUrl(url);
+  if (!u) return null;
+  const a = el('a', cls);
+  a.href = u;
+  if (isExternal(u)) { a.target = '_blank'; a.rel = 'noopener'; }
+  a.appendChild(document.createTextNode(label));
+  return a;
 }
 
-/* 资源行：GitHub / Gitee / 附件 / APK */
-function buildLinks(p) {
-  const links = el('div', 'card__links');
-  (p.links || []).forEach((l) => {
-    const a = el('a', '');
-    a.href = l.url;
-    if (!l.url.startsWith('mailto:')) { a.target = '_blank'; a.rel = 'noopener'; }
-    a.innerHTML = iconFor(l.icon);
-    a.appendChild(document.createTextNode(' ' + l.label));
-    links.appendChild(a);
+/* ---------- 首屏核对清单：从已存在的 pane 反查项目 ---------- */
+function renderRail() {
+  const rail = $('[data-rail]');
+  if (!rail) return;
+  const panes = $$('.artifact__pane');
+  rail.innerHTML = '';
+  panes.forEach((pane, i) => {
+    const p = PROJECTS.find((x) => x.id === pane.dataset.mock);
+    if (!p) return;
+    const row = el('button', 'rail__row ' + hueClass(p));
+    row.type = 'button';
+    row.setAttribute('role', 'tab');
+    row.dataset.mock = p.id;
+    row.dataset.status = p.status || 'live';
+    row.setAttribute('aria-selected', String(i === 0));
+    row.setAttribute('aria-label', p.name + '，切换到它在首屏运行');
+    row.appendChild(el('span', 'rail__dot'));
+    const mid = el('span', '');
+    mid.appendChild(el('span', 'rail__name', escapeHtml(p.name)));
+    mid.appendChild(el('span', 'rail__line', escapeHtml(p.tagline || '')));
+    mid.appendChild(el('span', 'rail__state', escapeHtml(STATE_TEXT[p.status || 'live'] || '')));
+    row.appendChild(mid);
+    row.appendChild(el('span', 'rail__proof', escapeHtml(p.proof || '')));
+    rail.appendChild(row);
   });
-  return links.childElementCount ? links : null;
 }
 
-function buildTags(p) {
-  const tags = el('div', 'card__tags');
-  (p.tags || []).slice(0, 3).forEach((t) => tags.appendChild(el('span', 'badge', escapeHtml(t))));
-  return tags;
+/* ---------- 首屏运行位 ---------- */
+function bindStage() {
+  const panes = $$('.artifact__pane');
+  if (!panes.length) return;
+  const rows = $$('.rail__row');
+  const proof = $('[data-artifact-proof]');
+  const videos = $$('[data-stage-video]');
+
+  const syncVideo = (key) => {
+    videos.forEach((v) => {
+      const pane = v.closest('.artifact__pane');
+      const active = pane && pane.dataset.mock === key;
+      if (active) {
+        const pr = v.play();
+        if (pr && typeof pr.catch === 'function') pr.catch(() => {});
+      } else {
+        v.pause();
+        /* 元数据未载入时重置 currentTime 会中止正在进行的请求（表现为一条
+           假的 requestfailed）。等 readyState>0 再归零。 */
+        if (v.readyState > 0) { try { v.currentTime = 0; } catch (_) { /* 不可 seek */ } }
+      }
+    });
+  };
+
+  const show = (key) => {
+    panes.forEach((p) => p.classList.toggle('is-on', p.dataset.mock === key));
+    rows.forEach((r) => r.setAttribute('aria-selected', String(r.dataset.mock === key)));
+    const p = PROJECTS.find((x) => x.id === key);
+    if (proof) {
+      proof.innerHTML = '';
+      if (p) {
+        const u = safeUrl(p.proofUrl);
+        const label = p.proof ? p.name + ' · ' + p.proof : p.name;
+        if (u) {
+          const a = linkEl(u, label, '');
+          if (a) proof.appendChild(a); else proof.appendChild(document.createTextNode(label));
+        } else {
+          proof.appendChild(document.createTextNode(label));
+        }
+        const st = el('span', '', ' — ' + (STATE_TEXT[p.status || 'live'] || ''));
+        proof.appendChild(st);
+      }
+    }
+    syncVideo(key);
+  };
+
+  rows.forEach((r) => r.addEventListener('click', () => show(r.dataset.mock)));
+  /* 键盘：清单是 tablist，左右方向键要在行之间走 */
+  rows.forEach((r, i) => r.addEventListener('keydown', (e) => {
+    const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1
+      : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const next = rows[(i + d + rows.length) % rows.length];
+    next.focus(); show(next.dataset.mock);
+  }));
+
+  const first = rows[0];
+  if (first) show(first.dataset.mock);
+
+  document.addEventListener('visibilitychange', () => {
+    const active = $('.artifact__pane.is-on');
+    if (!active) return;
+    syncVideo(document.hidden ? '' : active.dataset.mock);
+  });
 }
 
-/* 普通作品卡：有缩略图才建图区；纯文档类走紧凑信息块 */
-function renderCard(p) {
-  const article = el('article', 'card');
-  if (p.wide) article.classList.add('card--wide');
+/* ---------- 面板零件 ---------- */
+function actionsEl(p) {
+  const box = el('div', 'links');
+  const canPreview = Boolean(p.entry && p.source);
+  if (canPreview) {
+    const a = el('a', 'btn btn--solid');
+    a.href = '#preview';
+    a.dataset.preview = p.id;
+    a.appendChild(document.createTextNode('在线预览'));
+    box.appendChild(a);
+  }
+  const live = linkEl(p.liveUrl, '打开站点', canPreview ? 'btn btn--line' : 'btn btn--solid');
+  if (live) box.appendChild(live);
+  if (p.qr && p.qr.src) {
+    const q = el('button', 'note__qr');
+    q.type = 'button';
+    q.dataset.qr = p.qr.src;
+    q.dataset.qrTitle = p.qr.title || (p.name + ' · 扫码');
+    q.setAttribute('aria-label', (p.qr.title || p.name) + '，扫码打开');
+    q.appendChild(document.createTextNode('扫码'));
+    box.appendChild(q);
+  }
+  return box;
+}
 
+function linksEl(p) {
+  const box = el('div', 'links');
+  (p.links || []).forEach((l) => {
+    const a = linkEl(l.url, l.label, '');
+    if (a) box.appendChild(a);
+  });
+  return box.childElementCount ? box : null;
+}
+
+function tagsEl(p) {
+  const box = el('div', 'links');
+  (p.tags || []).slice(0, 3).forEach((t) => box.appendChild(el('span', 'badge badge--hue', escapeHtml(t))));
+  return box.childElementCount ? box : null;
+}
+
+function specEl(rows) {
+  if (!rows || !rows.length) return null;
+  const wrap = el('div', 'spec');
+  rows.forEach((r) => {
+    const row = el('div', '');
+    row.appendChild(el('span', 'spec__k', escapeHtml(r.k)));
+    const v = el('span', 'spec__v');
+    v.appendChild(r.mono ? el('em', '', escapeHtml(r.v)) : document.createTextNode(r.v));
+    row.appendChild(v);
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
+function mediaEl(p) {
+  const box = el('div', p.layout === 'data' ? 'data__media' : 'split__media');
+  if (p.demo) {
+    const v = el('video', '');
+    const src = safeUrl(p.demo.src);
+    if (!src) return null;
+    v.src = src;
+    const poster = safeUrl(p.demo.poster);
+    if (poster) v.poster = poster;
+    v.muted = true; v.loop = true; v.playsInline = true;
+    v.preload = 'none';
+    v.setAttribute('aria-label', p.name + ' 实机演示');
+    v.dataset.demoVideo = '1';
+    box.appendChild(v);
+    return box;
+  }
   if (p.thumbnail) {
-    const media = el('div', 'card__media');
-    if (p.id) media.classList.add('card__media--' + p.id);
-    // 有演示视频的项目：卡片媒体区直接放视频（静音循环 + poster 兜底）。
-    // 静态缩略图看不出「这游戏能玩」，视频是最短的证明；不支持/被拦截时
-    // poster 帧仍然显示，信息不丢。
-    if (p.demo) {
-      const v = el('video', 'card__video');
-      v.src = p.demo.src;
-      if (p.demo.poster) v.poster = p.demo.poster;
-      v.muted = true;
-      v.loop = true;
-      v.playsInline = true;
-      v.preload = 'none';           // 不自动拉流：进入视口再加载，省流量
-      v.setAttribute('aria-label', p.name + ' 游玩演示');
-      v.dataset.demoVideo = '1';
-      media.appendChild(v);
-      media.appendChild(el('span', 'card__badge', '▶ 演示'));
-      media.appendChild(el('span', 'card__accent'));
-      article.appendChild(media);
-      return finishCard(article, p);
+    const webp = safeUrl(p.thumbnail.replace(/\.png$/, '.webp'));
+    const small = safeUrl(p.thumbnail.replace(/\.png$/, '-640.webp'));
+    const pic = document.createElement('picture');
+    if (webp && small) {
+      const s = el('source');
+      s.type = 'image/webp';
+      s.srcset = `${small} 640w, ${webp} 1200w`;
+      s.sizes = '(max-width: 760px) 100vw, 640px';
+      pic.appendChild(s);
     }
     const img = el('img');
-    // WebP 优先：1200 宽给桌面，640 宽给窄屏（四张合计 934 KB → 142 KB）
-    const webp = p.thumbnail.replace(/\.png$/, '.webp');
-    const webpSmall = p.thumbnail.replace(/\.png$/, '-640.webp');
-    const picture = document.createElement('picture');
-    const source = el('source');
-    source.type = 'image/webp';
-    source.srcset = `${webpSmall} 640w, ${webp} 1200w`;
-    source.sizes = '(max-width: 760px) 100vw, 560px';
-    picture.appendChild(source);
-    img.src = p.thumbnail;
-    img.alt = p.name + ' 截图';
-    img.loading = 'lazy';
-    img.decoding = 'async';
+    img.src = safeUrl(p.thumbnail) || '';
+    img.alt = p.name + ' 界面';
+    img.loading = 'lazy'; img.decoding = 'async';
     img.width = 960; img.height = 600;
-    picture.appendChild(img);
-    media.appendChild(picture);
-    media.appendChild(el('span', 'card__accent'));
-    article.appendChild(media);
-  } else {
-    article.classList.add('card--note');
-    article.appendChild(el('span', 'card__accent'));
+    pic.appendChild(img);
+    box.appendChild(pic);
+    return box;
+  }
+  return null;
+}
+
+function versionsEl(p) {
+  if (!p.versions || !p.versions.length) return null;
+  const wrap = el('div', 'versions');
+  p.versions.forEach((v) => {
+    const row = el('div', 'version');
+    row.appendChild(el('div', 'version__name', escapeHtml(v.name)));
+    row.appendChild(el('div', 'version__desc', escapeHtml(v.desc || '')));
+    const proof = el('div', 'version__proof');
+    const pu = safeUrl(v.proofUrl);
+    if (pu) {
+      const a = linkEl(pu, v.proof || v.name, '');
+      if (a) proof.appendChild(a);
+    } else {
+      proof.appendChild(document.createTextNode(v.proof || ''));
+    }
+    row.appendChild(proof);
+
+    const state = el('div', 'version__state');
+    const cls = v.status === 'live' ? 'state state--live' : v.status === 'local' ? 'state state--local' : 'state';
+    state.appendChild(el('span', cls, escapeHtml(STATE_TEXT[v.status] || v.status || '')));
+    /* 只有真有产物的形态才配链接；local 不给按钮 */
+    if (v.status !== 'local') {
+      const a = linkEl(v.url, v.status === 'collection' ? '在合集里打开' : '打开', 'version__link');
+      if (a) state.appendChild(a);
+      else state.appendChild(el('span', 'version__none', '暂无可打开的地址'));
+    } else {
+      state.appendChild(el('span', 'version__none', '无网页产物'));
+    }
+    row.appendChild(state);
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
+function figuresEl(p) {
+  if (!p.figures || !p.figures.length) return null;
+  const wrap = el('div', 'data__figures');
+  p.figures.forEach((f) => {
+    const fig = el('div', 'data__fig');
+    fig.appendChild(el('span', 'num', escapeHtml(f.value)));
+    fig.appendChild(el('div', 'data__cap', escapeHtml(f.cap)));
+    wrap.appendChild(fig);
+  });
+  return wrap;
+}
+
+/* ---------- 版式分发 ---------- */
+function caseEl(p) {
+  const a = el('article', 'case ' + hueClass(p));
+  a.id = 'case-' + p.id;
+
+  const h = el('h3', 'case__title');
+  h.appendChild(document.createTextNode(p.name));
+  if (p.kicker) h.appendChild(el('span', 'case__tag', escapeHtml(p.kicker)));
+  a.appendChild(h);
+  a.appendChild(el('p', 'case__lead', escapeHtml(p.lead || p.tagline || '')));
+  if (p.lead && p.tagline) a.appendChild(el('p', 'case__note', escapeHtml(p.tagline)));
+
+  if (p.layout === 'versions') {
+    const v = versionsEl(p); if (v) a.appendChild(v);
+    const s = specEl(p.spec); if (s) a.appendChild(s);
+  } else if (p.layout === 'split') {
+    const grid = el('div', 'split');
+    const m = mediaEl(p); if (m) grid.appendChild(m);
+    const s = specEl(p.spec);
+    if (s) grid.appendChild(s); else {
+      const alt = el('div', '');
+      const t = tagsEl(p); if (t) alt.appendChild(t);
+      if (alt.childElementCount) grid.appendChild(alt);
+    }
+    if (grid.childElementCount) a.appendChild(grid);
+  } else if (p.layout === 'data') {
+    const wrap = el('div', 'data');
+    const f = figuresEl(p); if (f) wrap.appendChild(f);
+    const m = mediaEl(p); if (m) wrap.appendChild(m);
+    if (wrap.childElementCount) a.appendChild(wrap);
   }
 
-  return finishCard(article, p);
+  const tags = tagsEl(p); if (tags) a.appendChild(tags);
+  const acts = actionsEl(p); if (acts.childElementCount) a.appendChild(acts);
+  const ls = linksEl(p); if (ls) a.appendChild(ls);
+  return a;
 }
 
-/* 卡片正文：标题 / 一句话 / 标签 / 动作 / 资源行（视频卡与图片卡共用） */
-function finishCard(article, p) {
-  const body = el('div', 'card__body');
-  const eyebrow = el('p', 'card__eyebrow');
-  if (!p.thumbnail) eyebrow.innerHTML = iconFor(p.icon || (p.type === 'doc' ? 'doc' : 'globe'));
-  eyebrow.appendChild(document.createTextNode((p.thumbnail ? '' : ' ') + (p.kicker || p.category || '')));
-  body.appendChild(eyebrow);
-  body.appendChild(el('h3', 'card__title', escapeHtml(p.name)));
-  if (p.tagline) body.appendChild(el('p', 'card__line', escapeHtml(p.tagline)));
-  body.appendChild(buildTags(p));
-  body.appendChild(buildActions(p));
-  const links = buildLinks(p);
-  if (links) body.appendChild(links);
-
-  article.appendChild(body);
-  return article;
-}
-
-/* 游戏合集：降级成一条横幅（内容不变，层级变了） */
-function renderBand(p) {
-  const band = el('article', 'band');
-  const title = el('div', '');
-  title.appendChild(el('p', 'card__eyebrow', escapeHtml(p.kicker || '游戏合集')));
-  title.appendChild(el('h3', 'band__title', escapeHtml(p.name)));
-
-  const mid = el('div', '');
-  mid.appendChild(el('p', 'band__desc', escapeHtml(p.tagline || '')));
-  const tags = el('div', 'band__tags');
-  (p.tags || []).slice(0, 3).forEach((t) => tags.appendChild(el('span', 'badge', escapeHtml(t))));
-  mid.appendChild(tags);
-
-  const acts = buildActions(p);
-  acts.classList.add('band__acts');
-
-  band.appendChild(title);
-  band.appendChild(mid);
-  band.appendChild(acts);
-  return band;
-}
-
-function renderProjects() {
-  const bandMount = $('#bandMount');
-  const band = PROJECTS.find((p) => p.band === true);
-  const cards = PROJECTS.filter((p) => p.band !== true);
-  if (bandMount) {
-    bandMount.innerHTML = '';
-    if (band) bandMount.appendChild(renderBand(band));
-    else bandMount.remove();
+function noteEl(p) {
+  const n = el('article', 'note ' + hueClass(p));
+  n.appendChild(el('h3', '', escapeHtml(p.name)));
+  n.appendChild(el('p', '', escapeHtml(p.tagline || p.lead || '')));
+  const ls = linksEl(p); if (ls) n.appendChild(ls);
+  /* note 不给实心大按钮：过程资料不抢作品的排面，只给文字级入口 */
+  const row = el('div', 'links');
+  if (p.entry && p.source) {
+    const a = el('a', '');
+    a.href = '#preview'; a.dataset.preview = p.id;
+    a.appendChild(document.createTextNode('在线预览'));
+    row.appendChild(a);
   }
-  $$('[data-group]').forEach((mount) => {
-    const group = mount.dataset.group;
-    cards.filter((p) => p.group === group).forEach((p) => mount.appendChild(renderCard(p)));
+  const live = linkEl(p.liveUrl, '打开站点', '');
+  if (live) row.appendChild(live);
+  if (p.qr && p.qr.src) {
+    const q = el('button', 'note__qr');
+    q.type = 'button';
+    q.dataset.qr = p.qr.src;
+    q.dataset.qrTitle = p.qr.title || (p.name + ' · 扫码');
+    q.setAttribute('aria-label', (p.qr.title || p.name) + '，扫码打开');
+    q.appendChild(document.createTextNode('扫码'));
+    row.appendChild(q);
+  }
+  if (row.childElementCount) n.appendChild(row);
+  return n;
+}
+
+function renderCases() {
+  const works = $('[data-cases]:not([data-cases="process"])');
+  const proc = $('[data-cases="process"]');
+  const ordered = PROJECTS.slice().sort((a, b) => {
+    if (a.band !== b.band) return a.band ? -1 : 1;
+    return (a.order ?? 99) - (b.order ?? 99);
   });
 
-  // 数据带里「可玩网页游戏」跟着 countsAsGame 走，避免数字与内容漂移
+  if (works) {
+    works.innerHTML = '';
+    const full = ordered.filter((p) => p.group !== 'process' && p.layout !== 'note');
+    full.forEach((p) => works.appendChild(caseEl(p)));
+    const notes = ordered.filter((p) => p.group !== 'process' && p.layout === 'note');
+    if (notes.length) {
+      const wrap = el('div', 'notes');
+      notes.forEach((p) => wrap.appendChild(noteEl(p)));
+      works.appendChild(wrap);
+    }
+  }
+  if (proc) {
+    proc.innerHTML = '';
+    proc.className = 'notes';
+    ordered.filter((p) => p.group === 'process').forEach((p) => proc.appendChild(noteEl(p)));
+  }
+
+  /* 「可玩网页游戏」由 countsAsGame 实时算，不手写 */
   const gameCount = PROJECTS.filter((p) => p.group === 'play' && p.countsAsGame).length;
   $$('[data-count="games"]').forEach((n) => setText(n, String(gameCount)));
 }
@@ -212,7 +393,7 @@ function openPreview(id) {
   if (!p || !p.entry) return;
   const modal = $('#previewModal');
   setText($('#pmTitle'), p.name);
-  setText($('#pmSub'), (p.tags || []).join(' · '));
+  setText($('#pmSub'), (p.tags || []).join(' / '));
   $('#pmFrame').src = 'projects/' + p.id + '/' + p.entry;
   const live = $('#pmLive');
   if (p.liveUrl) { live.href = p.liveUrl; live.hidden = false; } else { live.hidden = true; }
@@ -249,8 +430,6 @@ function closeQr() {
   document.body.style.overflow = '';
 }
 
-/* 事件委托：弹窗、预览链接、二维码入口、复制按钮都挂在 document 上，
-   渲染出来的卡片无需逐个绑事件 */
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { closePreview(); closeQr(); }
 });
@@ -265,7 +444,7 @@ document.addEventListener('click', (e) => {
   if (copy) copyMail(copy);
 });
 $$('.modal').forEach((m) => {
-  m.addEventListener('click', (e) => { if (e.target === m) { m.querySelector('[data-close]')?.click(); } });
+  m.addEventListener('click', (e) => { if (e.target === m) m.querySelector('[data-close]')?.click(); });
 });
 
 /* ---------- 复制邮箱 ---------- */
@@ -273,72 +452,16 @@ async function copyMail(btn) {
   const text = btn.dataset.copyMail || '';
   try {
     await navigator.clipboard.writeText(text);
-    btn.textContent = '已复制';
-    setTimeout(() => { btn.textContent = '复制'; }, 1500);
+    setText(btn, '已复制');
+    setTimeout(() => setText(btn, '复制'), 1500);
   } catch (_) {
-    btn.textContent = '复制失败';
-    setTimeout(() => { btn.textContent = '复制'; }, 1500);
+    setText(btn, '复制失败');
+    setTimeout(() => setText(btn, '复制'), 1500);
   }
 }
 
-/* ---------- 首屏展示台：静态截图 + 一段游玩演示视频，按标签切换 ---------- */
-const STAGE_CAPS = {
-  /* 2026-11-01：新返航录接替旧《返航录》占据首屏默认位；旧作降为普通游戏卡片。 */
-  'returnlog': '新返航录 · 11 人类对 4 异形 · AI 会推理，也会撒谎',
-  'space-kill': '返航录 · v1preview1.0 · 15 人三阵营，空席位由 AI 托管',
-  'ping-pong-duel': '乒乓对决 · 两个 AI 在看台侧视角对打（实机录制，未剪辑）：发球、推挡、扣杀与得分都在这一段里。',
-  'delta-force': '落幕查 · 三角洲行动变卖物的实时价格查询，带 30 天走势。'
-};
-function bindStage() {
-  const tabs = $$('.stage__tabs [data-mock]');
-  if (!tabs.length) return;
-
-  // 演示视频只在它自己那一页播放：切走就暂停并回到开头，
-  // 既省流量/CPU，也保证下次点回来是从头看一遍完整回合。
-  // 注意选择器只认 [data-stage-video]（首屏展示台的那一支）；作品卡里的视频由
-  // bindDemoVideos 按「是否进入视口」独立管理，两者互不干扰。
-  const demos = $$('[data-stage-video]');
-  const syncVideo = (key) => {
-    demos.forEach((v) => {
-      const pane = v.closest('.stage__pane');
-      const active = pane && pane.dataset.mock === key;
-      if (active) {
-        // 静音自动播放是浏览器允许的；被策略拦下就静默停在 poster 帧，不影响其它内容
-        const p = v.play();
-        if (p && typeof p.catch === 'function') p.catch(() => {});
-      } else {
-        v.pause();
-        try { v.currentTime = 0; } catch (_) { /* 尚未载入元数据 */ }
-      }
-    });
-  };
-
-  const show = (key) => {
-    $$('.stage__pane').forEach((p) => p.classList.toggle('is-on', p.dataset.mock === key));
-    tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.mock === key)));
-    const cap = $('[data-stage-caption]');
-    if (cap && STAGE_CAPS[key]) setText(cap, STAGE_CAPS[key]);
-    syncVideo(key);
-  };
-  tabs.forEach((b) => b.addEventListener('click', () => show(b.dataset.mock)));
-
-  // 首屏默认停在「新返航录」：其余视频不抢开局，用户点标签才播。
-  // 标签页被切到后台时也暂停，回来再续播（避免后台空转）。
-  document.addEventListener('visibilitychange', () => {
-    const active = $('.stage__pane.is-on');
-    if (!active) return;
-    syncVideo(document.hidden ? '' : active.dataset.mock);
-  });
-}
-
-/* ---------- 导航：滚动毛玻璃 + 当前分区高亮 ---------- */
+/* ---------- 导航：当前分区 ---------- */
 function bindNav() {
-  const head = $('#siteHead');
-  if (head) {
-    const onScroll = () => head.setAttribute('data-scrolled', String(window.scrollY > 20));
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-  }
   const nav = $('[data-section-nav]');
   if (!nav) return;
   const links = $$('a', nav);
@@ -355,62 +478,47 @@ function bindNav() {
   sections.forEach((s) => io.observe(s));
 }
 
-/* ---------- 滚动淡入 + 数字递增（尊重 reduced-motion） ---------- */
-function countUp(node, to, suffix = '') {
-  if (reduceMotion() || to < 2) { setText(node, to.toLocaleString('en-US') + suffix); return; }
-  const t0 = performance.now(), dur = 1200;
+/* ---------- 数字递增（只在进视口时跑一次；reduced-motion 直接给终值） ---------- */
+function countUp(node, to) {
+  if (reduceMotion() || to < 2) { setText(node, to.toLocaleString('en-US')); return; }
+  const t0 = performance.now(), dur = 1100;
   const step = (t) => {
     const p = Math.min(1, (t - t0) / dur);
-    setText(node, Math.round(to * (1 - Math.pow(1 - p, 3))).toLocaleString('en-US') + suffix);
+    setText(node, Math.round(to * (1 - Math.pow(1 - p, 3))).toLocaleString('en-US'));
     if (p < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
 }
-function bindReveal() {
-  const targets = $$('.rv');
+function bindCounters() {
   const counters = $$('[data-to]');
+  if (!counters.length) return;
   if (!('IntersectionObserver' in window) || reduceMotion()) {
-    targets.forEach((t) => t.classList.add('is-in'));
     counters.forEach((n) => countUp(n, Number(n.dataset.to)));
     return;
   }
   const io = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('is-in');
+      if (!entry.isIntersecting || entry.target.dataset.counted === '1') return;
+      entry.target.dataset.counted = '1';
+      countUp(entry.target, Number(entry.target.dataset.to));
       io.unobserve(entry.target);
-      $$('[data-to]', entry.target).forEach((n) => {
-        if (n.dataset.counted === '1') return;
-        n.dataset.counted = '1';
-        countUp(n, Number(n.dataset.to));
-      });
     });
-  }, { threshold: 0.15 });
-  targets.forEach((t) => io.observe(t));
+  }, { threshold: 0.4 });
+  counters.forEach((n) => io.observe(n));
 }
 
-/* ---------- 作品卡里的演示视频：进入视口才播，离开即停 ----------
-   为什么用 IntersectionObserver 而不是直接 autoplay：卡片可能同时在屏外，
-   静音自动播放虽被允许，但多支视频一起解码会拖慢首屏滚动。这里按可见性开关，
-   既保证滚到卡片时「正在动」，也不为看不见的内容付解码成本。 */
+/* ---------- 面板里的演示视频：进视口才播，离开即停 ---------- */
 function bindDemoVideos() {
   const vids = $$('video[data-demo-video]');
   if (!vids.length) return;
   const play = (v) => {
     v.preload = 'auto';
     const p = v.play();
-    if (p && typeof p.catch === 'function') p.catch(() => {}); // 被策略拦下就停在 poster 帧
+    if (p && typeof p.catch === 'function') p.catch(() => {});
   };
-  if (!('IntersectionObserver' in window) || reduceMotion()) {
-    vids.forEach(play); // 无 IO 或用户要求减少动效：一次性加载（reduced-motion 下仍静音播放，无闪烁）
-    return;
-  }
+  if (!('IntersectionObserver' in window) || reduceMotion()) { vids.forEach(play); return; }
   const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      const v = entry.target;
-      if (entry.isIntersecting) play(v);
-      else v.pause();
-    });
+    entries.forEach((e) => { e.isIntersecting ? play(e.target) : e.target.pause(); });
   }, { threshold: 0.35 });
   vids.forEach((v) => io.observe(v));
 }
@@ -421,16 +529,16 @@ bindNav();
 fetch('projects.json', { cache: 'no-cache' })
   .then((r) => { if (!r.ok) throw new Error('projects.json ' + r.status); return r.json(); })
   .then((data) => {
-    // 排序：置顶优先，其次按 order 升序
     PROJECTS = (data.projects || []).slice().sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
-    renderProjects();
+    renderRail();
+    renderCases();
+    bindStage();
     bindDemoVideos();
-    bindReveal();
+    bindCounters();
   })
   .catch((err) => {
     console.error('[site] 项目数据加载失败：', err);
-    $$('[data-group]').forEach((m) => {
-      m.appendChild(el('p', 'card__line', '项目数据加载失败，请刷新重试。'));
-    });
-    bindReveal();
+    const mount = $('[data-cases]:not([data-cases="process"])');
+    if (mount) mount.appendChild(el('p', 'case__note', '项目数据加载失败，请刷新重试。'));
+    bindCounters();
   });
