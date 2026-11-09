@@ -30,7 +30,7 @@
       "liveUrl": "https://ping-pong-duel.pages.dev",
       "links": [
         { "label": "乒乓对决", "url": "https://ping-pong-duel.pages.dev", "icon": "globe" },
-        { "label": "返航录", "url": "https://space-kill-web.pages.dev", "icon": "globe" }
+        { "label": "返航录", "url": "https://returnlog.pages.dev", "icon": "globe" }
       ],
       "source": { "type": "local", "path": "projects/game-collection" }
     },
@@ -56,7 +56,7 @@
         { "label": "GitHub", "url": "https://github.com/hxj-2888/ping-pong-duel", "icon": "github" },
         { "label": "Gitee", "url": "https://gitee.com/hxj-2888/ping-pong-duel", "icon": "github" }
       ],
-      "qr": { "src": "assets/qr/ping-pong.png", "title": "乒乓对决 v3.2.1 · 扫码下载安卓安装包" },
+      "qr": { "src": "assets/qr/ping-pong.png", "title": "乒乓对决 v3.6.0 · 扫码下载安卓安装包" },
       "source": { "type": "local", "path": "projects/ping-pong-duel" }
     },
     {
@@ -77,35 +77,13 @@
       "entry": null,
       "type": "web",
       "mobile": true,
-      "liveUrl": "https://space-kill-web.pages.dev",
+      "liveUrl": "https://returnlog.pages.dev",
       "links": [
-        { "label": "GitHub", "url": "https://github.com/hxj-2888/space-kill-web", "icon": "github" },
-        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/space-kill-web", "icon": "github" },
-        { "label": "安卓安装包", "url": "https://github.com/hxj-2888/space-kill-web/releases/download/returnlog-v3/ReturnLog.apk", "icon": "doc" }
+        { "label": "GitHub", "url": "https://github.com/hxj-2888/returnlog", "icon": "github" },
+        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/returnlog", "icon": "github" },
+        { "label": "安卓安装包", "url": "https://github.com/hxj-2888/returnlog/releases/download/returnlog-v3/ReturnLog.apk", "icon": "doc" }
       ],
       "qr": { "src": "assets/qr/returnlog.png", "title": "新返航录 · 扫码下载安卓安装包" }
-    },
-    {
-      "id": "space-kill",
-      "group": "play",
-      "order": 4,
-      "countsAsGame": true,
-      "kicker": "可玩 · 网页游戏",
-      "name": "返航录",
-      "tagline": "15 人三阵营身份博弈，空席位由 AI 托管，手机横屏可玩。",
-      "tags": ["规则引擎", "AI 托管", "蒙特卡洛"],
-      "thumbnail": "assets/projects/space-kill.png",
-      "entry": "index.html",
-      "type": "web",
-      "mobile": true,
-      "liveUrl": "https://space-kill-web.pages.dev",
-      "links": [
-        { "label": "规则与资料", "url": "https://space-kill.pages.dev", "icon": "doc" },
-        { "label": "GitHub", "url": "https://github.com/hxj-2888/space-kill-web", "icon": "github" },
-        { "label": "Gitee", "url": "https://gitee.com/hxj-2888/space-kill-web", "icon": "github" }
-      ],
-      "qr": { "src": "assets/qr/space-kill-apk.png", "title": "返航录 · 扫码下载安卓安装包" },
-      "source": { "type": "local", "path": "projects/space-kill" }
     },
     {
       "id": "delta-force",
@@ -130,7 +108,7 @@
       "source": { "type": "local", "path": "projects/delta-force" }
     },
     {
-      "id": "space-kill-attachment",
+      "id": "space-kill",
       "icon": "doc",
       "group": "process",
       "order": 1,
@@ -139,12 +117,13 @@
       "tagline": "返航录的规则正文、速查卡、术语表与判定流程图。",
       "tags": ["规则正文", "速查卡", "术语表", "流程图"],
       "thumbnail": null,
-      "entry": null,
+      "entry": "index.html",
       "type": "doc",
       "liveUrl": "https://space-kill.pages.dev",
       "links": [
         { "label": "规则正文 v1preview1.0", "url": "https://space-kill.pages.dev", "icon": "doc" }
-      ]
+      ],
+      "source": { "type": "local", "path": "projects/space-kill" }
     },
     {
       "id": "portfolio-source",

@@ -147,7 +147,7 @@
     // 校验后下载：先用 HEAD 取服务器上安装包的真实大小作为基准（CI 每次重建 APK，
     // 大小随构建变化，不再硬编码），再取回整包核对一致性；若被浏览器拦截/截断
     //（最常见导致"无效安装包"的原因），当场提示而不是给坏文件
-    var APK = 'https://ping-pong-duel.pages.dev/PingPongDuel-v360.apk';
+    var APK = 'PingPongDuel-v360.apk';
     var btn = document.getElementById('dlBtn');
     var status = document.getElementById('dlStatus');
 

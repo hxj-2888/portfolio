@@ -204,6 +204,30 @@
               "okIfContains": "var APK = 'https://ping-pong-duel.pages.dev/PingPongDuel-v"
             }
           ]
+        },
+        {
+          "file": "index.html",
+          "note": "与合集段同口径（2026-11-09 补齐）：独立副本此前只适配 download.html，而 index.html 的 #btnDownloadApk 在触屏设备上由 js/app/main.js 显示，相对 href 在作品集域名下落到 SPA 回退，手机用户点它会下到改名成 .apk 的网页；#apkHelpLink 的 href=\"download\"（无扩展名）同样落到回退页。",
+          "rules": [
+            {
+              "type": "regex",
+              "from": "href=\"PingPongDuel-v",
+              "to": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "href=\"https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            },
+            {
+              "type": "regex",
+              "from": "download=\"PingPongDuel-v",
+              "to": "download=\"https://ping-pong-duel.pages.dev/PingPongDuel-v",
+              "okIfContains": "download=\"https://ping-pong-duel.pages.dev/PingPongDuel-v"
+            },
+            {
+              "type": "regex",
+              "from": "href=\"download\"",
+              "to": "href=\"download.html\"",
+              "okIfContains": "href=\"download.html\""
+            }
+          ]
         }
       ]
     },

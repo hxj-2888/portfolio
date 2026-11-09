@@ -73,7 +73,9 @@
       </div>
 
       <!-- 展示台：按「浏览器窗口」组织，默认停在**新返航录**（2026-11-01 换太子）。
-           旧《返航录》退出首屏，只保留在下方「普通游戏」卡片里。 -->
+           2026-11-09：旧《返航录》不再作为第二款游戏单列卡片——它与新返航录是同一个项目，
+           此前 countsAsGame 把它多算了一次（首屏手写兜底 2 与运行时 3 长期不一致）。
+           规则正文与资料仍在下方「过程 · 规则资料」卡片，预览走 projects/space-kill/。 -->
       <div class="stage">
         <div class="stage__frame">
           <div class="stage__bar" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -122,7 +124,7 @@
         <div class="stat stat--big">
           <p class="stat__num num" data-to="10000">10,000</p>
           <p class="stat__label">蒙特卡洛局数</p>
-          <p class="stat__note"><a href="https://space-kill-web.pages.dev" target="_blank" rel="noopener">新返航录平衡性验证</a></p>
+          <p class="stat__note"><a href="https://returnlog.pages.dev" target="_blank" rel="noopener">新返航录平衡性验证</a></p>
         </div>
         <div class="stat">
           <p class="stat__num num" data-count="games">2</p>

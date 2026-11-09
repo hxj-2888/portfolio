@@ -375,12 +375,18 @@
     if (PPD.ui.setTrailFx) PPD.ui.setTrailFx.checked = !(PPD.app.fxShow && PPD.app.fxShow.trail === false);
     if (PPD.ui.setSplashFx) PPD.ui.setSplashFx.checked = !(PPD.app.fxShow && PPD.app.fxShow.splash === false);
     if (PPD.ui.setShakeFx) PPD.ui.setShakeFx.checked = !(PPD.app.fxShow && PPD.app.fxShow.shake === false);
+    if (PPD.ui.setKeyHints) PPD.ui.setKeyHints.checked = PPD.app.showKeyHints !== false;
     if (PPD.ui.setMusic) PPD.ui.setMusic.checked = PPD.GameAudio.isMusicOn();
     if (PPD.ui.setSound) PPD.ui.setSound.checked = !PPD.GameAudio.isMuted();
     syncVolSlider(PPD.ui.setMusicVol, PPD.GameAudio.getMusicVol());
     syncVolSlider(PPD.ui.setSfxVol, PPD.GameAudio.getSfxVol());
     // v2.5:打开设置时同步联机线路选择（与联机对战面板共用）
     if (PPD.ui.serverLine) PPD.ui.serverLine.value = PPD.app.serverLine || 'auto';
+    // 第一人称：视角分段控件回填（程序化改值不会触发分段控件重绘，这里显式刷新）
+    if (PPD.ui.cameraView) {
+      PPD.ui.cameraView.value = PPD.app.cameraView;
+      if (PPD.refreshSegmented) PPD.refreshSegmented();
+    }
     // 对局中（mode 非空）：设置面板即暂停界面，不叠加暂停面板
     if (PPD.app.mode) {
       PPD.app.settingsPause = true;
@@ -466,6 +472,16 @@
       const v = PPD.ui.frameRate.value;
       PPD.setFrameRate(v === 'unlimited' ? 'unlimited' : parseInt(v, 10));
       PPD.setStatus('帧率上限：' + (PPD.app.quality.frameRate === 'unlimited' ? '无上限' : PPD.app.quality.frameRate));
+    });
+  }
+  // 比赛视角切换（第一人称）：只切渲染机位；人机/本地分屏/联机/AI 观战/回放生效
+  if (PPD.ui.cameraView) {
+    PPD.ui.cameraView.addEventListener('change', () => {
+      PPD.GameAudio.ui && PPD.GameAudio.ui();
+      PPD.setCameraView(PPD.ui.cameraView.value);
+      PPD.setStatus(PPD.app.cameraView === 'first'
+        ? '比赛视角：第一人称（全部对战模式）'
+        : '比赛视角：第三人称');
     });
   }
 
@@ -641,6 +657,7 @@
     syncHellOptions: PPD.syncHellOptions,
     viewModelFromEngine: PPD.viewModelFromEngine,
     viewModelFromSnap: PPD.viewModelFromSnap,
+    renderLocal: PPD.renderLocal,
     servePathFromSnap: PPD.servePathFromSnap,
     serveAimFromPointer: PPD.serveAimFromPointer,
     myServeSide: PPD.myServeSide,
