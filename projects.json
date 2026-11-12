@@ -116,9 +116,9 @@
         {
           "name": "3D 版",
           "status": "local",
-          "desc": "Godot 4.6 垂直切片，与 2.5D 共用规则口径，只搬数据与判定、不搬玩法实现。目前只有本机工程，没有可打开的网页产物。",
-          "proof": "70 项纯函数 · 63 已同步 / 7 适配层 / 0 待办",
-          "proofUrl": "https://github.com/hxj-2888/returnlog/tree/v1-preview/3d/spec/parity-map.json"
+          "desc": "Godot 4.6 垂直切片，与 2.5D 共用规则口径，只搬数据与判定、不搬玩法实现。工程在 returnlog 的 3d 副分支，暂无网页产物（需 Godot Web 导出）。",
+          "proof": "V1P-0.2 · 385 函数 · 未映射 0",
+          "proofUrl": "https://github.com/hxj-2888/returnlog/tree/3d/3d/spec/gameplay-parity.json"
         },
         {
           "name": "过渡式表单版",
