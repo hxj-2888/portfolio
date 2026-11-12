@@ -95,7 +95,7 @@ GitHub 侧另有独立工作流 `docs-gate.yml`。**三道任一不过就是硬�
 ### 2.6 推荐流程
 
 ```
-改代码
+改代码（改了 projects.json → 先 npm run data:inline）
   → npm run check / check:demo（按改动类型）
   → 写 docs/变更记录/YYYY-MM/YYYY-MM-DD_主题.md（五要素）
   → 刷 修改记录.md 的 LATEST 区块 + docs/变更记录/README.md 索引表
@@ -134,4 +134,5 @@ GitHub 侧另有独立工作流 `docs-gate.yml`。**三道任一不过就是硬�
 1. **卡片不是手写的**——由 `projects.json` + `js/site.js` 渲染，改 `index.html` 没用。
 2. **`projects/game-collection/games/` 是同步产物但已入库**——直接改会被 `verify-sync` 判为「产物被手工改过」。要改游戏请改源仓库再 `npm run sync`。
 3. **别为了让门禁变绿去 `--fix`**——`delta-force` 本地领先远端时，`verify-sync` 报的"落后"是本地假象，`--fix` 会把未发布的改动带进作品集。
-4. **`projects/_headers` 不要再加回来**——它不会被合并进响应，看着像治好了其实没有；CSP 用的是根 `_headers` 里的双行同名头。
+4. **`projects/_headers` 不要再加回来**——它不会被合并进响应，看着像治好了其实没有；CSP 用的是根 `_headers` 里的 `/projects/*` 规则（先 `! Content-Security-Policy` 删除继承的严格策略，再设宽松策略）。
+5. **改 `projects.json` 后必须跑 `npm run data:inline`**——首页渲染用的是 `index.html` 里的内联 JSON 副本，不再依赖第二次 `fetch`；`check:inline` 会拦漂移。

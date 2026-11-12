@@ -1,6 +1,6 @@
 # 交接入口
 
-> 最新交接文档：[`docs/交接文档.md`](交接文档.md)（2026-11-08 · HEAD `7d88f48`）
+> 最新交接文档：[`docs/交接文档.md`](交接文档.md)（2026-11-12 · HEAD `90e2dc7`）
 
 本仓库的文档分三类，**别混着看**：
 
@@ -18,7 +18,9 @@ npm run check:docs:all  # 推送前全套：新鲜度 + 事实契约 + 推送联
 npm run check:facts     # 只跑事实契约：文档数字/读数/索引 == 代码事实
 npm run check:push      # 只跑联动：本次提交是否带了记录与索引
 npm run check:docs:full # 额外实跑 collect（CI 用）
-npm run check           # 文案守门 + 规则同步 + 响应头 + 内嵌适配
+npm run check           # 文案守门 + 规则同步 + 响应头 + 内嵌适配 + 内联数据
+npm run data:inline     # 改 projects.json 后：把数据写进首页内联块
+npm run check:inline    # 只校验内联数据与 projects.json 是否一致
 npm run collect         # 项目收集（应 7/7）
 npm run sync:dry   # 同步预演（应 2 同步 / 2 跳过 / 1 失败，失败项见下）
 npm run check:demo # 演示视频守门（首屏/作品卡/合集页的视频可播）
@@ -30,13 +32,14 @@ npx serve . -p 3000   # 本地预览
 > `sync:dry` 的 `game-collection` 段失败退出。CI 从远端克隆源仓库，不受影响。
 > **不要为了让它变绿去改 `rules-map.json` 或 `sync.json`。**
 
-## 三个最容易踩的坑
+## 四个最容易踩的坑
 
 1. **卡片不是手写的**——由 `projects.json` + `js/site.js` 渲染，改 `index.html` 没用。
-2. **`projects/game-collection/games/` 是同步产物，但已入库**（2026-10-24 起，约 117 个文件）。
+2. **改 `projects.json` 后跑 `npm run data:inline`**——首页渲染读的是 `index.html` 里的内联 JSON，不再发第二次请求；漏跑会被 `check:inline` 拦下。
+3. **`projects/game-collection/games/` 是同步产物，但已入库**（2026-10-24 起，约 117 个文件）。
    要改游戏内容请改源仓库再 `npm run sync`——直接改这里的文件会被 `verify-sync` 判为
    「产物被手工改过」，CI 也会红。
-3. **推送前先 `git fetch origin`**——`sync-attachment-site` 工作流会在你推送间隙提交，
+4. **推送前先 `git fetch origin`**——`sync-attachment-site` 工作流会在你推送间隙提交，
    发现分叉用 `git rebase`（不是 merge），rebase 后 Gitee 需 `--force`。
 
 ## 推送前必须做的两件事

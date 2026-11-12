@@ -46,6 +46,9 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('sync.json','utf8')); console.log('sync.json OK')"
           node -e "JSON.parse(require('fs').readFileSync('projects/delta-force/manifest.json','utf8')); console.log('delta-force manifest OK')"
 
+      - name: Validate inline projects data
+        run: node tools/inline-projects.cjs --check
+
   # ===== Cloudflare Pages 正式版（portfolio-ji, 生产分支 main）=====
   deploy-cloudflare:
     name: Cloudflare Pages (production)

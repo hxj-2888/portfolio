@@ -1,23 +1,20 @@
 /* ============================================================
-   site.js — 作品集交互（零依赖，数据驱动）
-   数据源：projects.json（唯一真相）。首屏核对清单、作品面板、弹窗都从这里渲染。
+   site.js — 检验单版作品集交互（零依赖）
 
-   2026-11-09 重做要点：
-     · 首屏 = 核对清单 + 正在运行的产物。清单行**从 DOM 里已存在的
-       .artifact__pane 反查项目**，而不是各写一份名单 —— 否则「清单说在跑」
-       和「实际能切的产物」迟早会漂移。
-     · 版式由 layout 决定：versions / split / data / note。三款软件各按自己
-       的性质排，不再共用一张「图+标题+三标签+两按钮」的卡片模板。
-     · status=local 的形态**不给链接**。没有可打开的产物，给个按钮就是
-       把它画成「可做」，这正是本站声称要避免的事。
-     · 不写内联 style：首页 CSP 是 style-src 'self'，作品色走 .hue-* 类。
+   数据源：projects.json（唯一真相）。构建时由 tools/inline-projects.cjs
+   把同一份数据写进 index.html 的 #projects-data，页面首屏不再发出第二个
+   请求；fetch 只作为缺少内联块时的兜底。这样网络抖动只会影响样式/脚本，
+   不会再把整块作品区打成空白。
+
+   2026-11-12 重做要点：
+     · 首屏样张的标签从已存在的 .artifact__pane 反查项目，不另写名单。
+     · 作品区按「检验项」渲染：左栏状态/名称/口径，右栏证据与入口。
+     · status=local 的形态渲染成虚线「待接入」槽位，不配链接；3D 版就是
+       这样留位的。另一条工作流把它改成 status=live 并补 url 即可。
+     · 颜色只保留朱红（验收章/待检）与松绿（在线），不给作品分配色块。
+     · 不写内联 style：首页 CSP 是 style-src 'self'。
    ============================================================ */
 
-/* ---------- 基础 ----------
-   2026-11-09：移除手绘 inline SVG 图标层。
-   依据 portfolio AGENTS.md §2.8（四项目统一裁定）：素材优先取公开/开源且必须留署名，
-   缺署名一律不上站；自绘图标既非开源来源也无署名，属于该删的装饰。
-   文字链接（GitHub / 打开站点 / 扫码）本身已足够清楚，不需要图标陪衬。 */
 let PROJECTS = [];
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -34,19 +31,18 @@ const escapeHtml = (s = '') => String(s).replace(/[&<>"']/g, (c) => (
 ));
 const setText = (node, text) => { node.textContent = text; };
 
-/* 只挡危险协议；相对素材路径（assets/…、projects/…）与 http(s)/mailto/# 都放行。
-   上一版用白名单前缀，把 assets/ 误判成 null，导致面板图与演示视频 src 被置空。 */
+/* 只挡危险协议；相对素材路径与 http(s)/mailto/# 都放行。 */
 const safeUrl = (u) => {
   if (!u) return null;
   const s = String(u).trim();
   if (/^(javascript|data|vbscript|file):/i.test(s)) return null;
   return s;
 };
-const hueClass = (p) => 'hue-' + (p.hue || 'none');
 const isExternal = (u) => /^https?:/i.test(u);
 
-/* 状态词：只陈述事实，不用形容词 */
-const STATE_TEXT = { live: '在线', local: '仅本机工程', collection: '在游戏合集里' };
+/* 状态词只陈述事实，不用形容词 */
+const STATE_TEXT = { live: '在线', local: '待接入', collection: '在合集里' };
+const STATE_CLASS = { live: 'chip--live', local: 'chip--pending', collection: 'chip--collection' };
 
 function linkEl(url, label, cls) {
   const u = safeUrl(url);
@@ -58,30 +54,25 @@ function linkEl(url, label, cls) {
   return a;
 }
 
-/* ---------- 首屏核对清单：从已存在的 pane 反查项目 ---------- */
-function renderRail() {
-  const rail = $('[data-rail]');
-  if (!rail) return;
+/* ---------- 首屏样张：标签从 pane 反查 ---------- */
+function renderSampleTabs() {
+  const mount = $('[data-rail]');
+  if (!mount) return;
   const panes = $$('.artifact__pane');
-  rail.innerHTML = '';
-  panes.forEach((pane, i) => {
+  mount.innerHTML = '';
+  panes.forEach((pane) => {
     const p = PROJECTS.find((x) => x.id === pane.dataset.mock);
     if (!p) return;
-    const row = el('button', 'rail__row ' + hueClass(p));
-    row.type = 'button';
-    row.setAttribute('role', 'tab');
-    row.dataset.mock = p.id;
-    row.dataset.status = p.status || 'live';
-    row.setAttribute('aria-selected', String(i === 0));
-    row.setAttribute('aria-label', p.name + '，切换到它在首屏运行');
-    row.appendChild(el('span', 'rail__dot'));
-    const mid = el('span', '');
-    mid.appendChild(el('span', 'rail__name', escapeHtml(p.name)));
-    mid.appendChild(el('span', 'rail__line', escapeHtml(p.tagline || '')));
-    mid.appendChild(el('span', 'rail__state', escapeHtml(STATE_TEXT[p.status || 'live'] || '')));
-    row.appendChild(mid);
-    row.appendChild(el('span', 'rail__proof', escapeHtml(p.proof || '')));
-    rail.appendChild(row);
+    const btn = el('button', 'sample__tab');
+    btn.type = 'button';
+    btn.setAttribute('role', 'tab');
+    btn.dataset.mock = p.id;
+    btn.dataset.status = p.status || 'live';
+    btn.setAttribute('aria-selected', String(pane.classList.contains('is-on')));
+    btn.setAttribute('aria-label', p.name + '，切换到它在首屏运行');
+    btn.appendChild(el('span', 'sample__dot'));
+    btn.appendChild(document.createTextNode(p.name));
+    mount.appendChild(btn);
   });
 }
 
@@ -89,7 +80,7 @@ function renderRail() {
 function bindStage() {
   const panes = $$('.artifact__pane');
   if (!panes.length) return;
-  const rows = $$('.rail__row');
+  const rows = $$('.sample__tab');
   const proof = $('[data-artifact-proof]');
   const videos = $$('[data-stage-video]');
 
@@ -97,13 +88,12 @@ function bindStage() {
     videos.forEach((v) => {
       const pane = v.closest('.artifact__pane');
       const active = pane && pane.dataset.mock === key;
-      if (active) {
+      if (active && !reduceMotion()) {
         const pr = v.play();
         if (pr && typeof pr.catch === 'function') pr.catch(() => {});
       } else {
         v.pause();
-        /* 元数据未载入时重置 currentTime 会中止正在进行的请求（表现为一条
-           假的 requestfailed）。等 readyState>0 再归零。 */
+        /* 元数据未载入时重置 currentTime 会中止正在进行的请求。 */
         if (v.readyState > 0) { try { v.currentTime = 0; } catch (_) { /* 不可 seek */ } }
       }
     });
@@ -117,59 +107,58 @@ function bindStage() {
       proof.innerHTML = '';
       if (p) {
         const u = safeUrl(p.proofUrl);
-        const label = p.proof ? p.name + ' · ' + p.proof : p.name;
+        const label = p.proof || p.name;
         if (u) {
           const a = linkEl(u, label, '');
           if (a) proof.appendChild(a); else proof.appendChild(document.createTextNode(label));
         } else {
           proof.appendChild(document.createTextNode(label));
         }
-        const st = el('span', '', ' — ' + (STATE_TEXT[p.status || 'live'] || ''));
-        proof.appendChild(st);
+        proof.appendChild(el('span', '', '（' + (STATE_TEXT[p.status || 'live'] || '') + '）'));
       }
     }
     syncVideo(key);
   };
 
   rows.forEach((r) => r.addEventListener('click', () => show(r.dataset.mock)));
-  /* 键盘：清单是 tablist，左右方向键要在行之间走 */
   rows.forEach((r, i) => r.addEventListener('keydown', (e) => {
     const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1
       : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
     if (!d) return;
     e.preventDefault();
     const next = rows[(i + d + rows.length) % rows.length];
-    next.focus(); show(next.dataset.mock);
+    next.focus();
+    show(next.dataset.mock);
   }));
 
+  const active = $('.artifact__pane.is-on');
   const first = rows[0];
-  if (first) show(first.dataset.mock);
+  if (first) show(active ? active.dataset.mock : first.dataset.mock);
 
   document.addEventListener('visibilitychange', () => {
-    const active = $('.artifact__pane.is-on');
-    if (!active) return;
-    syncVideo(document.hidden ? '' : active.dataset.mock);
+    const on = $('.artifact__pane.is-on');
+    if (!on) return;
+    syncVideo(document.hidden ? '' : on.dataset.mock);
   });
 }
 
 /* ---------- 面板零件 ---------- */
 function actionsEl(p) {
-  const box = el('div', 'links');
-  const canPreview = Boolean(p.entry && p.source);
-  if (canPreview) {
+  const box = el('div', 'actions');
+  if (p.entry && p.source) {
     const a = el('a', 'btn btn--solid');
     a.href = '#preview';
     a.dataset.preview = p.id;
     a.appendChild(document.createTextNode('在线预览'));
     box.appendChild(a);
   }
-  const live = linkEl(p.liveUrl, '打开站点', canPreview ? 'btn btn--line' : 'btn btn--solid');
+  const live = linkEl(p.liveUrl, '打开站点', p.entry && p.source ? 'btn btn--line' : 'btn btn--solid');
   if (live) box.appendChild(live);
   if (p.qr && p.qr.src) {
-    const q = el('button', 'note__qr');
+    const q = el('button', 'btn btn--line');
     q.type = 'button';
     q.dataset.qr = p.qr.src;
-    q.dataset.qrTitle = p.qr.title || (p.name + ' · 扫码');
+    q.dataset.qrTitle = p.qr.title || (p.name + ' 扫码');
     q.setAttribute('aria-label', (p.qr.title || p.name) + '，扫码打开');
     q.appendChild(document.createTextNode('扫码'));
     box.appendChild(q);
@@ -186,10 +175,41 @@ function linksEl(p) {
   return box.childElementCount ? box : null;
 }
 
-function tagsEl(p) {
-  const box = el('div', 'links');
-  (p.tags || []).slice(0, 3).forEach((t) => box.appendChild(el('span', 'badge badge--hue', escapeHtml(t))));
-  return box.childElementCount ? box : null;
+function versionsEl(p) {
+  if (!p.versions || !p.versions.length) return null;
+  const wrap = el('div', 'versions');
+  p.versions.forEach((v) => {
+    const slot = v.status === 'local';
+    const row = el('div', slot ? 'version version--slot' : 'version');
+    row.dataset.status = v.status || '';
+    const name = el('div', 'version__name');
+    name.appendChild(document.createTextNode(v.name));
+    name.appendChild(el('span', 'chip ' + (STATE_CLASS[v.status] || 'chip--collection'), STATE_TEXT[v.status] || v.status || ''));
+    row.appendChild(name);
+    row.appendChild(el('p', 'version__desc', escapeHtml(v.desc || '')));
+
+    const proof = el('div', 'version__proof');
+    const pu = safeUrl(v.proofUrl);
+    if (pu) {
+      const a = linkEl(pu, v.proof || v.name, '');
+      if (a) proof.appendChild(a); else proof.appendChild(document.createTextNode(v.proof || ''));
+    } else {
+      proof.appendChild(document.createTextNode(v.proof || ''));
+    }
+    row.appendChild(proof);
+
+    const state = el('div', 'version__state');
+    if (slot) {
+      state.appendChild(el('span', 'version__none', '槽位预留，暂无网页产物'));
+    } else {
+      const a = linkEl(v.url, v.status === 'collection' ? '在合集里打开' : '打开', 'version__link');
+      if (a) state.appendChild(a);
+      else state.appendChild(el('span', 'version__none', '暂无可打开的地址'));
+    }
+    row.appendChild(state);
+    wrap.appendChild(row);
+  });
+  return wrap;
 }
 
 function specEl(rows) {
@@ -206,12 +226,24 @@ function specEl(rows) {
   return wrap;
 }
 
+function readoutEl(rows) {
+  if (!rows || !rows.length) return null;
+  const wrap = el('div', 'readout');
+  rows.forEach((r) => {
+    const row = el('div', 'readout__row');
+    row.appendChild(el('span', 'readout__v', escapeHtml(r.value)));
+    row.appendChild(el('span', 'readout__k', escapeHtml(r.cap)));
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+
 function mediaEl(p) {
-  const box = el('div', p.layout === 'data' ? 'data__media' : 'split__media');
+  const fig = el('figure', 'media');
   if (p.demo) {
-    const v = el('video', '');
     const src = safeUrl(p.demo.src);
     if (!src) return null;
+    const v = el('video', '');
     v.src = src;
     const poster = safeUrl(p.demo.poster);
     if (poster) v.poster = poster;
@@ -219,8 +251,9 @@ function mediaEl(p) {
     v.preload = 'none';
     v.setAttribute('aria-label', p.name + ' 实机演示');
     v.dataset.demoVideo = '1';
-    box.appendChild(v);
-    return box;
+    fig.appendChild(v);
+    fig.appendChild(el('figcaption', '', escapeHtml(p.name + ' 实机演示，静音循环')));
+    return fig;
   }
   if (p.thumbnail) {
     const webp = safeUrl(p.thumbnail.replace(/\.png$/, '.webp'));
@@ -239,121 +272,77 @@ function mediaEl(p) {
     img.loading = 'lazy'; img.decoding = 'async';
     img.width = 960; img.height = 600;
     pic.appendChild(img);
-    box.appendChild(pic);
-    return box;
+    fig.appendChild(pic);
+    fig.appendChild(el('figcaption', '', escapeHtml(p.name + ' 界面样张')));
+    return fig;
   }
   return null;
 }
 
-function versionsEl(p) {
-  if (!p.versions || !p.versions.length) return null;
-  const wrap = el('div', 'versions');
-  p.versions.forEach((v) => {
-    const row = el('div', 'version');
-    row.appendChild(el('div', 'version__name', escapeHtml(v.name)));
-    row.appendChild(el('div', 'version__desc', escapeHtml(v.desc || '')));
-    const proof = el('div', 'version__proof');
-    const pu = safeUrl(v.proofUrl);
-    if (pu) {
-      const a = linkEl(pu, v.proof || v.name, '');
-      if (a) proof.appendChild(a);
-    } else {
-      proof.appendChild(document.createTextNode(v.proof || ''));
-    }
-    row.appendChild(proof);
-
-    const state = el('div', 'version__state');
-    const cls = v.status === 'live' ? 'state state--live' : v.status === 'local' ? 'state state--local' : 'state';
-    state.appendChild(el('span', cls, escapeHtml(STATE_TEXT[v.status] || v.status || '')));
-    /* 只有真有产物的形态才配链接；local 不给按钮 */
-    if (v.status !== 'local') {
-      const a = linkEl(v.url, v.status === 'collection' ? '在合集里打开' : '打开', 'version__link');
-      if (a) state.appendChild(a);
-      else state.appendChild(el('span', 'version__none', '暂无可打开的地址'));
-    } else {
-      state.appendChild(el('span', 'version__none', '无网页产物'));
-    }
-    row.appendChild(state);
-    wrap.appendChild(row);
-  });
-  return wrap;
-}
-
-function figuresEl(p) {
-  if (!p.figures || !p.figures.length) return null;
-  const wrap = el('div', 'data__figures');
-  p.figures.forEach((f) => {
-    const fig = el('div', 'data__fig');
-    fig.appendChild(el('span', 'num', escapeHtml(f.value)));
-    fig.appendChild(el('div', 'data__cap', escapeHtml(f.cap)));
-    wrap.appendChild(fig);
-  });
-  return wrap;
-}
-
-/* ---------- 版式分发 ---------- */
+/* ---------- 版式分发：每件作品按自己的证据类型排 ---------- */
 function caseEl(p) {
-  const a = el('article', 'case ' + hueClass(p));
+  const a = el('article', 'item');
   a.id = 'case-' + p.id;
+  a.dataset.status = p.status || 'live';
 
-  const h = el('h3', 'case__title');
-  h.appendChild(document.createTextNode(p.name));
-  if (p.kicker) h.appendChild(el('span', 'case__tag', escapeHtml(p.kicker)));
-  a.appendChild(h);
-  a.appendChild(el('p', 'case__lead', escapeHtml(p.lead || p.tagline || '')));
-  if (p.lead && p.tagline) a.appendChild(el('p', 'case__note', escapeHtml(p.tagline)));
+  const side = el('div', 'item__side');
+  const state = el('div', 'item__state');
+  state.appendChild(el('span', 'chip ' + (STATE_CLASS[p.status] || 'chip--collection'), STATE_TEXT[p.status] || ''));
+  side.appendChild(state);
+  side.appendChild(el('h3', 'item__name', escapeHtml(p.name)));
+  side.appendChild(el('p', 'item__tagline', escapeHtml(p.tagline || '')));
+
+  if (p.proof) {
+    const proof = el('p', 'item__proof');
+    const u = safeUrl(p.proofUrl);
+    const link = u ? linkEl(u, p.proof, '') : null;
+    if (link) proof.appendChild(link); else proof.appendChild(document.createTextNode(p.proof));
+    side.appendChild(proof);
+  }
+  a.appendChild(side);
+
+  const body = el('div', 'item__body');
+  body.appendChild(el('p', 'item__lead', escapeHtml(p.lead || p.tagline || '')));
 
   if (p.layout === 'versions') {
-    const v = versionsEl(p); if (v) a.appendChild(v);
-    const s = specEl(p.spec); if (s) a.appendChild(s);
+    const v = versionsEl(p); if (v) body.appendChild(v);
+    const s = specEl(p.spec); if (s) body.appendChild(s);
   } else if (p.layout === 'split') {
     const grid = el('div', 'split');
     const m = mediaEl(p); if (m) grid.appendChild(m);
-    const s = specEl(p.spec);
-    if (s) grid.appendChild(s); else {
-      const alt = el('div', '');
-      const t = tagsEl(p); if (t) alt.appendChild(t);
-      if (alt.childElementCount) grid.appendChild(alt);
-    }
-    if (grid.childElementCount) a.appendChild(grid);
+    const s = specEl(p.spec); if (s) grid.appendChild(s);
+    if (grid.childElementCount) body.appendChild(grid);
   } else if (p.layout === 'data') {
     const wrap = el('div', 'data');
-    const f = figuresEl(p); if (f) wrap.appendChild(f);
+    const f = readoutEl(p.figures); if (f) wrap.appendChild(f);
     const m = mediaEl(p); if (m) wrap.appendChild(m);
-    if (wrap.childElementCount) a.appendChild(wrap);
+    if (wrap.childElementCount) body.appendChild(wrap);
   }
 
-  const tags = tagsEl(p); if (tags) a.appendChild(tags);
-  const acts = actionsEl(p); if (acts.childElementCount) a.appendChild(acts);
-  const ls = linksEl(p); if (ls) a.appendChild(ls);
+  const acts = actionsEl(p); if (acts.childElementCount) body.appendChild(acts);
+  const ls = linksEl(p); if (ls) body.appendChild(ls);
+  a.appendChild(body);
   return a;
 }
 
 function noteEl(p) {
-  const n = el('article', 'note ' + hueClass(p));
-  n.appendChild(el('h3', '', escapeHtml(p.name)));
-  n.appendChild(el('p', '', escapeHtml(p.tagline || p.lead || '')));
-  const ls = linksEl(p); if (ls) n.appendChild(ls);
-  /* note 不给实心大按钮：过程资料不抢作品的排面，只给文字级入口 */
-  const row = el('div', 'links');
-  if (p.entry && p.source) {
-    const a = el('a', '');
-    a.href = '#preview'; a.dataset.preview = p.id;
-    a.appendChild(document.createTextNode('在线预览'));
-    row.appendChild(a);
+  const n = el('article', 'note');
+  const side = el('div', 'note__side');
+  side.appendChild(el('h3', '', escapeHtml(p.name)));
+  if (p.proof) {
+    const proof = el('p', '');
+    const u = safeUrl(p.proofUrl);
+    const link = u ? linkEl(u, p.proof, '') : null;
+    if (link) proof.appendChild(link); else proof.appendChild(document.createTextNode(p.proof));
+    side.appendChild(proof);
   }
-  const live = linkEl(p.liveUrl, '打开站点', '');
-  if (live) row.appendChild(live);
-  if (p.qr && p.qr.src) {
-    const q = el('button', 'note__qr');
-    q.type = 'button';
-    q.dataset.qr = p.qr.src;
-    q.dataset.qrTitle = p.qr.title || (p.name + ' · 扫码');
-    q.setAttribute('aria-label', (p.qr.title || p.name) + '，扫码打开');
-    q.appendChild(document.createTextNode('扫码'));
-    row.appendChild(q);
-  }
-  if (row.childElementCount) n.appendChild(row);
+  n.appendChild(side);
+
+  const body = el('div', 'note__body');
+  body.appendChild(el('p', '', escapeHtml(p.tagline || p.lead || '')));
+  const acts = actionsEl(p); if (acts.childElementCount) body.appendChild(acts);
+  const ls = linksEl(p); if (ls) body.appendChild(ls);
+  n.appendChild(body);
   return n;
 }
 
@@ -367,8 +356,8 @@ function renderCases() {
 
   if (works) {
     works.innerHTML = '';
-    const full = ordered.filter((p) => p.group !== 'process' && p.layout !== 'note');
-    full.forEach((p) => works.appendChild(caseEl(p)));
+    ordered.filter((p) => p.group !== 'process' && p.layout !== 'note')
+      .forEach((p) => works.appendChild(caseEl(p)));
     const notes = ordered.filter((p) => p.group !== 'process' && p.layout === 'note');
     if (notes.length) {
       const wrap = el('div', 'notes');
@@ -381,10 +370,37 @@ function renderCases() {
     proc.className = 'notes';
     ordered.filter((p) => p.group === 'process').forEach((p) => proc.appendChild(noteEl(p)));
   }
+}
 
-  /* 「可玩网页游戏」由 countsAsGame 实时算，不手写 */
-  const gameCount = PROJECTS.filter((p) => p.group === 'play' && p.countsAsGame).length;
-  $$('[data-count="games"]').forEach((n) => setText(n, String(gameCount)));
+/* ---------- 核对记录与验收章：数字全部从数据算 ---------- */
+function renderRecord() {
+  const mount = $('[data-record]');
+  const full = PROJECTS.filter((p) => p.group !== 'process' && p.layout !== 'note');
+  const live = full.filter((p) => (p.status || 'live') === 'live').length;
+  const games = PROJECTS.filter((p) => p.group === 'play' && p.countsAsGame).length;
+  const slots = PROJECTS.reduce((n, p) => n + (p.versions || []).filter((v) => v.status === 'local').length, 0);
+
+  $$('[data-count="live"]').forEach((n) => setText(n, String(live)));
+  $$('[data-count="pending"]').forEach((n) => setText(n, String(slots)));
+
+  if (!mount) return;
+  mount.innerHTML = '';
+  const rows = [
+    { v: live, k: '在线作品', label: '本页检验项', url: '#work' },
+    { v: games, k: '可玩网页游戏', label: '各自独立域名', url: '#work' },
+    { v: slots, k: '预留槽位', label: '返航录 3D 版', url: '#case-returnlog' },
+    { v: 0, k: '运行时外部依赖', label: '本站源码', url: 'https://github.com/hxj-2888/portfolio' },
+  ];
+  rows.forEach((r) => {
+    const row = el('div', 'readout__row');
+    row.appendChild(el('span', 'readout__v', String(r.v)));
+    const k = el('span', 'readout__k');
+    k.appendChild(document.createTextNode(r.k + ' '));
+    const a = linkEl(r.url, r.label, '');
+    if (a) k.appendChild(a);
+    row.appendChild(k);
+    mount.appendChild(row);
+  });
 }
 
 /* ---------- 预览弹窗 ---------- */
@@ -478,35 +494,6 @@ function bindNav() {
   sections.forEach((s) => io.observe(s));
 }
 
-/* ---------- 数字递增（只在进视口时跑一次；reduced-motion 直接给终值） ---------- */
-function countUp(node, to) {
-  if (reduceMotion() || to < 2) { setText(node, to.toLocaleString('en-US')); return; }
-  const t0 = performance.now(), dur = 1100;
-  const step = (t) => {
-    const p = Math.min(1, (t - t0) / dur);
-    setText(node, Math.round(to * (1 - Math.pow(1 - p, 3))).toLocaleString('en-US'));
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
-function bindCounters() {
-  const counters = $$('[data-to]');
-  if (!counters.length) return;
-  if (!('IntersectionObserver' in window) || reduceMotion()) {
-    counters.forEach((n) => countUp(n, Number(n.dataset.to)));
-    return;
-  }
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting || entry.target.dataset.counted === '1') return;
-      entry.target.dataset.counted = '1';
-      countUp(entry.target, Number(entry.target.dataset.to));
-      io.unobserve(entry.target);
-    });
-  }, { threshold: 0.4 });
-  counters.forEach((n) => io.observe(n));
-}
-
 /* ---------- 面板里的演示视频：进视口才播，离开即停 ---------- */
 function bindDemoVideos() {
   const vids = $$('video[data-demo-video]');
@@ -516,29 +503,65 @@ function bindDemoVideos() {
     const p = v.play();
     if (p && typeof p.catch === 'function') p.catch(() => {});
   };
-  if (!('IntersectionObserver' in window) || reduceMotion()) { vids.forEach(play); return; }
+  if (reduceMotion()) return;
+  if (!('IntersectionObserver' in window)) { vids.forEach(play); return; }
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => { e.isIntersecting ? play(e.target) : e.target.pause(); });
   }, { threshold: 0.35 });
   vids.forEach((v) => io.observe(v));
 }
 
-/* ---------- 启动 ---------- */
-bindStage();
-bindNav();
-fetch('projects.json', { cache: 'no-cache' })
-  .then((r) => { if (!r.ok) throw new Error('projects.json ' + r.status); return r.json(); })
-  .then((data) => {
-    PROJECTS = (data.projects || []).slice().sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
-    renderRail();
-    renderCases();
-    bindStage();
-    bindDemoVideos();
-    bindCounters();
-  })
-  .catch((err) => {
-    console.error('[site] 项目数据加载失败：', err);
-    const mount = $('[data-cases]:not([data-cases="process"])');
-    if (mount) mount.appendChild(el('p', 'case__note', '项目数据加载失败，请刷新重试。'));
-    bindCounters();
+/* ---------- 数据加载：内联优先，fetch 只兜底 ---------- */
+function applyData(data) {
+  PROJECTS = (data.projects || []).slice().sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+  renderSampleTabs();
+  renderCases();
+  renderRecord();
+  bindStage();
+  bindDemoVideos();
+}
+
+function readInlineData() {
+  const node = document.getElementById('projects-data');
+  if (!node) return null;
+  try {
+    return JSON.parse(node.textContent);
+  } catch (err) {
+    console.warn('[site] projects-data 内联块解析失败', err);
+    return null;
+  }
+}
+
+function fetchProjects() {
+  return fetch('projects.json', { cache: 'no-cache' }).then((r) => {
+    if (!r.ok) throw new Error('projects.json ' + r.status);
+    return r.json();
   });
+}
+
+function fetchWithRetry(attempts = 2) {
+  return fetchProjects().catch((err) => {
+    if (attempts <= 1) throw err;
+    return new Promise((resolve) => setTimeout(resolve, 600)).then(() => fetchWithRetry(attempts - 1));
+  });
+}
+
+function showDataError(err) {
+  console.error('[site] 作品数据加载失败：', err);
+  const mount = $('[data-cases]:not([data-cases="process"])');
+  if (!mount) return;
+  mount.innerHTML = '';
+  const p = el('p', 'data-error');
+  p.appendChild(document.createTextNode('作品数据没有加载出来。检查网络后重试。'));
+  const b = el('button');
+  b.type = 'button';
+  b.appendChild(document.createTextNode('重新加载'));
+  b.addEventListener('click', () => location.reload());
+  p.appendChild(b);
+  mount.appendChild(p);
+}
+
+bindNav();
+const inlineData = readInlineData();
+if (inlineData) applyData(inlineData);
+else fetchWithRetry(2).then(applyData).catch(showDataError);

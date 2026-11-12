@@ -1,18 +1,18 @@
 # 审计 2026-08-30：补安全响应头（此前缺失）
 # 2026-10-25 收紧 script-src / style-src：首页重构后已无内联 onclick、无内联 style。
-#
-# ⚠ CSP 写成两行（同一条指令写两次）——这是刻意的，不要合并：
-#   内嵌项目副本（projects/*）仍是各游戏仓库的产物，含内联 <script> 与大量内联 style；
-#   而 Cloudflare Pages 的「路径递减规则」在实测中没有生效（/projects/ 下仍收到根的严格
-#   CSP，游戏页会白屏）。改成同名头多值后：HTTP 允许多个同名响应头，CSP 按规范取**交集**，
-#   浏览器执行的是更宽松的那条（'self' 是 'unsafe-inline' 的子集），于是：
-#     · 首页与静态资源 → 命中严格那条；
-#     · projects/ 下的内嵌副本 → 命中宽松那条，内联脚本照常运行。
+# 2026-11-12 修正 CSP 分层：
+#   Pages 的 _headers 规则是「继承 + 合并」：同名头会以逗号拼接。CSP 规范把
+#   逗号分隔的每条策略都当作独立策略执行（取交集），所以旧版「根严格 + 同名宽松
+#   两行」实际只会执行严格那条，/projects/* 的内联脚本/样式全被拦（2026-11-12 实测）。
+#   现改为：
+#     /*          严格策略，给首页与静态资源；
+#     /projects/* 先用 "! Content-Security-Policy" 删掉继承的严格策略，
+#                 再设置一条允许内联的宽松策略。
 #   改这里前先跑 node tools/check-headers.cjs。
 #
 # 说明：
 #   - 「项目预览」用同源 iframe 加载 projects/*，故 X-Frame-Options 用 SAMEORIGIN
-#    （允许自家嵌入、阻止跨站），frame-ancestors 用 'self'。
+#     （允许自家嵌入、阻止跨站），frame-ancestors 用 'self'。
 #   - 预览页（内嵌三角洲）需访问同源 /api 与 wss 联机，connect-src 放行 ws:/wss:。
 /*
   X-Frame-Options: SAMEORIGIN
@@ -20,4 +20,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+
+# 内嵌项目副本仍是各游戏仓库的产物，含内联 <script> 与内联 style。
+# 先删掉从 /* 继承的严格 CSP，再给一条与游戏页兼容的策略。
+/projects/*
+  ! Content-Security-Policy
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' ws: wss: https:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'

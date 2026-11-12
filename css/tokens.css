@@ -1,101 +1,75 @@
 /* ============================================================
-   tokens.css — 全局设计 token（作品集首页 / 合集 / 各项目共用）
+   tokens.css — 检验单版设计 token（2026-11-12 重做）
 
-   2026-11-09 重做（redesign/frontend-design 分支）。
-   设计对象不是「一个好看的开发者主页」，而是「一个声称每个数字都能
-   点开的人」。所以 token 的分工是：**中性底，色彩只属于作品**。
-   上一版把单一全局强调色刷在所有层级上，于是三款完全不同的软件看起来
-   像同一个 SaaS 模板的三个截图。
+   这一版的设计对象：一张能核对的「作品检验单」。
+   纸是浅灰白，字是近黑，唯一的重音是朱红验收章；
+   不再给每个作品分配一块颜色，也不在任何色块上压正文。
 
-   两条约束来自站点自己声称的内容，不是外加的偏好：
-     1. 「0 外部依赖运行时」→ 不引字体 CDN、不引框架、不加构建步骤。
-        中文的性格只能靠字重 / 字号 / 字距表达。
-     2. CSP 首页是 script-src 'self'; style-src 'self' → 无内联样式、
-        无内联脚本，本文件是颜色与排版的唯一出处（改前跑 check:headers）。
+   两条硬约束没有变：
+     1. 0 外部依赖运行时 → 不引字体 CDN、不引框架。
+     2. 首页 CSP 是 script-src 'self'; style-src 'self' → 无内联样式/脚本，
+        颜色与排版的唯一出处是本文件。
 
-   下方对比度全部实测（WCAG 2.1 相对亮度公式），不是估算。
+   对比度全部按 WCAG 2.1 相对亮度公式实测（数字写在值后面），
+   正文 ≥ 7:1；朱红/松绿只用于小面积标记与印章，均 ≥ 6:1。
    ============================================================ */
 
 :root{
-  /* ---------- 底色：中性，不参与品牌表达 ---------- */
-  --paper:#F2F4F7;      /* 页面底。刻意避开暖米色 #F4F1EA —— 生成页的常见胎记 */
-  --surface:#FFFFFF;    /* 只给「正在运行的产物」：让它像被观察的对象，而不是又一张卡 */
-  --ink:#10161E;        /* 蓝黑：核对清单与收尾条。paper 在其上 16.49:1 */
-  --ink-soft:#1C242F;   /* 清单内次级面。paper 在其上 14.19:1 */
-  --rule:#D4DAE3;       /* 分隔线只在信息真分段处出现，不做装饰性细线 */
-  --rule-strong:#AEB8C6;
-  --on-ink:#C6CFDB;     /* --ink 面上 11.55:1 */
-  --on-ink-soft:#B9C3D0;/* --ink-soft 面上 8.77:1 */
+  /* ---------- 纸与墨 ---------- */
+  --paper:#F3F5F6;        /* 页面底：冷灰纸，避开暖米色胎记 */
+  --surface:#FFFFFF;      /* 样张/弹窗内页，只给「被观察的对象」 */
+  --ink:#0F1418;          /* 纸面 16.94:1 · 白面 18.53:1 */
+  --muted:#47535E;        /* 纸面 7.20:1 —— 正文级次要文字 */
+  --muted-2:#5B6772;      /* 纸面 5.29:1 —— 小字号说明，不下探到正文 */
+  --rule:#CBD2D8;         /* 分隔线，只在信息真分段处出现 */
+  --rule-strong:#A9B3BC;
 
-  /* ---------- 文本 ---------- */
-  --text:#10161E;       /* /paper 16.49:1 */
-  --muted:#4E5A69;      /* /paper 6.37:1 —— 正文级次要文字 */
-  --muted-2:#5F6B7A;    /* /paper 4.92:1 —— 次级说明，不下探到小字号正文 */
+  /* ---------- 唯一重音：验收朱红 ---------- */
+  --seal:#A33A2A;         /* 纸面 6.01:1 · 白字在其上 6.57:1 */
+  --seal-hover:#8A2E21;
+  --on-seal:#FFFFFF;
 
-  /* ---------- 唯一 UI 强调色：保留上一版的推导结论 ---------- */
-  /* 上一版把 #F5A524 换成 #8A5A00，因为琥珀在白底只有 1.7:1。
-     这个值有据可依，不因改版丢弃——换掉等于把无障碍的账重新欠一遍。 */
-  --accent:#8A5A00;      /* /paper 5.38:1 · /surface 5.93:1 */
-  --accent-hover:#6E4800;
-  --accent-soft:#F6EEDD; /* --accent 在其上 5.13:1 */
-  --accent-ink:#FFFFFF;  /* /--accent 5.93:1 */
+  /* ---------- 语义色：只表示「已核对 / 在线」 ---------- */
+  --ok:#0B5C40;           /* 纸面 7.33:1 · 白字在其上 8.02:1 */
 
-  /* ---------- 语义色：只表示「已核对 / 线上可达」，禁止当装饰 ---------- */
-  --verified:#0A6A4A;    /* /paper 6.01:1 */
-
-  /* ---------- 作品色：只在该作品自己的面板内出现 ---------- */
-  --work-return:#1D4ED8;   /* 返航录 · /paper 6.08:1 · 白字在其上 6.70:1 */
-  --work-pingpong:#0F766E; /* 乒乓对决 · /paper 4.97:1 · 白字在其上 5.47:1 */
-  --work-delta:#C2410C;    /* 落幕查 · /paper 4.70:1 · 白字在其上 5.18:1 */
-  --work-terminal:#5B21B6; /* 实盘终端 · /paper 8.15:1 · 白字在其上 8.98:1 */
-  --work-fg:#FFFFFF;
-
-  /* ---------- 圆角：按层级分三档，不再「所有东西都 16px」 ----------
-     面板 4px（工具感）· 控件 2px（干脆）· 只有「产物外框」10px，因为它
-     模拟一个窗口。统一圆角是 SaaS 卡片 kit 的主要破绽。 */
-  --r-panel:4px;
+  /* ---------- 圆角：文件类界面用直角，控件只留 2px ---------- */
   --r-control:2px;
-  --r-frame:10px;
+  --r-frame:4px;          /* 只有样张外框，像一张放进去的图 */
 
   /* ---------- 间距 ---------- */
   --sp-1:8px;  --sp-2:16px; --sp-3:24px;
-  --sp-4:40px; --sp-5:64px; --sp-6:96px;
+  --sp-4:40px; --sp-5:64px; --sp-6:88px;
 
   /* ---------- 字号 ---------- */
-  --fs-xs:13px; --fs-sm:15px; --fs-base:17px;
-  --fs-lg:21px; --fs-xl:27px;
-  --fs-h1:clamp(38px,5.4vw,74px);
-  --fs-h2:clamp(26px,3vw,40px);
-  --fs-h3:clamp(20px,2.2vw,28px);
-  --fs-rail:14px;
-  --fs-num:clamp(30px,3.2vw,44px);
+  --fs-xs:13px; --fs-sm:14px; --fs-base:16.5px;
+  --fs-lg:20px; --fs-xl:26px;
+  --fs-h1:clamp(34px,4.4vw,60px);
+  --fs-h2:clamp(24px,2.6vw,34px);
+  --fs-h3:clamp(20px,1.8vw,24px);
+  --fs-num:clamp(18px,1.6vw,22px);
+  --lh-body:1.75;
+  --lh-tight:1.15;
+  --measure:66ch;
 
-  --lh-body:1.72;
-  --lh-tight:1.1;
-  --measure:66ch;   /* 行宽上限，中文约 66 字，低于 80 字符线 */
-
-  /* ---------- 字体：全部本地可得，零下载 ---------- */
-  --font-ui:"HarmonyOS Sans SC","MiSans","PingFang SC","Microsoft YaHei","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  /* 等宽只承载「可核对字符串」：指纹 / 版本号 / 条款号 / 局数。
-     不做终端风装扮，不做装饰性小标签 —— 那是生成页另一个胎记。 */
+  /* ---------- 字体：全部本地可得 ----------
+     宋体只承担「检验单标题 / 作品名」这一层，黑体承担正文与控件；
+     等宽只给真正的数据串（版本号、读数、条款号），不做装饰小标签。 */
+  --font-display:"Songti SC","Songti TC","STSong","SimSun","宋体","Noto Serif CJK SC","Source Han Serif SC",serif;
+  --font-ui:"HarmonyOS Sans SC","MiSans","PingFang SC","Microsoft YaHei","微软雅黑","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --font-num:"JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
 
   /* ---------- 布局 ---------- */
-  --w-max:1240px;
-  --w-rail:296px;
-  --h-nav:60px;
+  --w-max:1200px;
+  --w-side:220px;         /* 检验单左侧「版心边栏」 */
+  --h-nav:56px;
 
-  /* 阴影只花在「产物外框」这一处；卡片不每人发一个软灰阴影 */
-  --shadow-frame:0 18px 48px rgba(16,22,30,.16);
-
-  --dur:.2s;
-  --dur-load:.65s;
+  --shadow-frame:0 12px 32px rgba(15,20,24,.14);
+  --focus:0 0 0 2px var(--paper),0 0 0 4px var(--seal);
+  --dur:.18s;
   --ease:cubic-bezier(.2,.7,.3,1);
-  --focus:0 0 0 2px var(--paper),0 0 0 4px var(--accent);
 }
 
-/* 减弱动效：只在这一处关掉。首屏那一次编排也一并取消，不留残余 */
 @media (prefers-reduced-motion: reduce){
-  :root{ --dur:0s; --dur-load:0s; }
+  :root{ --dur:0s; }
   *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
 }
