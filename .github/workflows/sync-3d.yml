@@ -1,0 +1,81 @@
+# ===== GitHub Actions — 作品集 3D 版本卡自动同步 =====
+#
+# 做什么：从 returnlog 的 3d 副分支读 3D 版事实（version.json + gameplay-parity.json），
+#   只更新 projects.json 里「3D 版」那一条的 proof / proofUrl / desc，提交后唤起 deploy.yml。
+#
+# 为什么放在作品集仓、而不是 returnlog：
+#   - 两个仓都是 public，跨仓**读取**用默认 token 即可（沿用 sync-attachment.yml 的结论）；
+#   - GitHub 的 GITHUB_TOKEN 只能写本仓，而这次要改的是本仓的 projects.json；
+#   - 反向（returnlog 推送即联动）需要在本仓放一个可写 PAT，按既有裁决不取，
+#     所以用定时轮询 + 手动触发，最多延迟一个周期。
+#
+# 为什么提交后要显式唤起 deploy.yml：
+#   GITHUB_TOKEN 推送产生的 commit 不会触发其它 workflow（GitHub 的防递归机制），
+#   必须 gh workflow run 显式唤起，否则作品集不会重新部署。
+#
+# 机器人提交用 sync( 前缀：docs-gate 的 ②新鲜度 / ③推送联动 按 AGENTS.md §2.5 放行。
+
+name: sync-3d
+
+on:
+  schedule:
+    # 每天 03:17 UTC（北京时间 11:17，避开整点与其它项目）
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: sync-3d
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # 提交 projects.json
+  actions: write    # 显式唤起 deploy.yml
+
+jobs:
+  sync:
+    name: Sync 3D card
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout portfolio
+        uses: actions/checkout@v7
+
+      - name: Checkout returnlog@3d (public, default token)
+        uses: actions/checkout@v7
+        with:
+          repository: hxj-2888/returnlog
+          ref: 3d
+          path: upstream-3d
+          sparse-checkout: |
+            3d/version.json
+            3d/spec/gameplay-parity.json
+          sparse-checkout-cone-mode: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 20
+
+      - name: Update 3D version card
+        run: node tools/sync-3d-card.js --source upstream-3d
+
+      - name: Commit if changed
+        id: commit
+        run: |
+          if git diff --quiet -- projects.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::3D 版本卡无变化，跳过提交与部署"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add projects.json
+          git commit -m "sync(3d): 自动更新作品集 3D 版本卡（proof/链接取自 returnlog@3d）"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger deploy.yml
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run deploy.yml --ref main
