@@ -19,6 +19,7 @@
 - `node tools/check-copy.cjs`：4 文件 6 规则 0 命中
 - CDP 1440 / 390 / 320：`scrollWidth == viewport`，4 个条目、1 个 3D 槽位、
   2 个视频 `readyState=4`、过渡式表单截图 `naturalWidth=1280`
+- 线上合集页：4 条目 / 1 槽位 / 2 视频可播 / 图片 1280×800；预览 iframe 无横向滚动
 
 ### 未做
 - 3D 版可玩 Demo 由另一条工作流接入；本页只留槽位
