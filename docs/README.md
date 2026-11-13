@@ -1,6 +1,6 @@
 # 交接入口
 
-> 最新交接文档：[`docs/交接文档.md`](交接文档.md)（2026-11-13 · HEAD `f36dbdf`）
+> 最新交接文档：[`docs/交接文档.md`](交接文档.md)（2026-11-13 · HEAD `a208ca7`）
 
 本仓库的文档分三类，**别混着看**：
 
@@ -55,7 +55,7 @@ npx serve . -p 3000   # 本地预览
 
 | 命令 | 检查 | 触发点 |
 |---|---|---|
-| `check:docs` | 记录日期 ≥ 最近提交、`修改记录.md` 指向最新一篇、交接文档 HEAD 跟得上 | pre-push hook + CI |
+| `check:docs` | 记录日期 ≥ 最近提交、`修改记录.md` 指向**最新日期**的记录（同日可并列）、交接文档 HEAD 跟得上 | pre-push hook + CI |
 | `check:facts` | 文档里的项目条数、规则读数、collect 读数、索引表 == 代码实值 | pre-push hook + CI（`--full` 实跑） |
 | `check:push` | 本次 commit range 改了实质文件，是否带新记录 + 索引刷新 | pre-push hook + CI |
 

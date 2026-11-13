@@ -58,7 +58,9 @@ for (const month of fs.existsSync(CHANGELOG_DIR) ? fs.readdirSync(CHANGELOG_DIR)
 if (!records.length) {
   fail('docs/变更记录/ 下没有任何 YYYY-MM-DD_主题.md 记录');
 }
-// 同一天有多条记录时，以「最后写入的那篇」为最新，不靠文件名字典序碰运气
+// 同一天可能有多条记录；mtime 排序只用于展示。
+// 门禁只要求「修改记录」指向日期等于最新日期的一条记录——同日顺序不唯一，
+// 且 CI checkout 会让所有 mtime 相同，不能靠字典序决定“最新”。
 records.sort((a, b) => (a.date === b.date ? (a.mtime - b.mtime || a.rel.localeCompare(b.rel)) : a.date.localeCompare(b.date)));
 const latest = records[records.length - 1];
 
@@ -104,15 +106,20 @@ if (!fs.existsSync(INDEX_MD)) {
     const target = path.resolve(path.dirname(INDEX_MD), link);
     if (!fs.existsSync(target)) {
       fail(`修改记录.md 指向的记录文件不存在：${link}`);
-    } else if (!latest || target !== path.resolve(latest.file)) {
-      fail(
-        `修改记录.md 指向的是 ${link}，但最新一篇是 ${latest ? latest.rel : '(无)'}\n` +
-        `      → 把「最新一条」和「最近变更」表的第一行改成最新那篇`
-      );
-    } else if (date !== latest.date) {
-      fail(`修改记录.md「最新一条」的日期 ${date} 与文件名日期 ${latest.date} 不一致`);
     } else {
-      ok(`修改记录.md → ${latest.rel}（${date} · ${topic}）`);
+      const targetRecord = records.find((r) => path.resolve(r.file) === target);
+      if (!targetRecord) {
+        fail(`修改记录.md 指向的文件不在变更记录列表里：${link}`);
+      } else if (latest && targetRecord.date !== latest.date) {
+        fail(
+          `修改记录.md 指向 ${link}（${targetRecord.date}），但最新记录日期是 ${latest.date}\n` +
+          `      → 同一天可指向任一记录；跨天必须指向最新一天`
+        );
+      } else if (date !== targetRecord.date) {
+        fail(`修改记录.md「最新一条」的日期 ${date} 与文件名日期 ${targetRecord.date} 不一致`);
+      } else {
+        ok(`修改记录.md → ${targetRecord.rel}（${date} · ${topic}）`);
+      }
     }
   }
 }
