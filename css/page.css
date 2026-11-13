@@ -113,45 +113,33 @@ section,.item,.note{ scroll-margin-top:calc(var(--h-nav) + 12px); }
   color:var(--muted); max-width:var(--measure);
 }
 
-/* ---------- 多形态：返航录 ---------- */
-.versions{ margin-top:var(--sp-3); border-top:1px solid var(--rule); }
-.version{
-  display:grid;
-  grid-template-columns:minmax(150px,.8fr) minmax(0,1.8fr) auto;
-  grid-template-areas:"name desc state" "proof desc state";
-  gap:6px 20px;
-  padding:16px 0; border-bottom:1px solid var(--rule);
-  align-items:start;
+/* ---------- 2.5D / 3D 拆成独立作品后的补充 ---------- */
+.item__body > .media{ margin-top:var(--sp-3); }
+.item__alt{
+  margin-top:var(--sp-2); font-size:var(--fs-sm); color:var(--muted);
 }
-.version__name{
-  grid-area:name; display:flex; align-items:center; gap:10px;
-  font-weight:700; font-size:var(--fs-base);
-}
-.version__desc{ grid-area:desc; font-size:var(--fs-sm); color:var(--muted); }
-.version__proof{
-  grid-area:proof; font-family:var(--font-num);
-  font-size:var(--fs-xs); color:var(--muted);
-}
-.version__state{
-  grid-area:state; display:flex; align-items:center; gap:10px;
-  white-space:nowrap;
-}
-.version__link{ font-size:var(--fs-sm); font-weight:600; }
-.version__none{ font-size:var(--fs-sm); color:var(--muted-2); }
+.item__alt a{ font-weight:600; }
 
-/* 3D 槽位：虚线框是整页唯一的「空位」，明确表示还没有网页产物。
-   这是数据驱动的：projects.json 里该形态 status=local 时自动渲染为槽位，
-   另一条工作流只要把 status 改成 live 并补 url，就会变成普通形态行。 */
-.version--slot{
-  margin-top:12px;
-  padding:16px;
+/* 3D Demo 档位：整宽、加深，和落幕查的媒体区同一量级。
+   数据仍来自 projects.json 的 3D 形态 status=local；另一条工作流
+   改成 live 并补 url 后，把 demoSlotEl 换成 mediaEl 即可。 */
+.demo-slot{
+  margin:var(--sp-3) 0 0;
+  width:100%;
+  min-height:clamp(320px,40vw,500px);
   border:1px dashed var(--seal);
   border-radius:var(--r-control);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  padding:var(--sp-3); text-align:center;
 }
-.version--slot .version__name{ color:var(--seal); }
-.version--slot .version__desc{ color:var(--muted); }
-.version--slot .version__proof{ color:var(--seal); }
-.version--slot .version__state{ white-space:normal; }
+.demo-slot strong{
+  font-family:var(--font-display);
+  font-size:clamp(22px,2.4vw,30px); font-weight:700;
+  color:var(--seal);
+}
+.demo-slot span{ font-size:var(--fs-sm); color:var(--muted); }
+.demo-slot small{ font-size:var(--fs-xs); color:var(--muted-2); }
 
 /* ---------- 规格与读数 ---------- */
 .spec{ margin-top:var(--sp-3); border-top:1px solid var(--rule); }
@@ -320,12 +308,6 @@ section,.item,.note{ scroll-margin-top:calc(var(--h-nav) + 12px); }
   .item{ padding:var(--sp-3) 0 var(--sp-4); }
   .item__name{ margin-top:8px; }
   .item__tagline{ max-width:none; }
-  .version{
-    grid-template-columns:1fr;
-    grid-template-areas:"name" "desc" "proof" "state";
-    gap:6px; padding:14px 0;
-  }
-  .version__state{ flex-wrap:wrap; white-space:normal; }
   .readout__row{ grid-template-columns:1fr; gap:2px; }
   .note{ padding:var(--sp-3) 0; }
   .works__record{ grid-template-columns:1fr; gap:10px; }

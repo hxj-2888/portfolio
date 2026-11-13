@@ -137,3 +137,4 @@ GitHub 侧另有独立工作流 `docs-gate.yml`。**三道任一不过就是硬�
 4. **`projects/_headers` 不要再加回来**——它不会被合并进响应，看着像治好了其实没有；CSP 用的是根 `_headers` 里的 `/projects/*` 规则（先 `! Content-Security-Policy` 删除继承的严格策略，再设宽松策略）。
 5. **改 `projects.json` 后必须跑 `npm run data:inline`**——首页渲染用的是 `index.html` 里的内联 JSON 副本，不再依赖第二次 `fetch`；`check:inline` 会拦漂移。
 6. **合集页 `projects/game-collection/index.html` 是手写的**（不是 `games/` 同步产物）。返航录 3D 的 Demo 档位在 `3D_DEMO_SLOT` 注释处；接入时替换媒体块，不要改 `games/space-kill/`。
+7. **首页 returnlog 的 2.5D / 3D 由 `projects.json` 的 `versions` 生成两条独立检验项**：2.5D 整宽实机视频，3D 整宽虚线 Demo 槽；不要再塞回版本表，也不要为 3D 伪造视频/版本号。

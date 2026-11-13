@@ -175,41 +175,77 @@ function linksEl(p) {
   return box.childElementCount ? box : null;
 }
 
-function versionsEl(p) {
-  if (!p.versions || !p.versions.length) return null;
-  const wrap = el('div', 'versions');
-  p.versions.forEach((v) => {
-    const slot = v.status === 'local';
-    const row = el('div', slot ? 'version version--slot' : 'version');
-    row.dataset.status = v.status || '';
-    const name = el('div', 'version__name');
-    name.appendChild(document.createTextNode(v.name));
-    name.appendChild(el('span', 'chip ' + (STATE_CLASS[v.status] || 'chip--collection'), STATE_TEXT[v.status] || v.status || ''));
-    row.appendChild(name);
-    row.appendChild(el('p', 'version__desc', escapeHtml(v.desc || '')));
+function itemSide(status, name, tagline, proof, proofUrl) {
+  const side = el('div', 'item__side');
+  const state = el('div', 'item__state');
+  state.appendChild(el('span', 'chip ' + (STATE_CLASS[status] || 'chip--collection'), STATE_TEXT[status] || ''));
+  side.appendChild(state);
+  side.appendChild(el('h3', 'item__name', escapeHtml(name)));
+  side.appendChild(el('p', 'item__tagline', escapeHtml(tagline || '')));
+  if (proof) {
+    const p = el('p', 'item__proof');
+    const u = safeUrl(proofUrl);
+    const a = u ? linkEl(u, proof, '') : null;
+    if (a) p.appendChild(a); else p.appendChild(document.createTextNode(proof));
+    side.appendChild(p);
+  }
+  return side;
+}
 
-    const proof = el('div', 'version__proof');
-    const pu = safeUrl(v.proofUrl);
-    if (pu) {
-      const a = linkEl(pu, v.proof || v.name, '');
-      if (a) proof.appendChild(a); else proof.appendChild(document.createTextNode(v.proof || ''));
-    } else {
-      proof.appendChild(document.createTextNode(v.proof || ''));
-    }
-    row.appendChild(proof);
+/* 3D 的 Demo 档位：整宽、加深，和落幕查的媒体区同一量级 */
+function demoSlotEl() {
+  const fig = el('figure', 'demo-slot');
+  fig.setAttribute('aria-label', '返航录 3D 版 Demo 档位预留');
+  fig.appendChild(el('strong', '', 'Demo 档位预留'));
+  fig.appendChild(el('span', '', '3D 版 Web 导出后接入'));
+  fig.appendChild(el('small', '', 'Godot 垂直切片 · 暂无网页产物'));
+  return fig;
+}
 
-    const state = el('div', 'version__state');
-    if (slot) {
-      state.appendChild(el('span', 'version__none', '槽位预留，暂无网页产物'));
-    } else {
-      const a = linkEl(v.url, v.status === 'collection' ? '在合集里打开' : '打开', 'version__link');
-      if (a) state.appendChild(a);
-      else state.appendChild(el('span', 'version__none', '暂无可打开的地址'));
+/* returnlog 的 2.5D / 3D 从版本表拆成两条独立作品；
+   数据仍来自 projects.json 的 versions，不新增项目、不改 3D 数据。 */
+function featureItems(p) {
+  const versions = p.versions || [];
+  const v2d = versions.find((v) => v.name.includes('2.5D')) || versions[0];
+  const v3d = versions.find((v) => v.status === 'local');
+  const vAlt = versions.find((v) => v.status === 'collection');
+  const items = [];
+
+  if (v2d) {
+    const a = el('article', 'item');
+    a.id = 'case-returnlog';
+    a.dataset.status = 'live';
+    a.appendChild(itemSide('live', '新返航录 · 2.5D', p.tagline || '', v2d.proof || p.proof, v2d.proofUrl || p.proofUrl));
+    const body = el('div', 'item__body');
+    body.appendChild(el('p', 'item__lead', escapeHtml(p.lead || p.tagline || '')));
+    const m = mediaEl(p); if (m) body.appendChild(m);
+    const s = specEl(p.spec); if (s) body.appendChild(s);
+    const acts = actionsEl(p); if (acts.childElementCount) body.appendChild(acts);
+    const ls = linksEl(p); if (ls) body.appendChild(ls);
+    if (vAlt) {
+      const alt = el('p', 'item__alt');
+      alt.appendChild(document.createTextNode('过渡式表单版（' + (vAlt.proof || 'V1preview') + '）：'));
+      const altLink = linkEl(vAlt.url, '在合集里打开', '');
+      if (altLink) alt.appendChild(altLink);
+      body.appendChild(alt);
     }
-    row.appendChild(state);
-    wrap.appendChild(row);
-  });
-  return wrap;
+    a.appendChild(body);
+    items.push(a);
+  }
+
+  if (v3d) {
+    const a = el('article', 'item');
+    a.id = 'case-returnlog-3d';
+    a.dataset.status = 'local';
+    a.appendChild(itemSide('local', '新返航录 · 3D', '与 2.5D 共用规则口径，只搬数据与判定。', v3d.proof, v3d.proofUrl));
+    const body = el('div', 'item__body');
+    body.appendChild(el('p', 'item__lead', escapeHtml(v3d.desc || '')));
+    body.appendChild(demoSlotEl());
+    body.appendChild(el('p', 'item__note', 'Godot Web 导出后，这里会换成可玩的 3D Demo。'));
+    a.appendChild(body);
+    items.push(a);
+  }
+  return items;
 }
 
 function specEl(rows) {
@@ -284,30 +320,12 @@ function caseEl(p) {
   const a = el('article', 'item');
   a.id = 'case-' + p.id;
   a.dataset.status = p.status || 'live';
-
-  const side = el('div', 'item__side');
-  const state = el('div', 'item__state');
-  state.appendChild(el('span', 'chip ' + (STATE_CLASS[p.status] || 'chip--collection'), STATE_TEXT[p.status] || ''));
-  side.appendChild(state);
-  side.appendChild(el('h3', 'item__name', escapeHtml(p.name)));
-  side.appendChild(el('p', 'item__tagline', escapeHtml(p.tagline || '')));
-
-  if (p.proof) {
-    const proof = el('p', 'item__proof');
-    const u = safeUrl(p.proofUrl);
-    const link = u ? linkEl(u, p.proof, '') : null;
-    if (link) proof.appendChild(link); else proof.appendChild(document.createTextNode(p.proof));
-    side.appendChild(proof);
-  }
-  a.appendChild(side);
+  a.appendChild(itemSide(p.status || 'live', p.name, p.tagline || '', p.proof, p.proofUrl));
 
   const body = el('div', 'item__body');
   body.appendChild(el('p', 'item__lead', escapeHtml(p.lead || p.tagline || '')));
 
-  if (p.layout === 'versions') {
-    const v = versionsEl(p); if (v) body.appendChild(v);
-    const s = specEl(p.spec); if (s) body.appendChild(s);
-  } else if (p.layout === 'split') {
+  if (p.layout === 'split') {
     const grid = el('div', 'split');
     const m = mediaEl(p); if (m) grid.appendChild(m);
     const s = specEl(p.spec); if (s) grid.appendChild(s);
@@ -357,7 +375,13 @@ function renderCases() {
   if (works) {
     works.innerHTML = '';
     ordered.filter((p) => p.group !== 'process' && p.layout !== 'note')
-      .forEach((p) => works.appendChild(caseEl(p)));
+      .forEach((p) => {
+        if (p.layout === 'versions') {
+          featureItems(p).forEach((item) => works.appendChild(item));
+        } else {
+          works.appendChild(caseEl(p));
+        }
+      });
     const notes = ordered.filter((p) => p.group !== 'process' && p.layout === 'note');
     if (notes.length) {
       const wrap = el('div', 'notes');
@@ -388,7 +412,7 @@ function renderRecord() {
   const rows = [
     { v: live, k: '在线作品', label: '本页检验项', url: '#work' },
     { v: games, k: '可玩网页游戏', label: '各自独立域名', url: '#work' },
-    { v: slots, k: '预留槽位', label: '返航录 3D 版', url: '#case-returnlog' },
+    { v: slots, k: '预留槽位', label: '返航录 3D 版', url: '#case-returnlog-3d' },
     { v: 0, k: '运行时外部依赖', label: '本站源码', url: 'https://github.com/hxj-2888/portfolio' },
   ];
   rows.forEach((r) => {
