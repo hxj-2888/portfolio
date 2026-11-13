@@ -29,10 +29,10 @@
       "hue": "none",
       "layout": "note",
       "status": "live",
-      "proof": "2 个游戏",
+      "proof": "2 个游戏 · 4 个形态",
       "proofUrl": "projects/game-collection/index.html",
       "name": "游戏合集",
-      "tagline": "乒乓对决与返航录的统一入口，各自独立运行。",
+      "tagline": "乒乓对决与返航录的统一入口，含 2.5D / 3D Demo 档位。",
       "tags": ["合集", "多端", "PWA"],
       "thumbnail": "assets/projects/game-collection.png",
       "entry": "index.html",
@@ -41,7 +41,7 @@
       "liveUrl": "https://ping-pong-duel.pages.dev",
       "links": [
         { "label": "乒乓对决", "url": "https://ping-pong-duel.pages.dev", "icon": "globe" },
-        { "label": "返航录", "url": "https://returnlog.pages.dev", "icon": "globe" },
+        { "label": "返航录 2.5D", "url": "https://returnlog.pages.dev", "icon": "globe" },
         { "label": "过渡式表单版", "url": "projects/game-collection/games/space-kill/index.html", "icon": "play" }
       ],
       "source": { "type": "local", "path": "projects/game-collection" }

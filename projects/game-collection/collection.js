@@ -1,15 +1,20 @@
-/* game-collection/collection.js — 合集入口（零依赖）
-   只做一件事：按 CARD_MIN_HEIGHT 之外的平台提示（横屏）与返回链接注入，不接管游戏逻辑。 */
+/* ============================================================
+   collection.js — 游戏合集入口（零依赖）
+   只做三件事：返回提示、移动端横屏提示、演示视频进入视口播放。
+   不接管任何游戏逻辑，也不改各游戏的 localStorage 键。
+   ============================================================ */
 (function () {
   var QS = new URLSearchParams(location.search);
-  // 从游戏页返回时带 ?from=game，这里给出“回到顶部”的视觉提示（可选）
+
+  // 从游戏页返回时带 ?from=game，给一个短暂的返回提示
   if (QS.get('from') === 'game') {
     var bar = document.createElement('div');
     bar.textContent = '已返回合集';
-    bar.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:#F5A524;color:#1A1204;font:600 13px/1 system-ui;z-index:9';
+    bar.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);padding:8px 16px;border-radius:2px;background:#A33A2A;color:#fff;font:600 13px/1 system-ui;z-index:9;box-shadow:0 6px 18px rgba(15,20,24,.18)';
     document.body.appendChild(bar);
     setTimeout(function () { bar.remove(); }, 1400);
   }
+
   // 移动端进入返航录前提示横屏
   document.querySelectorAll('[data-landscape]').forEach(function (a) {
     a.addEventListener('click', function (e) {
@@ -17,10 +22,13 @@
       if (!confirm('返航录需要横屏游玩，继续进入吗？')) e.preventDefault();
     });
   });
-  // 演示视频（2026-10-25）：静音自动播放；浏览器策略拦下时保持 poster 帧，不报错。
-  // 进视口才播、离开即停——两个卡片的视频不一起解码。
-  var vids = Array.prototype.slice.call(document.querySelectorAll('.card__media video'));
+
+  // 演示视频：静音自动播放；进视口才播、离开即停。
+  // 用户要求减弱动效时不自动播放，保留 poster 帧。
+  var vids = Array.prototype.slice.call(document.querySelectorAll('.entry__media video'));
   if (!vids.length) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
   var play = function (v) {
     v.preload = 'auto';
     var p = v.play();
