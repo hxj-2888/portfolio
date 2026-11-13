@@ -275,6 +275,40 @@ function readoutEl(rows) {
 }
 
 function mediaEl(p) {
+  if (p.demoViews && p.demoViews.length) {
+    const fig = el('figure', 'media media-viewer');
+    const stage = el('div', 'media-viewer__stage');
+    p.demoViews.forEach((view, i) => {
+      const src = safeUrl(view.src);
+      if (!src) return;
+      const v = el('video', i === 0 ? 'is-on' : '');
+      v.src = src;
+      const poster = safeUrl(view.poster);
+      if (poster) v.poster = poster;
+      v.muted = true; v.loop = true; v.playsInline = true;
+      v.preload = 'metadata';
+      v.dataset.demoViewVideo = '1';
+      v.setAttribute('aria-label', p.name + ' ' + view.label + ' 演示');
+      stage.appendChild(v);
+    });
+    fig.appendChild(stage);
+
+    const tabs = el('div', 'media-viewer__tabs');
+    tabs.setAttribute('role', 'tablist');
+    p.demoViews.forEach((view, i) => {
+      const b = el('button', 'media-viewer__tab');
+      b.type = 'button';
+      b.setAttribute('role', 'tab');
+      b.dataset.demoView = String(i);
+      b.setAttribute('aria-selected', String(i === 0));
+      b.appendChild(document.createTextNode(view.label || ('视角 ' + (i + 1))));
+      tabs.appendChild(b);
+    });
+    fig.appendChild(tabs);
+    fig.appendChild(el('figcaption', '', escapeHtml(p.name + ' · 同一场连续对局，三条视角逐帧对齐')));
+    return fig;
+  }
+
   const fig = el('figure', 'media');
   if (p.demo) {
     const src = safeUrl(p.demo.src);
@@ -518,6 +552,42 @@ function bindNav() {
   sections.forEach((s) => io.observe(s));
 }
 
+/* ---------- 多视角演示：三条视频同一场，切换时只播当前视角 ---------- */
+function bindDemoViews() {
+  const viewer = $('.media-viewer');
+  if (!viewer) return;
+  const videos = $$('video[data-demo-view-video]', viewer);
+  const tabs = $$('.media-viewer__tab', viewer);
+  if (!videos.length) return;
+
+  const show = (index) => {
+    videos.forEach((v, i) => {
+      const on = i === index;
+      v.classList.toggle('is-on', on);
+      if (on && !reduceMotion()) {
+        const pr = v.play();
+        if (pr && typeof pr.catch === 'function') pr.catch(() => {});
+      } else {
+        v.pause();
+        if (v.readyState > 0) { try { v.currentTime = 0; } catch (_) { /* 不可 seek */ } }
+      }
+    });
+    tabs.forEach((t, i) => t.setAttribute('aria-selected', String(i === index)));
+  };
+
+  tabs.forEach((t, i) => t.addEventListener('click', () => show(i)));
+  tabs.forEach((t, i) => t.addEventListener('keydown', (e) => {
+    const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1
+      : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const next = tabs[(i + d + tabs.length) % tabs.length];
+    next.focus();
+    show(Number(next.dataset.demoView));
+  }));
+  show(0);
+}
+
 /* ---------- 面板里的演示视频：进视口才播，离开即停 ---------- */
 function bindDemoVideos() {
   const vids = $$('video[data-demo-video]');
@@ -543,6 +613,7 @@ function applyData(data) {
   renderRecord();
   bindStage();
   bindDemoVideos();
+  bindDemoViews();
 }
 
 function readInlineData() {

@@ -138,3 +138,4 @@ GitHub 侧另有独立工作流 `docs-gate.yml`。**三道任一不过就是硬�
 5. **改 `projects.json` 后必须跑 `npm run data:inline`**——首页渲染用的是 `index.html` 里的内联 JSON 副本，不再依赖第二次 `fetch`；`check:inline` 会拦漂移。
 6. **合集页 `projects/game-collection/index.html` 是手写的**（不是 `games/` 同步产物）。返航录 3D 的 Demo 档位在 `3D_DEMO_SLOT` 注释处；接入时替换媒体块，不要改 `games/space-kill/`。
 7. **首页 returnlog 的 2.5D / 3D 由 `projects.json` 的 `versions` 生成两条独立检验项**：2.5D 整宽实机视频，3D 整宽虚线 Demo 槽；不要再塞回版本表，也不要为 3D 伪造视频/版本号。
+8. **演示视频的画面必须是真实录屏**：乒乓三视角由同一场固定步进生成；落幕查/实盘终端真实 UI 单镜到底；Remotion 只做标题卡/标注，不用 ComfyUI 或生成画面替代产品画面。

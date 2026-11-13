@@ -11,6 +11,7 @@
     "tags": "最多显示 3 个",
     "links": "资源行：{label, url, icon: globe|github|doc}",
     "demo": "可选：{src, poster} —— 首屏与面板放游玩演示视频（静音循环），thumbnail 仍作回退图",
+    "demoViews": "可选：[{label, src, poster}] —— 同一作品的多视角演示；有它时面板显示视角切换（乒乓看台 / 球员甲 / 球员乙）",
     "hue": "return | pingpong | delta | none —— 作品色；2026-11-12 起首页不再按作品分色，字段保留给嵌入页与后续使用",
     "layout": "versions | split | data | note —— 按作品性质选版式，不是同一张卡片套四个项目",
     "status": "live | local | collection —— 决定清单行给不给链接。local 表示只有本机产物，不配链接",
@@ -73,6 +74,11 @@
         "src": "assets/projects/ping-pong-duel-demo-card.mp4",
         "poster": "assets/projects/ping-pong-duel-demo-card-poster.jpg"
       },
+      "demoViews": [
+        { "label": "看台", "src": "assets/projects/ping-pong-view-side.mp4", "poster": "assets/projects/ping-pong-view-side.poster.jpg" },
+        { "label": "球员 · 甲", "src": "assets/projects/ping-pong-view-player-a.mp4", "poster": "assets/projects/ping-pong-view-player-a.poster.jpg" },
+        { "label": "球员 · 乙", "src": "assets/projects/ping-pong-view-player-b.mp4", "poster": "assets/projects/ping-pong-view-player-b.poster.jpg" }
+      ],
       "entry": "index.html",
       "type": "web",
       "mobile": true,
@@ -164,6 +170,10 @@
         { "value": "3.1", "cap": "安卓 versionName · versionCode 3" }
       ],
       "thumbnail": "assets/projects/delta-force.png",
+      "demo": {
+        "src": "assets/projects/delta-force-demo.mp4",
+        "poster": "assets/projects/delta-force-demo.poster.jpg"
+      },
       "entry": "index.html",
       "type": "web",
       "mobile": true,
@@ -196,6 +206,10 @@
         { "value": "496", "cap": "个行业与概念板块" }
       ],
       "thumbnail": null,
+      "demo": {
+        "src": "assets/projects/realtime-terminal-demo.mp4",
+        "poster": "assets/projects/realtime-terminal-demo.poster.jpg"
+      },
       "entry": null,
       "type": "web",
       "mobile": true,

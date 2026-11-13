@@ -187,6 +187,28 @@ section,.item,.note{ scroll-margin-top:calc(var(--h-nav) + 12px); }
 }
 .data .media{ margin-top:var(--sp-3); }
 
+/* 多视角演示：三条视频同一场，标签在媒体框内切换 */
+.media-viewer__stage{
+  position:relative; aspect-ratio:16/9; background:var(--ink);
+}
+.media-viewer__stage video{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; opacity:0; transition:opacity var(--dur) var(--ease);
+}
+.media-viewer__stage video.is-on{ opacity:1; }
+.media-viewer__tabs{
+  display:flex; gap:var(--sp-2); flex-wrap:wrap;
+  padding:8px 12px; background:var(--surface);
+  border-top:1px solid var(--rule);
+}
+.media-viewer__tab{
+  background:none; border:0; border-bottom:2px solid transparent;
+  padding:4px 0; font:inherit; font-size:var(--fs-sm);
+  color:var(--muted); cursor:pointer;
+}
+.media-viewer__tab:hover{ color:var(--ink); }
+.media-viewer__tab[aria-selected="true"]{ color:var(--ink); border-bottom-color:var(--seal); }
+
 /* ---------- 入口 ---------- */
 .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:var(--sp-3); }
 .links{
