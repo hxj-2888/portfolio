@@ -1,0 +1,354 @@
+/* ============================================================
+   page.css — 检验单版面（2026-11-12 重做）
+
+   版面想法：整页是一张检验单。左侧 220px 是版心边栏（字段、印章），
+   右侧是正文；作品区沿用同一条栏线，每件作品占一行「检验项」，
+   行与行之间只用 1px 横线分隔，不做卡片、不做整块色底。
+
+   作品之间不再靠颜色区分：状态用「在线 / 待接入」文字 + 小圆点，
+   颜色只保留朱红（验收章 / 待检）与松绿（在线）。
+   ============================================================ */
+
+/* 锚点跳转不被 sticky 顶栏盖住 */
+section,.item,.note{ scroll-margin-top:calc(var(--h-nav) + 12px); }
+
+/* 两栏骨架：边栏 + 正文 */
+.sheet,
+.works,
+.appendix,
+.method,
+.contact{
+  max-width:var(--w-max); margin:0 auto;
+  padding-left:var(--sp-3); padding-right:var(--sp-3);
+}
+
+/* ---------- 首屏：检验单表头 ---------- */
+.sheet{ padding-top:clamp(32px,5vw,60px); padding-bottom:var(--sp-6); }
+.sheet__grid{
+  display:grid; grid-template-columns:var(--w-side) minmax(0,1fr);
+  gap:clamp(24px,4vw,56px); align-items:start;
+}
+.sheet__margin{
+  border-left:1px solid var(--rule);
+  padding-left:var(--sp-3);
+}
+.sheet__fields{ display:grid; gap:10px; }
+.sheet__field{
+  display:grid; grid-template-columns:56px minmax(0,1fr);
+  gap:var(--sp-1); font-size:var(--fs-xs); line-height:1.6;
+}
+.sheet__field dt{ color:var(--muted-2); }
+.sheet__field dd{ color:var(--ink); }
+.sheet__stamp{ margin-top:var(--sp-4); }
+
+.statement{
+  font-family:var(--font-display);
+  font-size:var(--fs-h1); line-height:var(--lh-tight);
+  font-weight:700; letter-spacing:-.01em;
+  text-wrap:balance;
+}
+.statement span{
+  display:block; margin-top:14px;
+  font-family:var(--font-ui);
+  font-size:clamp(16px,1.4vw,19px); font-weight:400;
+  line-height:1.6; letter-spacing:0; color:var(--muted);
+}
+.byline{
+  margin-top:var(--sp-2); font-size:var(--fs-sm);
+  color:var(--muted); max-width:var(--measure);
+}
+
+/* ---------- 作品区：一行一件，栏线与首屏对齐 ---------- */
+.works{ padding-bottom:var(--sp-6); }
+.works__head,
+.appendix__head,
+.method__head,
+.contact__grid{
+  display:grid; grid-template-columns:var(--w-side) minmax(0,1fr);
+  gap:clamp(24px,4vw,56px);
+  border-top:2px solid var(--ink);
+  padding-top:var(--sp-2);
+}
+.works__head h2,
+.appendix__head h2,
+.method__head h2,
+.contact__side h2{
+  font-family:var(--font-display);
+  font-size:var(--fs-h2); font-weight:700; letter-spacing:-.01em;
+}
+.works__head p,
+.appendix__head p,
+.method__head p{
+  font-size:var(--fs-sm); color:var(--muted); max-width:var(--measure);
+}
+
+.item{
+  display:grid; grid-template-columns:var(--w-side) minmax(0,1fr);
+  gap:clamp(24px,4vw,56px);
+  padding:var(--sp-4) 0 var(--sp-5);
+  border-top:1px solid var(--rule);
+}
+.item__side{ min-width:0; }
+.item__state{ display:flex; align-items:center; gap:8px; }
+.item__name{
+  margin-top:10px;
+  font-family:var(--font-display);
+  font-size:var(--fs-h3); font-weight:700; letter-spacing:-.01em;
+}
+.item__tagline{
+  margin-top:8px; font-size:var(--fs-sm); color:var(--muted);
+  max-width:30ch;
+}
+.item__proof{
+  margin-top:12px; font-size:var(--fs-xs); color:var(--muted);
+}
+.item__proof a{ font-family:var(--font-num); }
+.item__body{ min-width:0; }
+.item__lead{
+  font-size:var(--fs-lg); line-height:1.55;
+  max-width:var(--measure); color:var(--ink);
+}
+.item__note{
+  margin-top:10px; font-size:var(--fs-sm);
+  color:var(--muted); max-width:var(--measure);
+}
+
+/* ---------- 2.5D / 3D 拆成独立作品后的补充 ---------- */
+.item__body > .media{ margin-top:var(--sp-3); }
+.item__alt{
+  margin-top:var(--sp-2); font-size:var(--fs-sm); color:var(--muted);
+}
+.item__alt a{ font-weight:600; }
+
+/* 3D Demo 档位：整宽、加深，和落幕查的媒体区同一量级。
+   数据仍来自 projects.json 的 3D 形态 status=local；另一条工作流
+   改成 live 并补 url 后，把 demoSlotEl 换成 mediaEl 即可。 */
+.demo-slot{
+  margin:var(--sp-3) 0 0;
+  width:100%;
+  min-height:clamp(320px,40vw,500px);
+  border:1px dashed var(--seal);
+  border-radius:var(--r-control);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  padding:var(--sp-3); text-align:center;
+}
+.demo-slot strong{
+  font-family:var(--font-display);
+  font-size:clamp(22px,2.4vw,30px); font-weight:700;
+  color:var(--seal);
+}
+.demo-slot span{ font-size:var(--fs-sm); color:var(--muted); }
+.demo-slot small{ font-size:var(--fs-xs); color:var(--muted-2); }
+
+/* ---------- 规格与读数 ---------- */
+.spec{ margin-top:var(--sp-3); border-top:1px solid var(--rule); }
+.spec div{
+  display:grid; grid-template-columns:120px minmax(0,1fr);
+  gap:var(--sp-2); padding:10px 0;
+  border-bottom:1px solid var(--rule); align-items:baseline;
+}
+.spec__k{ font-size:var(--fs-xs); color:var(--muted-2); }
+.spec__v{ font-size:var(--fs-sm); }
+.spec__v em{ font-family:var(--font-num); font-style:normal; }
+
+.readout{
+  margin-top:var(--sp-3);
+  border-top:1px solid var(--rule);
+}
+.readout__row{
+  display:grid; grid-template-columns:minmax(90px,auto) minmax(0,1fr);
+  gap:var(--sp-2); padding:10px 0;
+  border-bottom:1px solid var(--rule); align-items:baseline;
+}
+.readout__v{
+  font-family:var(--font-num); font-size:var(--fs-num);
+  font-weight:500; letter-spacing:-.02em; color:var(--ink);
+}
+.readout__k{ font-size:var(--fs-sm); color:var(--muted); }
+
+/* ---------- 样张：画面与规格并置 ---------- */
+.split{
+  margin-top:var(--sp-3);
+  display:grid; gap:var(--sp-4); align-items:start;
+}
+@media (min-width:860px){
+  .split{ grid-template-columns:minmax(0,1.15fr) minmax(240px,.85fr); }
+}
+.media{
+  margin:0; border:1px solid var(--rule-strong);
+  border-radius:var(--r-frame); overflow:hidden; background:var(--ink);
+}
+.media video,.media img{ width:100%; display:block; }
+.media figcaption{
+  padding:8px 10px; background:var(--surface);
+  border-top:1px solid var(--rule);
+  font-size:var(--fs-xs); color:var(--muted-2);
+}
+.data .media{ margin-top:var(--sp-3); }
+
+/* 多视角演示：三条视频同一场，标签在媒体框内切换 */
+.media-viewer__stage{
+  position:relative; aspect-ratio:16/9; background:var(--ink);
+}
+.media-viewer__stage video{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; opacity:0; transition:opacity var(--dur) var(--ease);
+}
+.media-viewer__stage video.is-on{ opacity:1; }
+.media-viewer__tabs{
+  display:flex; gap:var(--sp-2); flex-wrap:wrap;
+  padding:8px 12px; background:var(--surface);
+  border-top:1px solid var(--rule);
+}
+.media-viewer__tab{
+  background:none; border:0; border-bottom:2px solid transparent;
+  padding:4px 0; font:inherit; font-size:var(--fs-sm);
+  color:var(--muted); cursor:pointer;
+}
+.media-viewer__tab:hover{ color:var(--ink); }
+.media-viewer__tab[aria-selected="true"]{ color:var(--ink); border-bottom-color:var(--seal); }
+
+/* ---------- 入口 ---------- */
+.actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:var(--sp-3); }
+.links{
+  display:flex; flex-wrap:wrap; gap:var(--sp-2);
+  margin-top:var(--sp-2);
+}
+.links a{ font-size:var(--fs-sm); color:var(--muted); }
+.links a:hover{ color:var(--seal); }
+
+/* ---------- 核对记录：作品区末尾的汇总，不做大数字卡 ---------- */
+.works__record{
+  margin-top:var(--sp-5);
+  padding-top:var(--sp-2);
+  border-top:2px solid var(--ink);
+  display:grid;
+  grid-template-columns:var(--w-side) minmax(0,1fr);
+  gap:clamp(24px,4vw,56px);
+}
+.works__record h3{
+  font-family:var(--font-display);
+  font-size:var(--fs-lg); font-weight:700;
+}
+.works__record .readout{ margin-top:0; }
+.works__record .readout__v{ font-size:var(--fs-lg); }
+.works__record .readout__k a{ margin-left:6px; }
+
+/* ---------- 附页：规则与本站 ---------- */
+.appendix{ padding-bottom:var(--sp-6); }
+.notes{ margin-top:var(--sp-3); border-top:1px solid var(--rule); }
+.note{
+  display:grid; grid-template-columns:var(--w-side) minmax(0,1fr);
+  gap:clamp(24px,4vw,56px);
+  padding:var(--sp-3) 0; border-bottom:1px solid var(--rule);
+}
+.note__side{ min-width:0; }
+.note__side h3{
+  font-family:var(--font-display);
+  font-size:var(--fs-lg); font-weight:700;
+}
+.note__side p{ margin-top:6px; font-size:var(--fs-xs); color:var(--muted); }
+.note__body p{ font-size:var(--fs-sm); color:var(--muted); }
+.note__body .actions{ margin-top:12px; }
+
+/* ---------- 检验方法：三条并列 ---------- */
+.method{ padding-top:var(--sp-6); padding-bottom:var(--sp-6); }
+.method__list{
+  display:grid; gap:var(--sp-4);
+  margin-top:var(--sp-4);
+}
+@media (min-width:901px){
+  .method__list{ margin-left:calc(var(--w-side) + clamp(24px,4vw,56px)); }
+}
+@media (min-width:820px){
+  .method__list{ grid-template-columns:repeat(3,1fr); gap:var(--sp-5); }
+}
+.method__list li{ border-top:2px solid var(--ink); padding-top:var(--sp-2); }
+.method__list h3{
+  font-family:var(--font-display);
+  font-size:var(--fs-lg); font-weight:700;
+}
+.method__list p{ margin-top:8px; font-size:var(--fs-sm); color:var(--muted); }
+
+/* ---------- 签名栏：不再用深色大块收尾 ---------- */
+.contact{
+  padding-top:var(--sp-6); padding-bottom:var(--sp-5);
+  border-top:2px solid var(--ink);
+}
+.contact__body p{ font-size:var(--fs-sm); color:var(--muted); max-width:var(--measure); }
+.contact__mail{
+  display:flex; align-items:center; gap:var(--sp-1);
+  flex-wrap:wrap; margin-top:var(--sp-2);
+}
+.contact__mail a{
+  font-family:var(--font-num); font-size:var(--fs-lg);
+  color:var(--ink); text-decoration:underline; text-underline-offset:4px;
+}
+.contact__mail button{
+  font:inherit; font-size:var(--fs-sm); cursor:pointer;
+  background:transparent; color:var(--muted);
+  border:1px solid var(--rule-strong);
+  border-radius:var(--r-control); padding:8px 12px;
+}
+.contact__mail button:hover{ color:var(--ink); border-color:var(--ink); }
+.contact__code{ display:flex; gap:var(--sp-3); margin-top:var(--sp-2); }
+.contact__code a{ font-size:var(--fs-sm); color:var(--muted); }
+
+/* ---------- 页脚 ---------- */
+.sig{
+  max-width:var(--w-max); margin:0 auto;
+  padding:var(--sp-3);
+  display:flex; justify-content:space-between; gap:var(--sp-2);
+  border-top:1px solid var(--rule);
+  font-size:var(--fs-xs); color:var(--muted-2);
+}
+.sig a{ color:var(--muted); }
+
+/* ---------- 窄屏：两栏收成一栏 ---------- */
+@media (max-width:900px){
+  .sheet__grid,
+  .works__head,
+  .appendix__head,
+  .method__head,
+  .contact__grid,
+  .item,
+  .note{ grid-template-columns:1fr; }
+  .sheet__margin{
+    order:2; border-left:0; padding-left:0;
+    border-top:1px solid var(--rule); padding-top:var(--sp-2);
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:var(--sp-2); flex-wrap:wrap;
+  }
+  .sheet__main{ order:1; }
+  .sheet__fields{ flex:1 1 220px; }
+  .sheet__stamp{ margin-top:0; }
+  .works__head h2,
+  .appendix__head h2,
+  .method__head h2,
+  .contact__side h2{ margin-bottom:6px; }
+  .item{ padding:var(--sp-3) 0 var(--sp-4); }
+  .item__name{ margin-top:8px; }
+  .item__tagline{ max-width:none; }
+  .readout__row{ grid-template-columns:1fr; gap:2px; }
+  .note{ padding:var(--sp-3) 0; }
+  .works__record{ grid-template-columns:1fr; gap:10px; }
+}
+
+@media (max-width:560px){
+  .statement span{ margin-top:10px; }
+  .masthead__in{ padding:0 var(--sp-2); }
+  .sheet,.works,.appendix,.method,.contact{ padding-left:var(--sp-2); padding-right:var(--sp-2); }
+  .sig{ padding:var(--sp-2); flex-wrap:wrap; }
+}
+
+/* ---------- 唯一一处非用户触发的动效：验收章盖章 ----------
+   只动 transform，不动 opacity：即使截图/打印在动画第一帧取图，
+   印章也不会消失。 */
+@media (prefers-reduced-motion: no-preference){
+  .stamp{ animation:stamp-in .45s var(--ease) both; }
+  @keyframes stamp-in{
+    from{ transform:rotate(-4deg) scale(1.18); }
+    to{ transform:rotate(-4deg) scale(1); }
+  }
+}

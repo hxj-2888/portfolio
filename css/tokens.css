@@ -1,0 +1,75 @@
+/* ============================================================
+   tokens.css — 检验单版设计 token（2026-11-12 重做）
+
+   这一版的设计对象：一张能核对的「作品检验单」。
+   纸是浅灰白，字是近黑，唯一的重音是朱红验收章；
+   不再给每个作品分配一块颜色，也不在任何色块上压正文。
+
+   两条硬约束没有变：
+     1. 0 外部依赖运行时 → 不引字体 CDN、不引框架。
+     2. 首页 CSP 是 script-src 'self'; style-src 'self' → 无内联样式/脚本，
+        颜色与排版的唯一出处是本文件。
+
+   对比度全部按 WCAG 2.1 相对亮度公式实测（数字写在值后面），
+   正文 ≥ 7:1；朱红/松绿只用于小面积标记与印章，均 ≥ 6:1。
+   ============================================================ */
+
+:root{
+  /* ---------- 纸与墨 ---------- */
+  --paper:#F3F5F6;        /* 页面底：冷灰纸，避开暖米色胎记 */
+  --surface:#FFFFFF;      /* 样张/弹窗内页，只给「被观察的对象」 */
+  --ink:#0F1418;          /* 纸面 16.94:1 · 白面 18.53:1 */
+  --muted:#47535E;        /* 纸面 7.20:1 —— 正文级次要文字 */
+  --muted-2:#5B6772;      /* 纸面 5.29:1 —— 小字号说明，不下探到正文 */
+  --rule:#CBD2D8;         /* 分隔线，只在信息真分段处出现 */
+  --rule-strong:#A9B3BC;
+
+  /* ---------- 唯一重音：验收朱红 ---------- */
+  --seal:#A33A2A;         /* 纸面 6.01:1 · 白字在其上 6.57:1 */
+  --seal-hover:#8A2E21;
+  --on-seal:#FFFFFF;
+
+  /* ---------- 语义色：只表示「已核对 / 在线」 ---------- */
+  --ok:#0B5C40;           /* 纸面 7.33:1 · 白字在其上 8.02:1 */
+
+  /* ---------- 圆角：文件类界面用直角，控件只留 2px ---------- */
+  --r-control:2px;
+  --r-frame:4px;          /* 只有样张外框，像一张放进去的图 */
+
+  /* ---------- 间距 ---------- */
+  --sp-1:8px;  --sp-2:16px; --sp-3:24px;
+  --sp-4:40px; --sp-5:64px; --sp-6:88px;
+
+  /* ---------- 字号 ---------- */
+  --fs-xs:13px; --fs-sm:14px; --fs-base:16.5px;
+  --fs-lg:20px; --fs-xl:26px;
+  --fs-h1:clamp(34px,4.4vw,60px);
+  --fs-h2:clamp(24px,2.6vw,34px);
+  --fs-h3:clamp(20px,1.8vw,24px);
+  --fs-num:clamp(18px,1.6vw,22px);
+  --lh-body:1.75;
+  --lh-tight:1.15;
+  --measure:66ch;
+
+  /* ---------- 字体：全部本地可得 ----------
+     宋体只承担「检验单标题 / 作品名」这一层，黑体承担正文与控件；
+     等宽只给真正的数据串（版本号、读数、条款号），不做装饰小标签。 */
+  --font-display:"Songti SC","Songti TC","STSong","SimSun","宋体","Noto Serif CJK SC","Source Han Serif SC",serif;
+  --font-ui:"HarmonyOS Sans SC","MiSans","PingFang SC","Microsoft YaHei","微软雅黑","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --font-num:"JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,monospace;
+
+  /* ---------- 布局 ---------- */
+  --w-max:1200px;
+  --w-side:220px;         /* 检验单左侧「版心边栏」 */
+  --h-nav:56px;
+
+  --shadow-frame:0 12px 32px rgba(15,20,24,.14);
+  --focus:0 0 0 2px var(--paper),0 0 0 4px var(--seal);
+  --dur:.18s;
+  --ease:cubic-bezier(.2,.7,.3,1);
+}
+
+@media (prefers-reduced-motion: reduce){
+  :root{ --dur:0s; }
+  *,*::before,*::after{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+}
